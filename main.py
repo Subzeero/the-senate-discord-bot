@@ -47,6 +47,17 @@ async def restart(ctx):
 	#Closes discord's connection and gets systemd to restart.
 	bot.close()
 
+@bot.command()
+@commands.has_role(modRoleId)
+async def react(ctx, messageId:int, emoji:str):
+	'''
+	Add a reaction to the specified message.
+	'''
+
+	await ctx.message.delete()
+
+	message = await ctx.fetch_message(messageId)
+	await message.add_reaction(emoji)
 
 @bot.command()
 async def ping(ctx):
