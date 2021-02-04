@@ -1,18 +1,21 @@
 # Imports
-import discord, os, math, json, time, replit
+import discord, os, math, json, replit
 
 from discord.ext import commands
+from asyncio import sleep
 from replit import db
 from stayin_alive import keep_alive
 
 bot = commands.Bot(command_prefix=";")
 modRoleId = 767956851772882944
+hackerRoleId = 745863515998519360
 suggestionsChannelId = 796553486677311510
 
 JSON_DB = None
 activeMutes = []
 
 spamming = False
+suggestionReactionsEnabled = True
 
 # Fetch bot authentication token
 botToken = os.getenv("BOT_TOKEN")
@@ -26,26 +29,38 @@ async def on_ready():
 @bot.event # Report permission errors
 async def on_command_error(ctx, error):
     if isinstance(error, commands.errors.CheckFailure):
-        await ctx.send('You do not have the necessary permissions to run this command.')
-
+        await ctx.send('You do not have the necessary permissions to run this command.', delete_after = 5)
 
 @bot.event # Add reactions to messages sent in #server-suggestions
 async def on_message(message):
-	if message.channel.id == suggestionsChannelId:
+	if message.channel.id == suggestionsChannelId and suggestionReactionsEnabled:
 		await message.add_reaction("👍")
 		await message.add_reaction("👎")
 	await bot.process_commands(message)
 
 # Bot Commands
-@bot.command(name = "[WIP] restart")
+@bot.command()
 @commands.has_role(modRoleId)
 async def restart(ctx):
 	'''
-	Force the bot to restart.
+	[WIP] Force the bot to restart.
 	'''
 
 	#Closes discord's connection and gets systemd to restart.
 	bot.close()
+
+@bot.command()
+@commands.has_role(hackerRoleId)
+async def suggestionReactions(ctx, toggle:bool):
+	'''
+	Toggle auto-reactions for #server-suggestions. 
+	'''
+
+	global suggestionReactionsEnabled
+	suggestionReactionsEnabled = toggle
+
+	await ctx.message.delete()
+	await ctx.send("✅ Enabled" if suggestionReactionsEnabled else "✅ Disabled" + " message reactions in #server-suggestions.", delete_after = 5)
 
 @bot.command()
 @commands.has_role(modRoleId)
@@ -100,7 +115,7 @@ async def spam(ctx, *, content: str):
 
 	while spamming:
 		await ctx.send(text)
-		time.sleep(1)
+		await sleep(1)
 
 
 @bot.command()
