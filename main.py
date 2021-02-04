@@ -37,11 +37,11 @@ async def on_message(message):
 	await bot.process_commands(message)
 
 # Bot Commands
-@bot.command()
+@bot.command(name = "[WIP] restart")
 @commands.has_role(modRoleId)
 async def restart(ctx):
 	'''
-	[WIP] Force the bot to restart.
+	Force the bot to restart.
 	'''
 
 	#Closes discord's connection and gets systemd to restart.
