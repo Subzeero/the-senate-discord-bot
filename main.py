@@ -1,6 +1,9 @@
 # Imports
-import discord, os, math, json, time
+import discord, os, math, json, time, replit
+
 from discord.ext import commands
+from replit import db
+from stayin_alive import keep_alive
 
 bot = commands.Bot(command_prefix=";")
 modRoleId = 767956851772882944
@@ -101,5 +104,5 @@ async def endspam(ctx):
 
 	await ctx.message.delete()
 
-
+keep_alive()
 bot.run(botToken)
