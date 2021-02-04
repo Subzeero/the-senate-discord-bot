@@ -60,19 +60,22 @@ async def suggestionReactions(ctx, toggle:bool):
 	suggestionReactionsEnabled = toggle
 
 	await ctx.message.delete()
-	await ctx.send("✅ Enabled" if suggestionReactionsEnabled else "✅ Disabled" + " message reactions in #server-suggestions.", delete_after = 5)
+	start = "Enabled" if suggestionReactionsEnabled else "Disabled"
+	await ctx.send("✅ " + start + " message reactions in #server-suggestions.", delete_after = 5)
 
 @bot.command()
 @commands.has_role(modRoleId)
-async def react(ctx, messageId:int, emoji:str):
+async def react(ctx, messageId:int, *reactions:str):
 	'''
-	Add a reaction to the specified message.
+	Adds reactions to the specified message.
 	'''
 
 	await ctx.message.delete()
 
 	message = await ctx.fetch_message(messageId)
-	await message.add_reaction(emoji)
+
+	for reaction in reactions:
+		await message.add_reaction(reaction)
 
 @bot.command()
 async def ping(ctx):
