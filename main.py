@@ -120,7 +120,7 @@ async def senate(ctx):
 	await ctx.message.delete()
 	await ctx.send("https://tenor.com/view/star-wars-i-am-the-senate-gif-10270130")
 
-@bot.command()
+@bot.command(aliases = ['e', 'say', 's'])
 @commands.has_role(modRoleId)
 async def echo(ctx, *, content: str):
 	'''
