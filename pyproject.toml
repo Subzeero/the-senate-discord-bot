@@ -9,6 +9,7 @@ python = "^3.8"
 "discord.py" = "^1.6.0"
 flask = "^1.1.2"
 replit = "^2.0.0"
+discord-pretty-help = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 

@@ -2,11 +2,12 @@
 import discord, os, math, json, replit
 
 from discord.ext import commands
+from pretty_help import PrettyHelp
 from asyncio import sleep
 from replit import db
 from stayin_alive import keep_alive
 
-bot = commands.Bot(command_prefix=";")
+bot = commands.Bot(command_prefix=";", help_command = PrettyHelp(color = discord.Color.gold()))
 modRoleId = 767956851772882944
 hackerRoleId = 745863515998519360
 suggestionsChannelId = 796553486677311510
@@ -49,7 +50,30 @@ async def restart(ctx):
 	#Closes discord's connection and gets systemd to restart.
 	bot.close()
 
-@bot.command()
+@commands.command(name = 'perms', aliases = ['perms_for', 'permissions'])
+@commands.guild_only()
+async def check_permissions(self, ctx, *, member: discord.Member = None):
+	'''
+	Check the permissions of a user.
+	'''
+
+	if not member:
+		member = ctx.author
+
+	# Here we check if the value of each permission is True.
+	perms = '\n'.join(perm for perm, value in member.guild_permissions if value)
+
+	# And to make it look nice, we wrap it in an Embed.
+	embed = discord.Embed(title='Permissions for:', description=ctx.guild.name, colour=member.colour)
+	embed.set_author(icon_url=member.avatar_url, name=str(member))
+
+	# \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
+	embed.add_field(name='\uFEFF', value=perms)
+
+	await ctx.send(content=None, embed=embed)
+
+@bot.command(name = "ssreactions")
+@commands.guild_only()
 @commands.has_role(hackerRoleId)
 async def suggestionReactions(ctx, toggle:bool):
 	'''

@@ -57,6 +57,14 @@ version = "7.1.2"
 
 [[package]]
 category = "main"
+description = "And nicer looking interactive help menu for discord.py"
+name = "discord-pretty-help"
+optional = false
+python-versions = ">=3.6,<4.0"
+version = "1.2.1"
+
+[[package]]
+category = "main"
 description = "A Python wrapper for the Discord API"
 name = "discord.py"
 optional = false
@@ -182,7 +190,7 @@ idna = ">=2.0"
 multidict = ">=4.0"
 
 [metadata]
-content-hash = "3885e3f7076c7898c74c40860dbca77d88f027166ed674287f9e3f3cb32f5596"
+content-hash = "6d4e78d85cbbb06356e26bb9f84533f5377d7fc84f2732e8028fa4f5d896ccf2"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -240,6 +248,10 @@ chardet = [
 click = [
     {file = "click-7.1.2-py2.py3-none-any.whl", hash = "sha256:dacca89f4bfadd5de3d7489b7c8a566eee0d3676333fbb50030263894c38c0dc"},
     {file = "click-7.1.2.tar.gz", hash = "sha256:d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"},
+]
+discord-pretty-help = [
+    {file = "discord-pretty-help-1.2.1.tar.gz", hash = "sha256:7f6e12dcb0bbf06ae6660c33c20c099814198b4e80cc801b0f8b9c8338b960fa"},
+    {file = "discord_pretty_help-1.2.1-py3-none-any.whl", hash = "sha256:0ffde855b83152884a6bd2244e7d4500220e4f1fcfa93189394eead222126ac5"},
 ]
 "discord.py" = [
     {file = "discord.py-1.6.0-py3-none-any.whl", hash = "sha256:3df148daf6fbcc7ab5b11042368a3cd5f7b730b62f09fb5d3cbceff59bcfbb12"},
