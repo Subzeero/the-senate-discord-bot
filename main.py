@@ -52,7 +52,7 @@ async def restart(ctx):
 
 @bot.command(name = 'perms', aliases = ['perms_for', 'permissions'])
 @commands.guild_only()
-async def check_permissions(self, ctx, *, member: discord.Member = None):
+async def check_permissions(ctx, *, member: discord.Member = None):
 	'''
 	Check the permissions of a user.
 	'''
@@ -64,13 +64,13 @@ async def check_permissions(self, ctx, *, member: discord.Member = None):
 	perms = '\n'.join(perm for perm, value in member.guild_permissions if value)
 
 	# And to make it look nice, we wrap it in an Embed.
-	embed = discord.Embed(title='Permissions for:', description=ctx.guild.name, colour=member.colour)
-	embed.set_author(icon_url=member.avatar_url, name=str(member))
+	embed = discord.Embed(title = 'Permissions for:', description = ctx.guild.name, colour = member.colour)
+	embed.set_author(icon_url = member.avatar_url, name = str(member))
 
 	# \uFEFF is a Zero-Width Space, which basically allows us to have an empty field name.
-	embed.add_field(name='\uFEFF', value=perms)
+	embed.add_field(name = '\uFEFF', value = perms)
 
-	await ctx.send(content=None, embed=embed)
+	await ctx.send(content = None, embed = embed)
 
 @bot.command(name = "ssreactions")
 @commands.guild_only()
