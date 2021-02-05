@@ -87,6 +87,14 @@ async def ping(ctx):
 	latency = str(math.floor(bot.latency * 1000))
 	await ctx.send("Pong! `(" + latency + " ms)`")
 
+@bot.command()
+async def senate(ctx):
+	'''
+	Declare supremacy.
+	'''
+
+	await ctx.message.delete()
+	await ctx.send("https://tenor.com/view/star-wars-i-am-the-senate-gif-10270130")
 
 @bot.command()
 @commands.has_role(modRoleId)
