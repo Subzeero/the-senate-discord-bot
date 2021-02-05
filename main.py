@@ -50,7 +50,7 @@ async def restart(ctx):
 	#Closes discord's connection and gets systemd to restart.
 	bot.close()
 
-@commands.command(name = 'perms', aliases = ['perms_for', 'permissions'])
+@bot.command(name = 'perms', aliases = ['perms_for', 'permissions'])
 @commands.guild_only()
 async def check_permissions(self, ctx, *, member: discord.Member = None):
 	'''
