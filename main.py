@@ -4,7 +4,7 @@
 
 
 # Imports
-import discord, os, replit
+import discord, os
 
 from discord.ext import commands
 from pretty_help import PrettyHelp
@@ -28,8 +28,11 @@ keep_alive()
 # Load cogs
 if "loadedCogs" in db.keys():
 	for fileName in db["loadedCogs"]:
-		print("Loaded " + fileName)
-		client.load_extension(f"cogs.{fileName}")
+		try:
+			client.load_extension(f"cogs.{fileName}")
+			print(f"Loaded {fileName}.")
+		except:
+			print(f"Failed to load {fileName}.")
 else:
 	db["loadedCogs"] = []
 
