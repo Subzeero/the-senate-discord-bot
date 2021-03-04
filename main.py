@@ -2,7 +2,6 @@
 # Subzeero
 # Development code for The Senate Discord Bot
 
-
 # Imports
 import discord, os
 
@@ -12,7 +11,7 @@ from pretty_help import PrettyHelp
 from replit import db
 from stayin_alive import keep_alive
 
-client = commands.Bot(command_prefix=";", help_command = PrettyHelp(color = discord.Color.gold()))
+client = commands.Bot(command_prefix=";", help_command=PrettyHelp(color=discord.Color.gold()))
 
 modRoleId = 767956851772882944
 hackerRoleId = 745863515998519360

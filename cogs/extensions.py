@@ -72,7 +72,7 @@ class Extensions(commands.Cog):
 					self.client.unload_extension(f"cogs.{fileName[:-3]}")
 
 		embed = discord.Embed(
-			title = 'Extension Information:', 
+			title = 'Extension Information', 
 			description = "The following cogs have been registered:", 
 			colour = discord.Color.gold())
 

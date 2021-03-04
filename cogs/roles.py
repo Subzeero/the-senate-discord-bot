@@ -14,25 +14,35 @@ class Roles(commands.Cog):
 	@commands.guild_only()
 	async def changeRole(self, ctx, colourHex: str, *roleName: str):
 		"""[WIP]"""
-		pass
+		print("OOF")
 
 	@commands.command()
 	@commands.guild_only()
 	async def listroles(self, ctx):
 		"""List all of the server's roles."""
 
-		roles = await ctx.guild.fetch_roles()
-		roleList = "\n".join(roles)
+		fetchedRoles = await ctx.guild.fetch_roles()
 
-		embed = discord.embed(
-			title = "Roles for:",
-			description = ctx.guild.name,
-			colour = discord.colour.gold()
+		def sortPos(role):
+			return role.position
+
+		sortedRoles = sorted(fetchedRoles, key = sortPos, reverse = True)
+
+		roleList = []
+
+		for role in sortedRoles:
+			roleList.append(role.mention)
+		
+		roleStr = "\n".join(roleList)
+
+		embed = discord.Embed(
+			title = f"Roles in {ctx.guild.name}",
+			colour = discord.Colour.gold()
 		)
 
 		embed.add_field(
 			name = "\uFEFF",
-			value = roleList
+			value = roleStr
 		)
 
 		await ctx.send(embed = embed)

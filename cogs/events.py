@@ -13,7 +13,7 @@ class Events(commands.Cog):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
-		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = "over you :D"))
+		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = "over you :)"))
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
