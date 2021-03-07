@@ -10,9 +10,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["ssr", "sr"])
 	async def suggestionReactions(self, ctx, toggle:bool = True):
-		'''
-		Toggle auto-reactions for #server-suggestions. 
-		'''
+		"""Toggle auto-reactions for #server-suggestions."""
 
 		await ctx.message.delete()
 
@@ -21,14 +19,19 @@ class Admin(commands.Cog):
 		
 		await ctx.send("✅ " + start + " message reactions in #server-suggestions.", delete_after = 5)
 
-	@commands.command()
+	@commands.command(aliases = ["say"])
 	async def echo(self, ctx, *, content:str):
-		'''
-		Echo a message back from the bot.
-		'''
+		"""Echo a message back from the bot."""
 
 		await ctx.message.delete()
 		await ctx.send(content)
+
+	@commands.command()
+	@commands.is_owner()
+	async def changeStatus(self, ctx, newStatus: str):
+		"""Change the bot's status."""
+
+		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = newStatus))
 
 def setup(client):
 	client.add_cog(Admin(client))

@@ -20,7 +20,14 @@ class Random(commands.Cog):
 		"""Declare supremacy."""
 
 		await ctx.message.delete()
-		await ctx.send("https://tenor.com/view/star-wars-i-am-the-senate-gif-10270130")
+		await ctx.send("https://tenor.com/RfTq.gif")
+
+	@commands.command()
+	async def doggo(self, ctx):
+		"""Happy doggo."""
+
+		await ctx.message.delete()
+		await ctx.send("https://tenor.com/xFa5.gif")
 
 def setup(client):
 	client.add_cog(Random(client))
