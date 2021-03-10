@@ -10,14 +10,55 @@ class Roles(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(name = "[WIP]")
-	@commands.guild_only()
-	async def changeRole(self, ctx, colourHex: str, *roleName: str):
-		"""[WIP]"""
-		print("OOF")
+	def check_Server(ctx):
+		if not ctx.guild:
+			return False
+		return ctx.guild.id == 745683100788457614
 
 	@commands.command()
-	@commands.guild_only()
+	@commands.check(check_Server)
+	async def changeRole(self, ctx):
+		"""[WIP]"""
+
+		server_data = None
+		serverId = ctx.guild.id
+		userId = ctx.author.id
+
+		if not "server_data" in db.keys():
+			server_data = {}
+			db["server_data"] = server_data
+		else:
+			server_data = db["server_data"]
+
+		if not serverId in server_data:
+			server_data[serverId] = {}
+
+		if not "custom_roles" in server_data[serverId]:
+			server_data[serverId]["custom_roles"] = {}
+
+		if not userId in server_data[serverId]["custom_roles"]:
+			embed = discord.Embed(
+				title = "Custom Role Configuration",
+				description = "Looks like you don't have a custom role yet; let's create one!",
+				colour = discord.Colour.gold()
+			)
+			embed.add_field(
+				name = "1) Role Name",
+				value = "What do you want your role name to be? Type it out below and send it. ",
+				inline = False
+			)
+			embed.set_author(
+				name = ctx.author.name + "#" + ctx.author.discriminator,
+				icon_url = ctx.author.avatar_url
+			)
+			embed.set_footer(text = "This message will self-destruct in 2 minutes if you don't reply.")
+
+			await ctx.send(embed = embed)
+
+		#serverRoles = await ctx.guild.fetch_roles()
+
+	@commands.command()
+	@commands.check(check_Server)
 	async def listroles(self, ctx):
 		"""List all of the server's roles."""
 
