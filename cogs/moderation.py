@@ -23,7 +23,8 @@ class Moderation(commands.Cog):
 		embed = discord.Embed(
 			#title = "Success",
 			description = f"✅ Successfully deleted {numOfMessages} messages.",
-			colour = discord.Colour.gold())
+			colour = discord.Colour.gold()
+		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
@@ -44,8 +45,9 @@ class Moderation(commands.Cog):
 
 		embed = discord.Embed(
 			#title = "Success!",
-			description = f"✅ Successfully added {reactions} to message #{messageId}",
-			colour = discord.Colour.gold())
+			description = f"✅ Successfully added {reactions} to message #{messageId}.",
+			colour = discord.Colour.gold()
+		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")

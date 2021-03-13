@@ -1,4 +1,4 @@
-import discord
+import discord, asyncio
 from discord.ext import commands
 from replit import db
 
@@ -24,6 +24,9 @@ class Roles(commands.Cog):
 		serverId = ctx.guild.id
 		userId = ctx.author.id
 
+		def validateMessage(message):
+			return message.author == ctx.author
+
 		if not "server_data" in db.keys():
 			server_data = {}
 			db["server_data"] = server_data
@@ -39,14 +42,98 @@ class Roles(commands.Cog):
 		if not userId in server_data[serverId]["custom_roles"]:
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
-				description = "Looks like you don't have a custom role yet; let's create one!",
+				description = "It looks like you don't have a custom role yet; let's create one!",
+				colour = discord.Colour.gold()
+			)
+			embed.add_field(
+				name = "Step 1) Role Name",
+				value = "What do you want your role name to be? Type it out below and send it. ",
+				inline = False
+			)
+			embed.set_author(
+				name = ctx.author.name + "#" + ctx.author.discriminator,
+				icon_url = ctx.author.avatar_url
+			)
+			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+
+			await ctx.send(embed = embed)
+
+			try:
+				reply = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+			except asyncio.TimeoutError:
+				embed = discord.Embed(
+					#title = "Custom Role Configuration",
+					description = "Role creation cancelled: timeout reached.",
+					colour = discord.Colour.gold()
+				)
+
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+
+				await ctx.send(embed = embed)
+				return
+			
+
+			if reply.content == "cancel":
+				embed = discord.Embed(
+					#title = "Custom Role Configuration",
+					description = "Role creation cancelled.",
+					colour = discord.Colour.gold()
+				)
+
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+
+				await ctx.send(embed = embed)
+				return
+			
+			embed = discord.Embed(
+				title = "Custom Role Configuration",
+				description = f"Great, I've got `{reply.content}` as your role name. If you want to change it type `cancel` and start over from the beginning.",
+				colour = discord.Colour.gold()
+			)
+
+			embed.add_field(
+				name = "Step 2) Role Colour",
+				value = "What do you want your role colour to be? Type it out below and send it. ",
+				inline = False
+			)
+
+			embed.set_image(url = "https://cdn.discordapp.com/attachments/759284419034087484/820131665343021066/Screen_Shot_2021-03-12_at_20.00.26.png")
+
+			embed.set_thumbnail(url = "https://cdn.discordapp.com/attachments/759284419034087484/820131665343021066/Screen_Shot_2021-03-12_at_20.00.26.png")
+
+			embed.set_author(
+				name = ctx.author.name + "#" + ctx.author.discriminator,
+				icon_url = ctx.author.avatar_url
+			)
+
+			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+
+			await ctx.send(embed = embed)
+
+		else:
+			embed = discord.Embed(
+				title = "Custom Role Configuration",
+				description = "It looks like you have an existing custom role; what do you want to modify?",
 				colour = discord.Colour.gold()
 			)
 			embed.add_field(
 				name = "1) Role Name",
-				value = "What do you want your role name to be? Type it out below and send it. ",
+				value = "Reply with `1` if you want to change the name of your role.",
 				inline = False
 			)
+
+			embed.add_field(
+				name = "2) Role Colour",
+				value = "Reply with `2` if you want to change the colour of your role.",
+				inline = False
+			)
+
 			embed.set_author(
 				name = ctx.author.name + "#" + ctx.author.discriminator,
 				icon_url = ctx.author.avatar_url
@@ -55,6 +142,7 @@ class Roles(commands.Cog):
 
 			await ctx.send(embed = embed)
 
+		db["server_data"] = server_data
 		#serverRoles = await ctx.guild.fetch_roles()
 
 	@commands.command()

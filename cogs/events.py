@@ -58,7 +58,7 @@ class Events(commands.Cog):
 			await ctx.send(f"❌ Extension Error: {error}")
 
 		else:
-			await ctx.send("❌ An unknown error has occurred.\nhttps://tenor.com/tFAk.gif")
+			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
 			traceback.print_exception(type(error), error, error.__traceback__)
 
 	@commands.Cog.listener()

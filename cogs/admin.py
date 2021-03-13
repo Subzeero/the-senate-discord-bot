@@ -1,6 +1,7 @@
 import discord, replit
 from discord.ext import commands
 from replit import db
+#curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
 class Admin(commands.Cog):
 	"""Administrator commands."""
@@ -9,17 +10,28 @@ class Admin(commands.Cog):
 		self.client = client
 
 	@commands.command(aliases = ["ssr", "sr"])
+	@commands.is_owner()
 	async def suggestionReactions(self, ctx, toggle:bool = True):
 		"""Toggle auto-reactions for #server-suggestions."""
 
 		await ctx.message.delete()
 
 		db["suggestionReactionsEnabled"] = toggle
-		start = "Enabled" if toggle else "Disabled"
-		
-		await ctx.send("✅ " + start + " message reactions in #server-suggestions.", delete_after = 5)
+		option = "enabled" if toggle else "disabled"
+
+		embed = discord.Embed(
+			#title = "Success!",
+			description = f"✅ Auto reactions are now {option}!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
 
 	@commands.command(aliases = ["say"])
+	@commands.is_owner()
 	async def echo(self, ctx, *, content:str):
 		"""Echo a message back from the bot."""
 
@@ -28,10 +40,23 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.is_owner()
-	async def changeStatus(self, ctx, newStatus: str):
+	async def changeStatus(self, ctx, *, newStatus: str):
 		"""Change the bot's status."""
 
+		await ctx.message.delete()
 		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = newStatus))
+
+		embed = discord.Embed(
+			#title = "Success!",
+			description = "✅ Successfully changed the bot's status!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
+
 
 def setup(client):
 	client.add_cog(Admin(client))
