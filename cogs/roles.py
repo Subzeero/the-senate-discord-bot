@@ -93,20 +93,18 @@ class Roles(commands.Cog):
 			
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
-				description = f"Great, I've got `{reply.content}` as your role name. If you want to change it type `cancel` and start over from the beginning.",
+				description = f"Great, I've got `{reply.content}` as your role name. If that's not what you want type `cancel` and start over from the beginning.",
 				colour = discord.Colour.gold()
 			)
 
 			embed.add_field(
 				name = "Step 2) Role Colour",
-				value = "What do you want your role colour to be? Type it out below and send it. ",
+				value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
 				inline = False
 			)
 
-			embed.set_image(url = "https://cdn.discordapp.com/attachments/759284419034087484/820131665343021066/Screen_Shot_2021-03-12_at_20.00.26.png")
-
-			embed.set_thumbnail(url = "https://cdn.discordapp.com/attachments/759284419034087484/820131665343021066/Screen_Shot_2021-03-12_at_20.00.26.png")
-
+			embed.set_image(url = "https://i.imgur.com/seUpcRU.png")
+			
 			embed.set_author(
 				name = ctx.author.name + "#" + ctx.author.discriminator,
 				icon_url = ctx.author.avatar_url
