@@ -42,8 +42,12 @@ class Roles(commands.Cog):
 		if not userId in server_data[serverId]["custom_roles"]:
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
-				description = "It looks like you don't have a custom role yet; let's create one!",
 				colour = discord.Colour.gold()
+			)
+			embed.add_field(
+				name = "\uFEFF",
+				value = "It looks like you don't have a custom role yet; let's create one!",
+				inline = False
 			)
 			embed.add_field(
 				name = "Step 1) Role Name",
@@ -56,14 +60,14 @@ class Roles(commands.Cog):
 			)
 			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-			await ctx.send(embed = embed)
+			message1 = await ctx.send(embed = embed)
 
 			try:
-				reply = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+				response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
 			except asyncio.TimeoutError:
 				embed = discord.Embed(
 					#title = "Custom Role Configuration",
-					description = "Role creation cancelled: timeout reached.",
+					description = "❌ Role creation cancelled: timeout reached.",
 					colour = discord.Colour.gold()
 				)
 
@@ -73,13 +77,15 @@ class Roles(commands.Cog):
 				)
 
 				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await message1.delete()
 				return
 			
 
-			if reply.content == "cancel":
+			if response1.content == "cancel":
 				embed = discord.Embed(
 					#title = "Custom Role Configuration",
-					description = "Role creation cancelled.",
+					description = "❌ Role creation cancelled.",
 					colour = discord.Colour.gold()
 				)
 
@@ -89,30 +95,77 @@ class Roles(commands.Cog):
 				)
 
 				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await message1.delete()
 				return
 			
-			embed = discord.Embed(
-				title = "Custom Role Configuration",
-				description = f"Great, I've got `{reply.content}` as your role name. If that's not what you want type `cancel` and start over from the beginning.",
-				colour = discord.Colour.gold()
-			)
+			else:
+				embed = discord.Embed(
+					title = "Custom Role Configuration",
+					description = f"Great, I've got `{response1.content}` as your role name. If that's not what you want type `cancel` and start over from the beginning.",
+					colour = discord.Colour.gold()
+				)
+				embed.add_field(
+					name = "\uFEFF",
+					value = "It looks like you don't have a custom role yet; let's create one!",
+					inline = False
+				)
+				embed.add_field(
+					name = "Step 2) Role Colour",
+					value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
+					inline = False
+				)
+				embed.set_image(
+					url = "https://i.imgur.com/seUpcRU.png"
+				)
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+				embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-			embed.add_field(
-				name = "Step 2) Role Colour",
-				value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
-				inline = False
-			)
+				message2 = await ctx.send(embed = embed)
 
-			embed.set_image(url = "https://i.imgur.com/seUpcRU.png")
-			
-			embed.set_author(
-				name = ctx.author.name + "#" + ctx.author.discriminator,
-				icon_url = ctx.author.avatar_url
-			)
+			try:
+				response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+			except asyncio.TimeoutError:
+				embed = discord.Embed(
+					#title = "Custom Role Configuration",
+					description = "❌ Role creation cancelled: timeout reached.",
+					colour = discord.Colour.gold()
+				)
 
-			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
 
-			await ctx.send(embed = embed)
+				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await message1.delete()
+				await message2.delete()
+				return
+
+			if response2.content == "cancel":
+				embed = discord.Embed(
+					#title = "Custom Role Configuration",
+					description = "❌ Role creation cancelled.",
+					colour = discord.Colour.gold()
+				)
+
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+
+				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await message1.delete()
+				await message2.delete()
+				return
+
+			else:
+				None
 
 		else:
 			embed = discord.Embed(
@@ -169,7 +222,8 @@ class Roles(commands.Cog):
 
 		embed.add_field(
 			name = "\uFEFF",
-			value = roleStr
+			value = roleStr,
+			inline = False
 		)
 
 		await ctx.send(embed = embed)
@@ -189,7 +243,8 @@ class Roles(commands.Cog):
 
 		embed.add_field(
 			name = "\uFEFF",
-			value = perms
+			value = perms,
+			inline = False
 		)
 
 		await ctx.send(embed = embed)
@@ -216,7 +271,8 @@ class Roles(commands.Cog):
 
 		embed.add_field(
 			name = "\uFEFF",
-			value = perms
+			value = perms,
+			inline = False
 		)
 
 		await ctx.send(embed = embed)

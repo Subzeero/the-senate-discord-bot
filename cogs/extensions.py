@@ -113,7 +113,8 @@ class Extensions(commands.Cog):
 			embed.add_field(
 				name = cogName, 
 				value = cogDict[cogName], 
-				inline = True)
+				inline = True
+			)
 					
 		await ctx.send(embed = embed)
 
