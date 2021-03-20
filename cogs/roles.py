@@ -17,6 +17,7 @@ class Roles(commands.Cog):
 
 	@commands.command()
 	@commands.check(check_Server)
+	@commands.cooldown(1, 7, commands.BucketType.user)
 	async def changeRole(self, ctx):
 		"""[WIP]"""
 
@@ -42,12 +43,8 @@ class Roles(commands.Cog):
 		if not userId in server_data[serverId]["custom_roles"]:
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
+				description = "It looks like you don't have a custom role yet; let's create one!",
 				colour = discord.Colour.gold()
-			)
-			embed.add_field(
-				name = "\uFEFF",
-				value = "It looks like you don't have a custom role yet; let's create one!",
-				inline = False
 			)
 			embed.add_field(
 				name = "Step 1) Role Name",
@@ -66,7 +63,7 @@ class Roles(commands.Cog):
 				response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
 			except asyncio.TimeoutError:
 				embed = discord.Embed(
-					#title = "Custom Role Configuration",
+					title = "Custom Role Configuration",
 					description = "❌ Role creation cancelled: timeout reached.",
 					colour = discord.Colour.gold()
 				)
@@ -78,13 +75,13 @@ class Roles(commands.Cog):
 
 				await ctx.send(embed = embed)
 				await ctx.message.delete()
+				await response1.delete()
 				await message1.delete()
 				return
-			
 
 			if response1.content == "cancel":
 				embed = discord.Embed(
-					#title = "Custom Role Configuration",
+					title = "Custom Role Configuration",
 					description = "❌ Role creation cancelled.",
 					colour = discord.Colour.gold()
 				)
@@ -96,76 +93,129 @@ class Roles(commands.Cog):
 
 				await ctx.send(embed = embed)
 				await ctx.message.delete()
+				await response1.delete()
 				await message1.delete()
 				return
 			
 			else:
-				embed = discord.Embed(
-					title = "Custom Role Configuration",
-					description = f"Great, I've got `{response1.content}` as your role name. If that's not what you want type `cancel` and start over from the beginning.",
-					colour = discord.Colour.gold()
-				)
-				embed.add_field(
-					name = "\uFEFF",
-					value = "It looks like you don't have a custom role yet; let's create one!",
-					inline = False
-				)
-				embed.add_field(
-					name = "Step 2) Role Colour",
-					value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
-					inline = False
-				)
-				embed.set_image(
-					url = "https://i.imgur.com/seUpcRU.png"
-				)
-				embed.set_author(
-					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
-				)
-				embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+				while True:
+					embed = discord.Embed(
+						title = "Custom Role Configuration",
+						description = f"Great, I've got `{response1.content}` as your role name. If that's not what you want type `cancel` and start over from the beginning.",
+						colour = discord.Colour.gold()
+					)
+					embed.add_field(
+						name = "Step 2) Role Colour",
+						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
+						inline = False
+					)
+					embed.set_image(
+						url = "https://i.imgur.com/seUpcRU.png"
+					)
+					embed.set_author(
+						name = ctx.author.name + "#" + ctx.author.discriminator,
+						icon_url = ctx.author.avatar_url
+					)
+					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-				message2 = await ctx.send(embed = embed)
+					message2 = await ctx.send(embed = embed)
 
-			try:
-				response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-			except asyncio.TimeoutError:
-				embed = discord.Embed(
-					#title = "Custom Role Configuration",
-					description = "❌ Role creation cancelled: timeout reached.",
-					colour = discord.Colour.gold()
-				)
+					try:
+						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+					except asyncio.TimeoutError:
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role creation cancelled: timeout reached.",
+							colour = discord.Colour.gold()
+						)
 
-				embed.set_author(
-					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
-				)
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
 
-				await ctx.send(embed = embed)
-				await ctx.message.delete()
-				await message1.delete()
-				await message2.delete()
-				return
+						await ctx.send(embed = embed)
+						await ctx.message.delete()
+						await message1.delete()
+						await message2.delete()
+						await response1.delete()
+						break
 
-			if response2.content == "cancel":
-				embed = discord.Embed(
-					#title = "Custom Role Configuration",
-					description = "❌ Role creation cancelled.",
-					colour = discord.Colour.gold()
-				)
+					if response2.content == "cancel":
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role creation cancelled.",
+							colour = discord.Colour.gold()
+						)
 
-				embed.set_author(
-					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
-				)
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
 
-				await ctx.send(embed = embed)
-				await ctx.message.delete()
-				await message1.delete()
-				await message2.delete()
-				return
+						await ctx.send(embed = embed)
+						await ctx.message.delete()
+						await message1.delete()
+						await message2.delete()
+						await response1.delete()
+						await response2.delete()
+						break
 
-			else:
-				None
+					else:
+						def isHex(input):
+							def removePrefix(input):
+								if input.startswith("#"):
+									return input[1:]
+								else:
+									return input
+							
+							formattedInput = removePrefix(input)
+							
+							if len(formattedInput) != 6:
+								return False
+
+							try:
+								return int(removePrefix(input), 16)
+							except ValueError:
+								return False
+
+						colourValue = isHex(response2.content)
+						
+						if colourValue:
+							newRole = await ctx.guild.create_role(
+								name = response1.content,
+								colour = colourValue,
+								reason = "Created by user command."
+							)
+
+							await ctx.author.add_roles(newRole)
+
+							embed = discord.Embed(
+								title = "Custom Role Configuration",
+								description = f"✅ Role created: {newRole.mention}",
+								colour = discord.Colour.gold()
+							)
+							embed.set_author(
+								name = ctx.author.name + "#" + ctx.author.discriminator,
+								icon_url = ctx.author.avatar_url
+							)
+
+							await ctx.send(embed = embed)
+							# save role data
+							break
+
+						else:
+							embed = discord.Embed(
+								title = "Custom Role Configuration",
+								description = "❌ That's not a valid hex colour code.",
+								colour = discord.Colour.gold()
+							)
+							embed.set_author(
+								name = ctx.author.name + "#" + ctx.author.discriminator,
+								icon_url = ctx.author.avatar_url
+							)
+
+							await ctx.send(embed = embed)
 
 		else:
 			embed = discord.Embed(
@@ -189,15 +239,59 @@ class Roles(commands.Cog):
 				name = ctx.author.name + "#" + ctx.author.discriminator,
 				icon_url = ctx.author.avatar_url
 			)
-			embed.set_footer(text = "This message will self-destruct in 2 minutes if you don't reply.")
+			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-			await ctx.send(embed = embed)
+			message1 = await ctx.send(embed = embed)
 
-		db["server_data"] = server_data
+			try:
+				response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+			except asyncio.TimeoutError:
+				embed = discord.Embed(
+					title = "Custom Role Configuration",
+					description = "❌ Role configuration cancelled: timeout reached.",
+					colour = discord.Colour.gold()
+				)
+
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+
+				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await response1.delete()
+				await message1.delete()
+				return
+
+			if response1.content == "cancel":
+				embed = discord.Embed(
+					title = "Custom Role Configuration",
+					description = "❌ Role configuration cancelled.",
+					colour = discord.Colour.gold()
+				)
+
+				embed.set_author(
+					name = ctx.author.name + "#" + ctx.author.discriminator,
+					icon_url = ctx.author.avatar_url
+				)
+
+				await ctx.send(embed = embed)
+				await ctx.message.delete()
+				await response1.delete()
+				await message1.delete()
+				return
+
+			elif response1.content == "1" or response1.contect == "2":
+				embed = discord.Embed(
+					title = "Custom Role Configuration"
+				)
+
+		#db["server_data"] = server_data
 		#serverRoles = await ctx.guild.fetch_roles()
 
 	@commands.command()
-	@commands.check(check_Server)
+	@commands.guild_only()
+	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def listroles(self, ctx):
 		"""List all of the server's roles."""
 
@@ -230,6 +324,7 @@ class Roles(commands.Cog):
 		
 	@commands.command(name = "rolepermissions", aliases = ["roleperms"])
 	@commands.guild_only()
+	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def role_permissions(self, ctx, *, role: discord.Role):
 		"""List the permissions of given roles."""
 
@@ -251,6 +346,7 @@ class Roles(commands.Cog):
 
 	@commands.command(aliases = ["listperms", "perms"])
 	@commands.guild_only()
+	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def permissions(self, ctx, *, member: discord.Member = None):
 		"""List the permissions of given users."""
 

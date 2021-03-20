@@ -10,6 +10,7 @@ class Moderation(commands.Cog):
 
 	@commands.command(aliases = ["delete"])
 	@commands.has_role(moderatorRole)
+	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def purge(self, ctx, numOfMessages: int, user = None):
 		"""Purge a number of messages."""
 
@@ -33,6 +34,7 @@ class Moderation(commands.Cog):
 
 	@commands.command(aliases = ["r"])
 	@commands.has_role(moderatorRole)
+	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def react(self, ctx, messageId:int, *reactions:str):
 		"""Add reactions to the specified message."""
 

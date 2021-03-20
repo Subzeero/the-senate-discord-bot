@@ -33,6 +33,9 @@ class Events(commands.Cog):
 		if isinstance(error, commands.DisabledCommand):
 			await ctx.send(f"❌ {ctx.command} has been disabled!")
 
+		if isinstance(error, commands.CommandOnCooldown):
+			await ctx.send(f"❌ {ctx.author.mention}, you're runnning commands too fast.")
+
 		elif isinstance(error, commands.CommandNotFound):
 			await ctx.send(f"❌ `{ctx.message.content[1:]}` is not a registered command.")
 

@@ -1,7 +1,7 @@
 import discord, replit
 from discord.ext import commands
 from replit import db
-#curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
+#View DB: curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
 class Admin(commands.Cog):
 	"""Administrator commands."""
