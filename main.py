@@ -11,20 +11,18 @@ from pretty_help import PrettyHelp
 from replit import db
 from stayin_alive import keep_alive
 
-client = commands.Bot(command_prefix=";", help_command=PrettyHelp(color=discord.Color.gold()))
-
-modRoleId = 767956851772882944
-hackerRoleId = 745863515998519360
-suggestionsChannelId = 796553486677311510
-
-activeMutes = []
-spamming = False
-suggestionReactionsEnabled = True
+client = commands.Bot(
+	command_prefix = ";",
+	case_insensitive = True,
+	help_command = PrettyHelp(
+		color = discord.Color.gold()
+	)
+)
 
 #Startup web server to prevent sleep
 keep_alive()
 
-# Load cogs
+# Load cogs on startup.
 if "loadedCogs" in db.keys():
 	for fileName in db["loadedCogs"]:
 		try:
