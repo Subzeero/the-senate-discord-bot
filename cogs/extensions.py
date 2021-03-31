@@ -1,6 +1,6 @@
 import discord, os
 from discord.ext import commands
-from replit import db
+import database as db
 
 class Extensions(commands.Cog):
 	"""Manages the bot's extensions."""
@@ -17,12 +17,12 @@ class Extensions(commands.Cog):
 
 		self.client.load_extension(f"cogs.{extension}")
 
-		if "loadedCogs" in db.keys():
-			loadedCogs = db["loadedCogs"]
+		if "loaded_cogs" in db.get_keys():
+			loadedCogs = db.get("loaded_cogs")
 			loadedCogs.append(extension)
-			db["loadedCogs"] = loadedCogs
+			db.set("loaded_cogs", loadedCogs)
 		else:
-			db["loadedCogs"] = [extension]
+			db.set("loaded_cogs", [extension])
 
 		embed = discord.Embed(
 			#title = "Success!",
@@ -44,13 +44,13 @@ class Extensions(commands.Cog):
 
 		self.client.unload_extension(f"cogs.{extension}")
 
-		if "loadedCogs" in db.keys():
-			loadedCogs = db["loadedCogs"]
+		if "loaded_cogs" in db.get_keys():
+			loadedCogs = db.get("loadedCogs")
 			if extension in loadedCogs:
 				loadedCogs.remove(extension)
-				db["loadedCogs"] = loadedCogs	
+				db.set("loaded_cogs", loadedCogs)	
 		else:
-			db["loadedCogs"] = []
+			db.set("loaded_cogs", [])
 
 		embed = discord.Embed(
 			#title = "Success!",

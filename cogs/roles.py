@@ -1,6 +1,6 @@
 import discord, asyncio
 from discord.ext import commands
-from replit import db
+import database as db
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
@@ -21,20 +21,14 @@ class Roles(commands.Cog):
 	async def changeRole(self, ctx):
 		"""[WIP]"""
 
-		server_data = db["server_data"]
-		serverId = ctx.guild.id
+		serverId = str(ctx.guild.id)
 		userId = ctx.author.id
+		server_data = db.validate_server(serverId)
 
 		def validateMessage(message):
 			return message.author == ctx.author
 
-		if not serverId in server_data:
-			server_data[serverId] = {}
-
-		if not "custom_roles" in server_data[serverId]:
-			server_data[serverId]["custom_roles"] = {}
-
-		if not userId in server_data[serverId]["custom_roles"]:
+		if not userId in server_data["custom_roles"]:
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
 				description = "It looks like you don't have a custom role yet; let's create one!",

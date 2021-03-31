@@ -1,6 +1,6 @@
 import discord, traceback
 from discord.ext import commands
-from replit import db
+import database as db
 
 suggestionsChannelId = 796553486677311510
 
@@ -14,6 +14,11 @@ class Events(commands.Cog):
 	async def on_ready(self):
 		print("Bot Running.")
 		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = "over you :)"))
+
+	@commands.Cog.listener()
+	async def on_guild_join(self, guild):
+		serverId = str(guild.id)
+		db.validate_server(serverId)
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
@@ -64,11 +69,87 @@ class Events(commands.Cog):
 			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
 			traceback.print_exception(type(error), error, error.__traceback__)
 
+	# @commands.Cog.listener()
+	async def on_raw_reaction_add(self, payload):
+		if payload.event_type != "REACTION_ADD" or payload.user_id == 773066373693046826 or not payload.guild_id:
+			return
+
+		serverId = str(payload.guild_id)
+		messageId = payload.message_id
+		server = self.client.get_guild(int(serverId))
+		emoji = payload.emoji
+		user = server.get_member(payload.user_id)
+		print(f"User: {user}")
+
+		if not serverId or not user:
+			return
+
+		server_data = db.get_server(serverId)
+		reactionRoleData = server_data["reaction_roles"]
+		reactionRoleList = []
+
+		for reactionName, reactionData in reactionRoleData.items():
+			reactionRoleList.append({
+				"messageId": reactionData["messageId"],
+				"emojiId": reactionData["emojiId"],
+				"roleId": reactionData["roleId"]
+			})
+
+		for data in reactionRoleList:
+			if data["messageId"] == messageId and data["emojiId"] == emoji.id:
+				role = server.get_role(data["roleId"])
+				await user.add_roles(role)
+				break
+
+	# @commands.Cog.listener()
+	async def on_raw_reaction_remove(self, payload):
+		if payload.event_type != "REACTION_REMOVE" or payload.user_id == 773066373693046826 or not payload.guild_id:
+			return
+
+		serverId = str(payload.guild_id)
+		messageId = payload.message_id
+		server = self.client.get_guild(int(serverId))
+		emoji = payload.emoji
+		user = server.get_member(payload.user_id)
+		print(f"User: {user}")
+
+		if not serverId or not user:
+			return
+
+		server_data = db.get_server(serverId)
+		reactionRoleData = server_data["reaction_roles"]
+		reactionRoleList = []
+
+		for reactionName, reactionData in reactionRoleData.items():
+			reactionRoleList.append({
+				"messageId": reactionData["messageId"],
+				"emojiId": reactionData["emojiId"],
+				"roleId": reactionData["roleId"]
+			})
+
+		for data in reactionRoleList:
+			if data["messageId"] == messageId and data["emojiId"] == emoji.id:
+				role = server.get_role(data["roleId"])
+				await user.remove_roles(role)
+				break
+
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.channel.id == suggestionsChannelId and db["suggestionReactionsEnabled"]:
+		if message.author.id == 773066373693046826 or message.author.id == 716390085896962058: # Ignore self and @Poketwo
+			return
+
+		if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):
 			await message.add_reaction("👍")
 			await message.add_reaction("👎")
+
+		# print("author:", message.author.id, "message:", message.content)
+		if message.author.id == 397879157029077002:
+			if "<@!296406728818425857>" in message.content or "<@!355099018113843200>" in message.content:
+				await message.delete()
+				if message.guild:
+					muterole = message.guild.get_role(755925817028247644)
+					await message.author.add_roles(muterole)
+					await message.channel.send("You're not allowed to ping <@!296406728818425857>! Now you can sit in silence until he decides to unmute you.")
 
 def setup(client):
 	client.add_cog(Events(client))

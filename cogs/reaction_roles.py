@@ -1,6 +1,6 @@
 import discord, replit
 from discord.ext import commands
-from replit import db
+import database as db
 
 class ReactionRoles(commands.Cog):
 	"""Random commands."""
@@ -14,8 +14,10 @@ class ReactionRoles(commands.Cog):
 	async def listReactionRoles(self, ctx):
 		"""Remove a reaction role."""
 
-		await ctx.message.delete()
-		await ctx.send("https://tenor.com/RfTq.gif")
+		serverId = str(ctx.guild.id)
+		server_data = db.validate_server(serverId)
+
+		# if len()
 
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
@@ -31,23 +33,19 @@ class ReactionRoles(commands.Cog):
 
 		await message.add_reaction(emoji)
 
-		server_data = db["server_data"]
-		serverId = ctx.guild.id
-
-		if not serverId in server_data:
-			server_data[serverId] = {}
-
-		if not "reaction_roles" in server_data[serverId]:
-			server_data[serverId]["reaction_roles"] = {}
+		serverId = str(ctx.guild.id)
+		server_data = db.validate_server(serverId)
 
 		server_data[serverId]["reaction_roles"][name] = {
 			"messageId": messageId,
-			"emoji": emoji,
-			"role": role
+			"emojiId": emoji.id,
+			"roleId": role.id
 		}
 
+		db.set_server(serverId, server_data)
+
 		embed = discord.Embed(
-			description = "✅ Reaction Role Successfully Created!",
+			title = "✅ Reaction Role Successfully Created!",
 			colour = discord.Colour.gold()
 		)
 

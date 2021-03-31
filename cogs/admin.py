@@ -1,6 +1,6 @@
 import discord, replit
 from discord.ext import commands
-from replit import db
+import database as db
 #View DB: curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
 class Admin(commands.Cog):
@@ -16,7 +16,7 @@ class Admin(commands.Cog):
 
 		await ctx.message.delete()
 
-		db["suggestionReactionsEnabled"] = toggle
+		db.set("suggestionReactionsEnabled", toggle)
 		option = "enabled" if toggle else "disabled"
 
 		embed = discord.Embed(
