@@ -144,12 +144,20 @@ class Events(commands.Cog):
 
 		# print("author:", message.author.id, "message:", message.content)
 		if message.author.id == 397879157029077002:
-			if "<@!296406728818425857>" in message.content or "<@!355099018113843200>" in message.content:
-				await message.delete()
-				if message.guild:
-					muterole = message.guild.get_role(755925817028247644)
-					await message.author.add_roles(muterole)
-					await message.channel.send("You're not allowed to ping <@!296406728818425857>! Now you can sit in silence until he decides to unmute you.")
+			await message.delete()
+			invalidMention = None
+			
+			if "<@!296406728818425857>" in message.content:
+				invalidMention = "<@!296406728818425857>"
+			elif "<@!355099018113843200>" in message.content:
+				invalidMention = "<@!355099018113843200>"
+			else:
+				return
+
+			if message.guild:
+				muterole = message.guild.get_role(755925817028247644)
+				await message.author.add_roles(muterole)
+				await message.channel.send(f"You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you.")
 
 def setup(client):
 	client.add_cog(Events(client))

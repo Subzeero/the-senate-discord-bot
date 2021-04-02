@@ -59,11 +59,15 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["deletereactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def removeReactionRole(self, ctx):
+	async def removeReactionRole(self, ctx, reactionRoleName: str):
 		"""Remove a reaction role."""
 
-		await ctx.message.delete()
-		await ctx.send("https://tenor.com/RfTq.gif")
+		serverId = str(ctx.guild.id)
+		server_data = db.validate_server(serverId)
+
+		for name, reactionRoleData in server_data["reaction_roles"]:
+			if name == reactionRoleName:
+				print("Here")
 
 def setup(client):
 	client.add_cog(ReactionRoles(client))
