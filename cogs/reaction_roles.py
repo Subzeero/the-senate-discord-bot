@@ -86,9 +86,15 @@ class ReactionRoles(commands.Cog):
 		serverId = str(ctx.guild.id)
 		server_data = db.validate_server(serverId)
 
-		for name, reactionRoleData in server_data["reaction_roles"]:
-			if name == reactionRoleName:
-				print("Here")
+		def verifyRR():
+			for name, reactionRoleData in server_data["reaction_roles"]:
+				if name == reactionRoleName:
+					return True
+
+			return False
+
+		if verifyRR():
+			None
 
 def setup(client):
 	client.add_cog(ReactionRoles(client))
