@@ -144,7 +144,6 @@ class Events(commands.Cog):
 
 		# print("author:", message.author.id, "message:", message.content)
 		if message.author.id == 397879157029077002:
-			await message.delete()
 			invalidMention = None
 			
 			if "<@!296406728818425857>" in message.content:
@@ -154,6 +153,7 @@ class Events(commands.Cog):
 			else:
 				return
 
+			await message.delete()
 			if message.guild:
 				muterole = message.guild.get_role(755925817028247644)
 				await message.author.add_roles(muterole)
