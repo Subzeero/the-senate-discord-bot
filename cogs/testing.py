@@ -8,7 +8,9 @@ class Testing(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	# print(db.get_keys())
+	for key in db.get_keys():
+		print(key)
+		print(db.get(key))
 
 def setup(client):
 	client.add_cog(Testing(client))

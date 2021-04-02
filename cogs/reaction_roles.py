@@ -17,7 +17,28 @@ class ReactionRoles(commands.Cog):
 		serverId = str(ctx.guild.id)
 		server_data = db.validate_server(serverId)
 
-		# if len()
+		embed = discord.Embed(
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(
+			name = f"Reaction Roles in {ctx.guild.name}",
+			icon_url = ctx.guild.icon_url
+		)
+
+		for rrName, rrData in server_data["reaction_roles"].items():
+			for emoji in ctx.guild.emojis:
+				if emoji.id == rrData["emojiId"]:
+					emojiObject = emoji
+
+			roleObject = ctx.guild.get_role(rrData["roleId"])
+
+			embed.add_field(
+				name = rrName,
+				value = f"Message ID: {rrData['messageId']}\nEmoji: {str(emojiObject)}\nRole: {roleObject.mention}"
+			)
+
+		await ctx.send(embed=embed)
 
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
@@ -36,7 +57,7 @@ class ReactionRoles(commands.Cog):
 		serverId = str(ctx.guild.id)
 		server_data = db.validate_server(serverId)
 
-		server_data[serverId]["reaction_roles"][name] = {
+		server_data["reaction_roles"][name] = {
 			"messageId": messageId,
 			"emojiId": emoji.id,
 			"roleId": role.id

@@ -1,7 +1,10 @@
 from replit import db
 
 def validate_server(serverId: str):
-	server_data = {}
+	server_data = {
+		"reaction_roles": {},
+		"custom_roles": {}
+	}
 
 	if not serverId in db.keys():
 		db[serverId] = server_data
