@@ -21,7 +21,7 @@ class Roles(commands.Cog):
 	async def changeRole(self, ctx):
 		"""[WIP]"""
 
-		serverId = str(ctx.guild.id)
+		serverId = ctx.guild.id
 		userId = ctx.author.id
 		server_data = db.validate_server(serverId)
 

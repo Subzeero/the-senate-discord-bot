@@ -9,9 +9,9 @@ import database as db # Custom database wrapper
 from discord.ext import commands
 from pretty_help import PrettyHelp
 
-from stayin_alive import keep_alive
+from stayin_alive import keep_alive # Webserver to keep the bot running
 
-intents = discord.Intents.all()
+intents = discord.Intents.all() # All permissions
 
 client = commands.Bot(
 	command_prefix = ";",

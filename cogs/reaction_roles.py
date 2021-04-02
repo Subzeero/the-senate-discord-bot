@@ -14,7 +14,7 @@ class ReactionRoles(commands.Cog):
 	async def listReactionRoles(self, ctx):
 		"""Remove a reaction role."""
 
-		serverId = str(ctx.guild.id)
+		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
 		embed = discord.Embed(
@@ -54,7 +54,7 @@ class ReactionRoles(commands.Cog):
 
 		await message.add_reaction(emoji)
 
-		serverId = str(ctx.guild.id)
+		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
 		server_data["reaction_roles"][name] = {
@@ -83,7 +83,7 @@ class ReactionRoles(commands.Cog):
 	async def removeReactionRole(self, ctx, reactionRoleName: str):
 		"""Remove a reaction role."""
 
-		serverId = str(ctx.guild.id)
+		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
 		def verifyRR():
