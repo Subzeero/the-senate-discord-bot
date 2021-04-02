@@ -1,3 +1,5 @@
+# Wrapper for Replit's databases.
+
 from replit import db
 
 def validate_server(serverId: str):
