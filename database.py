@@ -2,7 +2,8 @@
 
 from replit import db
 
-def validate_server(serverId: str):
+def validate_server(serverId: int):
+	serverId = str(serverId)
 	server_data = {
 		"reaction_roles": {},
 		"custom_roles": {}
@@ -15,10 +16,12 @@ def validate_server(serverId: str):
 
 	return server_data
 
-def get_server(serverId: str):
+def get_server(serverId: int):
+	serverId = str(serverId)
 	return db[serverId]
 
-def set_server(serverId: str, newServerData: dict):
+def set_server(serverId: int, newServerData: dict):
+	serverId = str(serverId)
 	db[serverId] = newServerData
 
 def get(key):
