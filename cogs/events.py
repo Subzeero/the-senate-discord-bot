@@ -69,67 +69,49 @@ class Events(commands.Cog):
 			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
 			traceback.print_exception(type(error), error, error.__traceback__)
 
-	# @commands.Cog.listener()
+	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
 		if payload.event_type != "REACTION_ADD" or payload.user_id == 773066373693046826 or not payload.guild_id:
 			return
 
-		serverId = str(payload.guild_id)
+		serverId = payload.guild_id
 		messageId = payload.message_id
-		server = self.client.get_guild(int(serverId))
+		server = self.client.get_guild(serverId)
 		emoji = payload.emoji
 		user = server.get_member(payload.user_id)
 		print(f"User: {user}")
 
-		if not serverId or not user:
+		if not user:
 			return
 
-		server_data = db.get_server(serverId)
-		reactionRoleData = server_data["reaction_roles"]
-		reactionRoleList = []
+		server_data = db.validate_server(serverId)
 
-		for reactionName, reactionData in reactionRoleData.items():
-			reactionRoleList.append({
-				"messageId": reactionData["messageId"],
-				"emojiId": reactionData["emojiId"],
-				"roleId": reactionData["roleId"]
-			})
-
-		for data in reactionRoleList:
-			if data["messageId"] == messageId and data["emojiId"] == emoji.id:
-				role = server.get_role(data["roleId"])
+		for rrdata in server_data["reaction_roles"]:
+			if rrdata["messageId"] == messageId and rrdata["emojiId"] == emoji.id:
+				role = server.get_role(rrdata["roleId"])
 				await user.add_roles(role)
 				break
 
-	# @commands.Cog.listener()
+	@commands.Cog.listener()
 	async def on_raw_reaction_remove(self, payload):
 		if payload.event_type != "REACTION_REMOVE" or payload.user_id == 773066373693046826 or not payload.guild_id:
 			return
 
-		serverId = str(payload.guild_id)
+		serverId = payload.guild_id
 		messageId = payload.message_id
-		server = self.client.get_guild(int(serverId))
+		server = self.client.get_guild(serverId)
 		emoji = payload.emoji
 		user = server.get_member(payload.user_id)
 		print(f"User: {user}")
 
-		if not serverId or not user:
+		if not user:
 			return
 
-		server_data = db.get_server(serverId)
-		reactionRoleData = server_data["reaction_roles"]
-		reactionRoleList = []
+		server_data = db.validate_server(serverId)
 
-		for reactionName, reactionData in reactionRoleData.items():
-			reactionRoleList.append({
-				"messageId": reactionData["messageId"],
-				"emojiId": reactionData["emojiId"],
-				"roleId": reactionData["roleId"]
-			})
-
-		for data in reactionRoleList:
-			if data["messageId"] == messageId and data["emojiId"] == emoji.id:
-				role = server.get_role(data["roleId"])
+		for rrdata in server_data["reaction_roles"]:
+			if rrdata["messageId"] == messageId and rrdata["emojiId"] == emoji.id:
+				role = server.get_role(rrdata["roleId"])
 				await user.remove_roles(role)
 				break
 

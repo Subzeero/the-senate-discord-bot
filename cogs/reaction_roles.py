@@ -26,7 +26,7 @@ class ReactionRoles(commands.Cog):
 			icon_url = ctx.guild.icon_url
 		)
 
-		for rrName, rrData in server_data["reaction_roles"].items():
+		for rrId, rrData in enumerate(server_data["reaction_roles"]):
 			for emoji in ctx.guild.emojis:
 				if emoji.id == rrData["emojiId"]:
 					emojiObject = emoji
@@ -34,7 +34,7 @@ class ReactionRoles(commands.Cog):
 			roleObject = ctx.guild.get_role(rrData["roleId"])
 
 			embed.add_field(
-				name = rrName,
+				name = f"ReactionRoleID: {rrId}",
 				value = f"Message ID: {rrData['messageId']}\nEmoji: {str(emojiObject)}\nRole: {roleObject.mention}"
 			)
 
@@ -43,7 +43,7 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def newReactionRole(self, ctx, messageId: int, emoji: discord.Emoji, role: discord.Role, *, name: str):
+	async def newReactionRole(self, ctx, messageId: int, emoji: discord.Emoji, role: discord.Role):
 		"""Create a reaction role."""
 
 		try:
@@ -57,11 +57,11 @@ class ReactionRoles(commands.Cog):
 		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
-		server_data["reaction_roles"][name] = {
+		server_data["reaction_roles"].append({
 			"messageId": messageId,
 			"emojiId": emoji.id,
 			"roleId": role.id
-		}
+		})
 
 		db.set_server(serverId, server_data)
 
@@ -70,7 +70,7 @@ class ReactionRoles(commands.Cog):
 			colour = discord.Colour.gold()
 		)
 
-		embed.add_field(name = "Name: ", value = name, inline = False)
+		embed.add_field(name = "ReactionRoleID: ", value = len(server_data["reaction_roles"]) - 1, inline = False)
 		embed.add_field(name = "MessageId: ", value = messageId, inline = False)
 		embed.add_field(name = "Emoji: ", value = emoji, inline = False)
 		embed.add_field(name = "Role: ", value = role.mention, inline = False)
@@ -80,21 +80,38 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["deletereactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def removeReactionRole(self, ctx, reactionRoleName: str):
+	async def removeReactionRole(self, ctx, reactionRoleId: int):
 		"""Remove a reaction role."""
 
 		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
-		def verifyRR():
-			for name, reactionRoleData in server_data["reaction_roles"]:
-				if name == reactionRoleName:
-					return True
+		try:
+			server_data["reaction_roles"][reactionRoleId]
+		except ValueError:
+			await ctx.send(f"❌ `{reactionRoleId}` is not a valid reaction role ID.")
+			return
 
-			return False
+		rrData = server_data["reaction_roles"].pop(reactionRoleId)
+		db.set_server(serverId, server_data)
 
-		if not verifyRR():
-			await ctx.send(f"❌ `{reactionRoleName}` is not a valid reaction role name.")
+		for emoji in ctx.guild.emojis:
+			if emoji.id == rrData["emojiId"]:
+				emojiObject = emoji
+
+		roleObject = ctx.guild.get_role(rrData["roleId"])
+
+		embed = discord.Embed(
+			title = "✅ Reaction Role Successfully Removed!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.add_field(name = "ReactionRoleID: ", value = reactionRoleId, inline = False)
+		embed.add_field(name = "MessageId: ", value = rrData["messageId"], inline = False)
+		embed.add_field(name = "Emoji: ", value = emojiObject, inline = False)
+		embed.add_field(name = "Role: ", value = roleObject.mention, inline = False)
+
+		await ctx.send(embed = embed)
 
 def setup(client):
 	client.add_cog(ReactionRoles(client))
