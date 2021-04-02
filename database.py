@@ -5,7 +5,7 @@ from replit import db
 def validate_server(serverId: int):
 	serverId = str(serverId)
 	server_data = {
-		"reaction_roles": {},
+		"reaction_roles": [],
 		"custom_roles": {}
 	}
 

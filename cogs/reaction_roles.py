@@ -93,8 +93,8 @@ class ReactionRoles(commands.Cog):
 
 			return False
 
-		if verifyRR():
-			None
+		if not verifyRR():
+			await ctx.send(f"❌ `{reactionRoleName}` is not a valid reaction role name.")
 
 def setup(client):
 	client.add_cog(ReactionRoles(client))
