@@ -57,6 +57,14 @@ class Admin(commands.Cog):
 
 		await ctx.send(embed = embed, delete_after = 10)
 
+	@commands.command()
+	@commands.is_owner()
+	async def shutdown(self, ctx):
+		"""Shutdown the bot."""
+
+		await ctx.message.delete()
+		await self.client.close()
+
 
 def setup(client):
 	client.add_cog(Admin(client))
