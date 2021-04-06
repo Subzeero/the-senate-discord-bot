@@ -3,6 +3,7 @@ from discord.ext import commands
 import database as db
 
 suggestionsChannelId = 796553486677311510
+bannedWords = ["🖕"]
 
 class Events(commands.Cog):
 	"""Listen for the bot's events."""
@@ -123,6 +124,12 @@ class Events(commands.Cog):
 		if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):
 			await message.add_reaction("👍")
 			await message.add_reaction("👎")
+
+		for bannedItem in bannedWords:
+			# print(bannedItem, message.content)
+			if bannedItem in message.content:
+				await message.delete()
+				await message.channel.send(f"That wasn't very kind of you, {message.author.mention}!", delete_after = 5)
 
 		# print("author:", message.author.id, "message:", message.content)
 		if message.author.id == 397879157029077002:
