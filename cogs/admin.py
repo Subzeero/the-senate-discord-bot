@@ -59,10 +59,30 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.is_owner()
+	async def changeActivity(self, ctx, *, newStatus: str):
+		"""Change the bot's activity."""
+
+		await ctx.message.delete()
+		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = newStatus))
+
+		embed = discord.Embed(
+			#title = "Success!",
+			description = "✅ Successfully changed the bot's status!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
+
+	@commands.command()
+	@commands.is_owner()
 	async def shutdown(self, ctx):
 		"""Shutdown the bot."""
 
 		await ctx.message.delete()
+		await self.client.change_presence(status = discord.Status.invisible)
 		await self.client.close()
 
 
