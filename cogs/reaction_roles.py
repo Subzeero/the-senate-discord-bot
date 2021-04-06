@@ -1,4 +1,4 @@
-import discord, replit
+import discord, replit, emoji, regex
 from discord.ext import commands
 import database as db
 
@@ -7,6 +7,17 @@ class ReactionRoles(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
+
+	def locateEmojis(string):
+		emojiList = []
+		emojiData = regex.findall(r"\X", string)
+		emojiFlags = regex.findall(u"[\U0001F1E6-\U0001F1FF]", string)
+
+		for word in emojiData:
+			if any(character in emoji.UNICODE_EMOJI for character in word):
+				emojiList.append(word)
+		
+		return emojiList + emojiFlags
 
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
@@ -43,7 +54,7 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def newReactionRole(self, ctx, messageId: int, emoji: discord.Emoji, role: discord.Role):
+	async def newReactionRole(self, ctx, messageId: int, emoji, role: discord.Role):
 		"""Create a reaction role."""
 
 		try:
@@ -100,6 +111,23 @@ class ReactionRoles(commands.Cog):
 				emojiObject = emoji
 
 		roleObject = ctx.guild.get_role(rrData["roleId"])
+		messageObject = None
+
+		try:
+			messageObject = ctx.fetch_message(rrData["messageId"])
+		except:
+			None
+
+		if not roleObject:
+			await ctx.send(f"❌ Reaction Role removed from database; unable to find role with ID: {rrData['roleId']}.")
+			return
+
+		if not emojiObject:
+			await ctx.send(f"❌ Reaction Role removed from database; unable to find emoji with ID: {rrData['roleId']}.")
+			return
+
+		if messageObject:
+			await messageObject.clear_reaction(emojiObject)
 
 		embed = discord.Embed(
 			title = "✅ Reaction Role Successfully Removed!",

@@ -10,6 +10,8 @@ python = "^3.8"
 flask = "^1.1.2"
 replit = "^2.0.0"
 discord-pretty-help = "^1.2.1"
+regex = "^2021.4.4"
+emoji = "^1.2.0"
 
 [tool.poetry.dev-dependencies]
 
