@@ -13,7 +13,7 @@ from stayin_alive import keep_alive # Webserver to keep the bot running
 
 intents = discord.Intents.all() # All permissions
 
-client = commands.Bot(
+client = commands.Bot( # Initialize bot settings
 	command_prefix = ";",
 	intents = intents,
 	case_insensitive = True,
@@ -36,4 +36,4 @@ if "loaded_cogs" in db.get_keys():
 else:
 	db.set("loaded_cogs", [])
 
-client.run(os.getenv("DISCORD_TOKEN")) # Get bot token from secret ENV file
+client.run(os.getenv("DISCORD_TOKEN")) # Get bot token from secret ENV file and start running
