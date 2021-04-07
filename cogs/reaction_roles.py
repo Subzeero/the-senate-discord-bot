@@ -10,7 +10,6 @@ class ReactionRoles(commands.Cog):
 
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
-	@commands.is_owner()
 	async def listReactionRoles(self, ctx):
 		"""Remove a reaction role."""
 
