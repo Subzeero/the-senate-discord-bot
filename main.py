@@ -25,7 +25,7 @@ client = commands.Bot(
 #Startup web server to prevent sleep
 keep_alive()
 
-# Load cogs on startup.
+# Load cogs on startup
 if "loaded_cogs" in db.get_keys():
 	for fileName in db.get("loaded_cogs"):
 		try:
@@ -36,4 +36,4 @@ if "loaded_cogs" in db.get_keys():
 else:
 	db.set("loaded_cogs", [])
 
-client.run(os.getenv("DISCORD_TOKEN"))
+client.run(os.getenv("DISCORD_TOKEN")) # Get bot token from secret ENV file
