@@ -8,16 +8,6 @@ class ReactionRoles(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	def locateEmojis(string):
-		emojiData = regex.findall(r"\X", string)
-		flagData = regex.findall(u"[\U0001F1E6-\U0001F1FF]", string)
-
-		for word in emojiData:
-			if any(character in emoji_lib.UNICODE_EMOJI["en"] for character in word):
-				return word
-		
-		return flagData
-
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
 	@commands.is_owner()
@@ -27,9 +17,15 @@ class ReactionRoles(commands.Cog):
 		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
 
-		embed = discord.Embed(
-			colour = discord.Colour.gold()
-		)
+		if not server_data["reaction_roles"]:
+			embed = discord.Embed(
+				description = "None!",
+				colour = discord.Colour.gold()
+			)
+		else:
+			embed = discord.Embed(
+				colour = discord.Colour.gold()
+			)
 
 		embed.set_author(
 			name = f"Reaction Roles in {ctx.guild.name}",
@@ -37,9 +33,14 @@ class ReactionRoles(commands.Cog):
 		)
 
 		for rrId, rrData in enumerate(server_data["reaction_roles"]):
-			for emoji in ctx.guild.emojis:
-				if emoji.id == rrData["emojiId"]:
-					emojiObject = emoji
+			if rrData["unicodeEmoji"]:
+				emojiObject = rrData["unicodeEmoji"]
+
+			else:
+				for emoji in ctx.guild.emojis:
+					if emoji.id == rrData["customEmojiId"]:
+						emojiObject = emoji
+						break
 
 			roleObject = ctx.guild.get_role(rrData["roleId"])
 
@@ -53,8 +54,28 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def newReactionRole(self, ctx, messageId: int, emoji, role: discord.Role):
+	async def newReactionRole(self, ctx, messageId: int, emoji: str, role: discord.Role):
 		"""Create a reaction role."""
+
+		def validateEmoji(string):
+			emojiData = regex.findall(r"\X", string)
+			flagData = regex.findall(u"[\U0001F1E6-\U0001F1FF]", string)
+
+			for word in emojiData:
+				if any(character in emoji_lib.UNICODE_EMOJI["en"] for character in word):
+					return word
+			
+			return flagData
+
+		def validateCustomEmoji(string):
+			return string == discord.Emoji
+
+		isEmoji = validateEmoji(emoji)
+		isCustomEmoji = validateCustomEmoji(emoji)
+
+		if not isEmoji:
+			await ctx.send(f"❌ `{emoji}` is not a valid emoji.")
+			return
 
 		try:
 			message = await ctx.fetch_message(messageId)
@@ -69,7 +90,8 @@ class ReactionRoles(commands.Cog):
 
 		server_data["reaction_roles"].append({
 			"messageId": messageId,
-			"emojiId": emoji.id,
+			"unicodeEmoji": isEmoji and emoji or "",
+			"customEmojiId": isCustomEmoji and emoji.id or 0,
 			"roleId": role.id
 		})
 
@@ -105,15 +127,18 @@ class ReactionRoles(commands.Cog):
 		rrData = server_data["reaction_roles"].pop(reactionRoleId)
 		db.set_server(serverId, server_data)
 
-		for emoji in ctx.guild.emojis:
-			if emoji.id == rrData["emojiId"]:
-				emojiObject = emoji
+		if rrData["unicodeEmoji"]:
+			emojiObject = rrData["unicodeEmoji"]
+		else:
+			for emoji in ctx.guild.emojis:
+				if emoji.id == rrData["customEmojiId"]:
+					emojiObject = emoji
 
 		roleObject = ctx.guild.get_role(rrData["roleId"])
 		messageObject = None
 
 		try:
-			messageObject = ctx.fetch_message(rrData["messageId"])
+			messageObject = await ctx.fetch_message(rrData["messageId"])
 		except:
 			None
 
@@ -122,7 +147,7 @@ class ReactionRoles(commands.Cog):
 			return
 
 		if not emojiObject:
-			await ctx.send(f"❌ Reaction Role removed from database; unable to find emoji with ID: {rrData['roleId']}.")
+			await ctx.send(f"❌ Reaction Role removed from database; unable to find emoji with ID: {rrData['customEmojiId']} or unicode: {rrData['unicodeEmoji']}.")
 			return
 
 		if messageObject:
