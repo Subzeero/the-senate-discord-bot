@@ -1,4 +1,4 @@
-import discord, replit, emoji, regex
+import discord, emoji as emoji_lib, regex
 from discord.ext import commands
 import database as db
 
@@ -9,15 +9,14 @@ class ReactionRoles(commands.Cog):
 		self.client = client
 
 	def locateEmojis(string):
-		emojiList = []
 		emojiData = regex.findall(r"\X", string)
-		emojiFlags = regex.findall(u"[\U0001F1E6-\U0001F1FF]", string)
+		flagData = regex.findall(u"[\U0001F1E6-\U0001F1FF]", string)
 
 		for word in emojiData:
-			if any(character in emoji.UNICODE_EMOJI for character in word):
-				emojiList.append(word)
+			if any(character in emoji_lib.UNICODE_EMOJI["en"] for character in word):
+				return word
 		
-		return emojiList + emojiFlags
+		return flagData
 
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
