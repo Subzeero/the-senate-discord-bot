@@ -1,5 +1,6 @@
 import discord, emoji as emoji_lib, regex
 from discord.ext import commands
+from typing import Union
 import database as db
 
 class ReactionRoles(commands.Cog):
@@ -53,7 +54,7 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
 	@commands.is_owner()
-	async def newReactionRole(self, ctx, messageId: int, emoji: str, role: discord.Role):
+	async def newReactionRole(self, ctx, messageId: int, emoji: Union[discord.Emoji, str], role: discord.Role):
 		"""Create a reaction role."""
 
 		def validateEmoji(string):
@@ -67,12 +68,16 @@ class ReactionRoles(commands.Cog):
 			return flagData
 
 		def validateCustomEmoji(string):
-			return string == discord.Emoji
-
-		isEmoji = validateEmoji(emoji)
+			return isinstance(string, discord.Emoji)
+			
 		isCustomEmoji = validateCustomEmoji(emoji)
 
-		if not isEmoji:
+		if not isCustomEmoji:
+			isEmoji = validateEmoji(emoji)
+		else:
+			isEmoji = False
+
+		if not isEmoji and not isCustomEmoji:
 			await ctx.send(f"❌ `{emoji}` is not a valid emoji.")
 			return
 
@@ -150,7 +155,7 @@ class ReactionRoles(commands.Cog):
 			return
 
 		if messageObject:
-			await messageObject.clear_reaction(emojiObject)
+			await messageObject.remove_reaction(emojiObject, self.client.user)
 
 		embed = discord.Embed(
 			title = "✅ Reaction Role Successfully Removed!",

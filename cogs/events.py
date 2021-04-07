@@ -80,17 +80,27 @@ class Events(commands.Cog):
 		server = self.client.get_guild(serverId)
 		emoji = payload.emoji
 		user = server.get_member(payload.user_id)
-		print(f"User: {user}")
 
 		if not user:
 			return
 
 		server_data = db.validate_server(serverId)
 
-		for rrdata in server_data["reaction_roles"]:
-			if rrdata["messageId"] == messageId and rrdata["emojiId"] == emoji.id:
-				role = server.get_role(rrdata["roleId"])
-				await user.add_roles(role)
+		def emojiCheck(emojiObject, unicodeEmoji, customEmojiId):
+			isUnicodeEmoji = emoji.is_unicode_emoji()
+			isCustomEmoji = emoji.is_custom_emoji()
+
+			if isUnicodeEmoji:
+				return unicodeEmoji == emojiObject
+			elif isCustomEmoji:
+				return customEmojiId == emojiObject.id
+			else:
+				return False
+
+		for rrData in server_data["reaction_roles"]:
+			if rrData["messageId"] == messageId and emojiCheck(emoji, rrData["unicodeEmoji"], rrData["customEmojiId"]):
+				role = server.get_role(rrData["roleId"])
+				await user.add_roles(role, reason = "Reaction Role: User reacted on a message.")
 				break
 
 	@commands.Cog.listener()
@@ -103,17 +113,27 @@ class Events(commands.Cog):
 		server = self.client.get_guild(serverId)
 		emoji = payload.emoji
 		user = server.get_member(payload.user_id)
-		print(f"User: {user}")
 
 		if not user:
 			return
 
 		server_data = db.validate_server(serverId)
 
-		for rrdata in server_data["reaction_roles"]:
-			if rrdata["messageId"] == messageId and rrdata["emojiId"] == emoji.id:
-				role = server.get_role(rrdata["roleId"])
-				await user.remove_roles(role)
+		def emojiCheck(emojiObject, unicodeEmoji, customEmojiId):
+			isUnicodeEmoji = emoji.is_unicode_emoji()
+			isCustomEmoji = emoji.is_custom_emoji()
+
+			if isUnicodeEmoji:
+				return unicodeEmoji == emojiObject
+			elif isCustomEmoji:
+				return customEmojiId == emojiObject.id
+			else:
+				return False
+
+		for rrData in server_data["reaction_roles"]:
+			if rrData["messageId"] == messageId and emojiCheck(emoji, rrData["unicodeEmoji"], rrData["customEmojiId"]):
+				role = server.get_role(rrData["roleId"])
+				await user.remove_roles(role, reason = "Reaction Role: User reacted on a message.")
 				break
 
 	@commands.Cog.listener()
