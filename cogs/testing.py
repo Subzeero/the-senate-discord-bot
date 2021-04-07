@@ -11,6 +11,7 @@ class Testing(commands.Cog):
 	# for key in db.get_keys():
 	# 	print(key)
 	# 	print(db.get(key))
+	# Hello There
 
 def setup(client):
 	client.add_cog(Testing(client))
