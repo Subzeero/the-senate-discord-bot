@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 import database as db
-#View DB:
-#curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
+# View DB:
+# curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
 class Admin(commands.Cog):
 	"""Administrator commands."""
