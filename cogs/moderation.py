@@ -35,7 +35,7 @@ class Moderation(commands.Cog):
 
 		while True:
 			if numPurged < numOfMessages:
-				await ctx.channel.purge(limit = 5, check = purgeCheck)
+				await ctx.channel.purge(limit = 10, check = purgeCheck)
 			else:
 				break
 
@@ -47,7 +47,7 @@ class Moderation(commands.Cog):
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
-		await ctx.send(embed = embed, delete_after = 10)
+		await ctx.send(embed = embed, delete_after = 15)
 
 	@commands.command(aliases = ["r"])
 	@commands.has_role(moderatorRole)
