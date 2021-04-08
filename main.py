@@ -26,14 +26,11 @@ client = commands.Bot( # Initialize bot settings
 keep_alive()
 
 # Load cogs on startup
-if "loaded_cogs" in db.get_keys():
-	for fileName in db.get("loaded_cogs"):
-		try:
-			client.load_extension(f"cogs.{fileName}")
-			print(f"Loaded {fileName}.")
-		except:
-			print(f"Failed to load {fileName}.")
-else:
-	db.set("loaded_cogs", [])
+for fileName in db.get("loaded_cogs"):
+	try:
+		client.load_extension(f"cogs.{fileName}")
+		print(f"Loaded {fileName}.")
+	except:
+		print(f"Failed to load {fileName}.")
 
 client.run(os.getenv("DISCORD_TOKEN")) # Get bot token from secret ENV file and start running

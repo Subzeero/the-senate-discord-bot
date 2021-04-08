@@ -77,7 +77,7 @@ class Admin(commands.Cog):
 
 		await ctx.send(embed = embed, delete_after = 10)
 
-	@commands.command()
+	@commands.command(aliases = ["close", "stop"])
 	@commands.is_owner()
 	async def shutdown(self, ctx):
 		"""Shutdown the bot."""

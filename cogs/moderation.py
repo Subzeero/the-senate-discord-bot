@@ -11,18 +11,35 @@ class Moderation(commands.Cog):
 	@commands.command(aliases = ["delete"])
 	@commands.has_role(moderatorRole)
 	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def purge(self, ctx, numOfMessages: int, user = None):
+	async def purge(self, ctx, numOfMessages: int, user: discord.User = None):
 		"""Purge a number of messages."""
 
-		messagesToDelete = []
+		numPurged = 0
+		def purgeCheck(message):
+			nonlocal numPurged
+			if message.id == ctx.message.id:
+				return True
 
-		async for message in ctx.channel.history(limit = numOfMessages + 1):
-			messagesToDelete.append(message)
+			if numPurged >= numOfMessages:
+				return False
 
-		await ctx.channel.delete_messages(messagesToDelete)
+			if user:
+				if message.author.id == user.id:
+					numPurged += 1
+					return True
+				else:
+					return False
+			else:
+				numPurged += 1
+				return True
+
+		while True:
+			if numPurged < numOfMessages:
+				await ctx.channel.purge(limit = 5, check = purgeCheck)
+			else:
+				break
 
 		embed = discord.Embed(
-			#title = "Success",
 			description = f"✅ Successfully deleted {numOfMessages} messages.",
 			colour = discord.Colour.gold()
 		)
@@ -39,15 +56,14 @@ class Moderation(commands.Cog):
 		"""Add reactions to the specified message."""
 
 		await ctx.message.delete()
-
 		message = await ctx.fetch_message(messageId)
-		
+
 		for reaction in reactions:
 			await message.add_reaction(reaction)
 
+		reactionsStr = " ".join(reactions)
 		embed = discord.Embed(
-			#title = "Success!",
-			description = f"✅ Successfully added {reactions} to message #{messageId}.",
+			description = f"✅ Successfully added {reactionsStr} to message #{messageId}.",
 			colour = discord.Colour.gold()
 		)
 

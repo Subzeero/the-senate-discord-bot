@@ -17,15 +17,12 @@ class Extensions(commands.Cog):
 
 		self.client.load_extension(f"cogs.{extension}")
 
-		if "loaded_cogs" in db.get_keys():
-			loadedCogs = db.get("loaded_cogs")
+		loadedCogs = db.get("loaded_cogs")
+		if not extension in loadedCogs:
 			loadedCogs.append(extension)
 			db.set("loaded_cogs", loadedCogs)
-		else:
-			db.set("loaded_cogs", [extension])
 
 		embed = discord.Embed(
-			#title = "Success!",
 			description = f"✅ `{extension}` has been loaded!",
 			colour = discord.Colour.gold()
 		)
@@ -44,16 +41,12 @@ class Extensions(commands.Cog):
 
 		self.client.unload_extension(f"cogs.{extension}")
 
-		if "loaded_cogs" in db.get_keys():
-			loadedCogs = db.get("loadedCogs")
-			if extension in loadedCogs:
-				loadedCogs.remove(extension)
-				db.set("loaded_cogs", loadedCogs)	
-		else:
-			db.set("loaded_cogs", [])
+		loadedCogs = db.get("loadedCogs")
+		if extension in loadedCogs:
+			loadedCogs.remove(extension)
+			db.set("loaded_cogs", loadedCogs)	
 
 		embed = discord.Embed(
-			#title = "Success!",
 			description = f"✅ `{extension}` has been unloaded!",
 			colour = discord.Colour.gold()
 		)
@@ -74,7 +67,6 @@ class Extensions(commands.Cog):
 		self.client.load_extension(f"cogs.{extension}")
 
 		embed = discord.Embed(
-			#title = "Success!",
 			description = f"✅ `{extension}` has been reloaded!",
 			colour = discord.Colour.gold()
 		)
