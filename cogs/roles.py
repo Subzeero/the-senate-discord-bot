@@ -18,13 +18,15 @@ class Roles(commands.Cog):
 
 	@commands.command()
 	@commands.check(check_Server)
-	@commands.cooldown(1, 7, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def changeRole(self, ctx):
 		"""[WIP]"""
 
+		global roleChangeInProgress
 		if roleChangeInProgress:
 			await ctx.send("Someone else is changing their role right now. Please try again later.")
 			return
+		roleChangeInProgress = True
 
 		serverId = ctx.guild.id
 		userId = ctx.author.id
@@ -72,6 +74,7 @@ class Roles(commands.Cog):
 
 				await ctx.send(embed = embed, delete_after = 300)
 				await ctx.channel.delete_messages(messagesList)
+				roleChangeInProgress = False
 				return
 
 			if response1.content == "cancel":
@@ -86,10 +89,11 @@ class Roles(commands.Cog):
 					icon_url = ctx.author.avatar_url
 				)
 
-				await ctx.send(embed = embed)
-				await ctx.message.delete()
-				await response1.delete()
-				await message1.delete()
+				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+				await ctx.send(embed = embed, delete_after = 300)
+				await ctx.channel.delete_messages(messagesList)
+				roleChangeInProgress = False
 				return
 			
 			else:
@@ -113,10 +117,11 @@ class Roles(commands.Cog):
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-					message2 = await ctx.send(embed = embed)
+					messagesList.append(await ctx.send(embed = embed))
 
 					try:
 						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+						messagesList.append(response2)
 					except asyncio.TimeoutError:
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
@@ -129,11 +134,11 @@ class Roles(commands.Cog):
 							icon_url = ctx.author.avatar_url
 						)
 
-						await ctx.send(embed = embed)
-						await ctx.message.delete()
-						await message1.delete()
-						await message2.delete()
-						await response1.delete()
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
 						break
 
 					if response2.content == "cancel":
@@ -148,12 +153,11 @@ class Roles(commands.Cog):
 							icon_url = ctx.author.avatar_url
 						)
 
-						await ctx.send(embed = embed)
-						await ctx.message.delete()
-						await message1.delete()
-						await message2.delete()
-						await response1.delete()
-						await response2.delete()
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
 						break
 
 					else:
@@ -177,10 +181,20 @@ class Roles(commands.Cog):
 						colourValue = isHex(response2.content)
 						
 						if colourValue:
+							hackerRole = ctx.guild.get_role(745863515998519360)
+							if not hackerRole:
+								roleChangeInProgress = False
+								return ctx.send("❌ Discord is being mean, please try again later.")
+
 							newRole = await ctx.guild.create_role(
 								name = response1.content,
 								colour = colourValue,
 								reason = "Created by user command."
+							)
+
+							await newRole.edit(
+								position = hackerRole.position - 1,
+								reason = "Order role created by user command."
 							)
 
 							await ctx.author.add_roles(newRole)
@@ -197,6 +211,7 @@ class Roles(commands.Cog):
 
 							await ctx.send(embed = embed)
 							# save role data
+							roleChangeInProgress = False
 							break
 
 						else:
@@ -292,11 +307,12 @@ class Roles(commands.Cog):
 
 	@commands.command()
 	@commands.guild_only()
-	@commands.cooldown(1, 3, commands.BucketType.user)
+	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def listroles(self, ctx):
 		"""List all of the server's roles."""
 
 		fetchedRoles = await ctx.guild.fetch_roles()
+		print(fetchedRoles)
 
 		def sortPos(role):
 			return role.position
@@ -323,7 +339,7 @@ class Roles(commands.Cog):
 
 		await ctx.send(embed = embed)
 		
-	@commands.command(name = "rolepermissions", aliases = ["roleperms"])
+	@commands.command(name = "rolePermissions", aliases = ["rperms"])
 	@commands.guild_only()
 	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def role_permissions(self, ctx, role: discord.Role):
@@ -345,10 +361,10 @@ class Roles(commands.Cog):
 
 		await ctx.send(embed = embed)
 
-	@commands.command(aliases = ["listperms", "perms"])
+	@commands.command(name = "userPermissions", aliases = ["uperms"])
 	@commands.guild_only()
 	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def permissions(self, ctx, member: discord.Member = None):
+	async def user_permissions(self, ctx, member: discord.Member = None):
 		"""List the permissions of a given user."""
 
 		if not member:
