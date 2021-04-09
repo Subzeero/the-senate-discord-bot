@@ -1,6 +1,7 @@
 import discord, asyncio
 from discord.ext import commands
 import database as db
+roleChangeInProgress = False
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
@@ -21,9 +22,14 @@ class Roles(commands.Cog):
 	async def changeRole(self, ctx):
 		"""[WIP]"""
 
+		if roleChangeInProgress:
+			await ctx.send("Someone else is changing their role right now. Please try again later.")
+			return
+
 		serverId = ctx.guild.id
 		userId = ctx.author.id
 		server_data = db.validate_server(serverId)
+		messagesList = [ctx.message]
 
 		def validateMessage(message):
 			return message.author == ctx.author
@@ -45,10 +51,11 @@ class Roles(commands.Cog):
 			)
 			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-			message1 = await ctx.send(embed = embed)
+			messagesList.append(await ctx.send(embed = embed))
 
 			try:
 				response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+				messagesList.append(response1)
 			except asyncio.TimeoutError:
 				embed = discord.Embed(
 					title = "Custom Role Configuration",
@@ -61,10 +68,10 @@ class Roles(commands.Cog):
 					icon_url = ctx.author.avatar_url
 				)
 
-				await ctx.send(embed = embed)
-				await ctx.message.delete()
-				await response1.delete()
-				await message1.delete()
+				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+				await ctx.send(embed = embed, delete_after = 300)
+				await ctx.channel.delete_messages(messagesList)
 				return
 
 			if response1.content == "cancel":
