@@ -61,7 +61,7 @@ class Events(commands.Cog):
 			await ctx.send(f"❌ Invalid Arguments. Type `;help {ctx.command}` to see the proper arguments.")
 
 		elif isinstance(error, commands.CheckFailure):
-			await ctx.send("❌ You don't have permission to run this command!")
+			await ctx.send("❌ You don't have permission to run this command! Maybe try in a different channel.")
 
 		elif isinstance(error, commands.ExtensionError):
 			await ctx.send(f"❌ Extension Error: {error}")
