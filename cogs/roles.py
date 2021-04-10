@@ -36,7 +36,7 @@ class Roles(commands.Cog):
 		def validateMessage(message):
 			return message.author == ctx.author
 
-		if not userId in server_data["custom_roles"]:
+		if not str(userId) in server_data["custom_roles"]:
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
 				description = "It looks like you don't have a custom role yet; let's create one!",
@@ -184,7 +184,8 @@ class Roles(commands.Cog):
 							hackerRole = ctx.guild.get_role(745863515998519360)
 							if not hackerRole:
 								roleChangeInProgress = False
-								return ctx.send("❌ Discord is being mean, please try again later.")
+								await ctx.send("❌ Discord is being mean, please try again later.")
+								break
 
 							newRole = await ctx.guild.create_role(
 								name = response1.content,
@@ -194,10 +195,14 @@ class Roles(commands.Cog):
 
 							await newRole.edit(
 								position = hackerRole.position - 1,
-								reason = "Order role created by user command."
+								reason = "Reorder the role created by user command."
 							)
 
 							await ctx.author.add_roles(newRole)
+
+							server_data = db.validate_server(serverId)
+							server_data["custom_roles"][str(userId)] = newRole.id
+							db.set_server(serverId, server_data)
 
 							embed = discord.Embed(
 								title = "Custom Role Configuration",
@@ -210,7 +215,7 @@ class Roles(commands.Cog):
 							)
 
 							await ctx.send(embed = embed)
-							# save role data
+							await ctx.channel.delete_messages(messagesList)
 							roleChangeInProgress = False
 							break
 
@@ -225,7 +230,7 @@ class Roles(commands.Cog):
 								icon_url = ctx.author.avatar_url
 							)
 
-							await ctx.send(embed = embed)
+							messagesList.append(await ctx.send(embed = embed))
 
 		else:
 			while True:
@@ -252,10 +257,11 @@ class Roles(commands.Cog):
 				)
 				embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-				message1 = await ctx.send(embed = embed)
+				messagesList.append(await ctx.send(embed = embed))
 
 				try:
 					response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+					messagesList.append(response1)
 				except asyncio.TimeoutError:
 					embed = discord.Embed(
 						title = "Custom Role Configuration",
@@ -268,10 +274,10 @@ class Roles(commands.Cog):
 						icon_url = ctx.author.avatar_url
 					)
 
-					await ctx.send(embed = embed)
-					await ctx.message.delete()
-					await response1.delete()
-					await message1.delete()
+					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+					await ctx.send(embed = embed, delete_after = 300)
+					await ctx.channel.delete_messages(messagesList)
 					break
 
 				if response1.content == "cancel":
@@ -286,24 +292,232 @@ class Roles(commands.Cog):
 						icon_url = ctx.author.avatar_url
 					)
 
-					await ctx.send(embed = embed)
-					await ctx.message.delete()
-					await response1.delete()
-					await message1.delete()
-					return
+					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
-				elif response1.content == "1" or response1.contect == "2":
+					await ctx.send(embed = embed, delete_after = 300)
+					await ctx.channel.delete_messages(messagesList)
+					roleChangeInProgress = False
+					break
+
+				elif response1.content == "1":
 					embed = discord.Embed(
-						title = "Custom Role Configuration"
+						title = "Custom Role Configuration",
+						colour = discord.Colour.gold()
 					)
+					embed.add_field(
+						name = "1) Role Name",
+						value = "What do you want your role name to be? Type it out below and send it. ",
+						inline = False
+					)
+					embed.set_author(
+						name = ctx.author.name + "#" + ctx.author.discriminator,
+						icon_url = ctx.author.avatar_url
+					)
+					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+
+					messagesList.append(await ctx.send(embed = embed))
+
+					try:
+						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+						messagesList.append(response2)
+					except asyncio.TimeoutError:
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role configuration cancelled: timeout reached.",
+							colour = discord.Colour.gold()
+						)
+
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						break
+
+					if response2.content == "cancel":
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role configuration cancelled.",
+							colour = discord.Colour.gold()
+						)
+
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
+						break
+
+					else:
+						userRoleId = server_data["custom_roles"][str(userId)]
+						userRole = ctx.guild.get_role(userRoleId)
+
+						if not userRole:
+							await ctx.send("❌ Discord is being mean, please try again later.")
+							roleChangeInProgress = False
+							break
+
+						await userRole.edit(
+							name = response2.content
+						)
+
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = f"✅ Role name modified: {userRole.mention}",
+							colour = discord.Colour.gold()
+						)
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						await ctx.send(embed = embed)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
+						break
+
+				elif response1.content == "2":
+					embed = discord.Embed(
+						title = "Custom Role Configuration",
+						colour = discord.Colour.gold()
+					)
+					embed.add_field(
+						name = "2) Role Colour",
+						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
+						inline = False
+					)
+					embed.set_image(
+						url = "https://i.imgur.com/seUpcRU.png"
+					)
+					embed.set_author(
+						name = ctx.author.name + "#" + ctx.author.discriminator,
+						icon_url = ctx.author.avatar_url
+					)
+					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
+
+					messagesList.append(await ctx.send(embed = embed))
+
+					try:
+						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
+						messagesList.append(response2)
+					except asyncio.TimeoutError:
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role creation cancelled: timeout reached.",
+							colour = discord.Colour.gold()
+						)
+
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
+						break
+
+					if response2.content == "cancel":
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = "❌ Role creation cancelled.",
+							colour = discord.Colour.gold()
+						)
+
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
+
+						await ctx.send(embed = embed, delete_after = 300)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
+						break
+
+					else:
+						def isHex(input):
+							def removePrefix(input):
+								if input.startswith("#"):
+									return input[1:]
+								else:
+									return input
+							
+							formattedInput = removePrefix(input)
+							
+							if len(formattedInput) != 6:
+								return False
+
+							try:
+								return int(removePrefix(input), 16)
+							except ValueError:
+								return False
+
+						colourValue = isHex(response2.content)
+						userRoleId = server_data["custom_roles"][str(userId)]
+						userRole = ctx.guild.get_role(userRoleId)
+						
+						if not colourValue:
+							embed = discord.Embed(
+								title = "Custom Role Configuration",
+								description = "❌ That's not a valid hex colour code.",
+								colour = discord.Colour.gold()
+							)
+							embed.set_author(
+								name = ctx.author.name + "#" + ctx.author.discriminator,
+								icon_url = ctx.author.avatar_url
+							)
+
+							messagesList.append(await ctx.send(embed = embed))
+
+						if not userRole:
+							await ctx.send("❌ Discord is being mean, please try again later.")
+							roleChangeInProgress = False
+							break
+
+						await userRole.edit(
+							colour = colourValue
+						)
+
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = f"✅ Role colour modified: {userRole.mention}",
+							colour = discord.Colour.gold()
+						)
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						await ctx.send(embed = embed)
+						await ctx.channel.delete_messages(messagesList)
+						roleChangeInProgress = False
+						break
 
 				else:
 					embed = discord.Embed(
-						title = "Invalid"
+						title = "Custom Role Configuration",
+						description = "❌ Invalid response; please try again.",
+						colour = discord.Colour.gold()
+					)
+					embed.set_author(
+						name = ctx.author.name + "#" + ctx.author.discriminator,
+						icon_url = ctx.author.avatar_url
 					)
 
-		#db["server_data"] = server_data
-		#serverRoles = await ctx.guild.fetch_roles()
+					messagesList.append(await ctx.send(embed = embed))
 
 	@commands.command()
 	@commands.guild_only()
@@ -312,7 +526,6 @@ class Roles(commands.Cog):
 		"""List all of the server's roles."""
 
 		fetchedRoles = await ctx.guild.fetch_roles()
-		print(fetchedRoles)
 
 		def sortPos(role):
 			return role.position
