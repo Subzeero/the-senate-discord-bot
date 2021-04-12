@@ -56,7 +56,7 @@ class Admin(commands.Cog):
 		status_data["status"] = newStatus
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(activity = discord.Activity(type = status_data["activity"], name = newStatus))
+		await self.client.change_presence(activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatus))
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
