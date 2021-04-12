@@ -4,6 +4,13 @@ import database as db
 # View DB:
 # curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
+activityReference = {
+	"playing": discord.ActivityType.playing,
+	"streaming": discord.ActivityType.streaming,
+	"listening": discord.ActivityType.listening,
+	"watching": discord.ActivityType.watching,
+}
+
 class Admin(commands.Cog):
 	"""Administrator commands."""
 
@@ -21,7 +28,6 @@ class Admin(commands.Cog):
 		option = "enabled" if toggle else "disabled"
 
 		embed = discord.Embed(
-			#title = "Success!",
 			description = f"✅ Auto reactions are now {option}!",
 			colour = discord.Colour.gold()
 		)
@@ -45,10 +51,14 @@ class Admin(commands.Cog):
 		"""Change the bot's status."""
 
 		await ctx.message.delete()
-		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = newStatus))
+
+		status_data = db.get("bot_status")
+		status_data["status"] = newStatus
+		db.set("bot_status", status_data)
+
+		await self.client.change_presence(activity = discord.Activity(type = status_data["activity"], name = newStatus))
 
 		embed = discord.Embed(
-			#title = "Success!",
 			description = "✅ Successfully changed the bot's status!",
 			colour = discord.Colour.gold()
 		)
@@ -60,15 +70,25 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.is_owner()
-	async def changeActivity(self, ctx, *, newStatus: str):
+	async def changeActivity(self, ctx, *, newActivityStr: str):
 		"""Change the bot's activity."""
 
 		await ctx.message.delete()
-		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = newStatus))
+		
+		if newActivityStr.lower() in activityReference:
+			newActivity = activityReference[newActivityStr]
+		else:
+			await ctx.send("❌ That is not a valid activity type!")
+			return
+		
+		status_data = db.get("bot_status")
+		status_data["activity"] = newActivityStr
+		db.set("bot_status", status_data)
+
+		await self.client.change_presence(activity = discord.Activity(type = newActivity, name = status_data["status"]))
 
 		embed = discord.Embed(
-			#title = "Success!",
-			description = "✅ Successfully changed the bot's status!",
+			description = "✅ Successfully changed the bot's activity!",
 			colour = discord.Colour.gold()
 		)
 
