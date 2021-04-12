@@ -9,6 +9,7 @@ activityReference = {
 	"streaming": discord.ActivityType.streaming,
 	"listening": discord.ActivityType.listening,
 	"watching": discord.ActivityType.watching,
+	"competing": discord.ActivityType.competing
 }
 
 class Admin(commands.Cog):
