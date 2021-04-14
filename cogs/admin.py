@@ -58,7 +58,33 @@ class Admin(commands.Cog):
 	async def changeStatusType(self, ctx, newStatusStr):
 		"""Change the bot's status type.
 		Valid status types: `online`, `idle`, `dnd`, `invisible`."""
-		None
+		
+		await ctx.message.delete()
+
+		if newStatusStr.lower() in statusReference:
+			newStatus = statusReference[newStatusStr]
+		else:
+			await ctx.send("❌ That is not a valid status type!")
+			return
+
+		status_data = db.get("bot_status")
+		status_data["status"] = newStatusStr
+		db.set("bot_status", status_data)
+
+		await self.client.change_presence(
+			activity = discord.Activity(type = activityReference[status_data["activity"], name = status_data["message"]])
+			status = newStatus
+		)
+
+		embed = discord.Embed(
+			description = "✅ Successfully changed the bot's status!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
 
 	@commands.command()
 	@commands.is_owner()
@@ -72,10 +98,13 @@ class Admin(commands.Cog):
 		status_data["message"] = newStatusMessage
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatus))
+		await self.client.change_presence(
+			activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatus),
+			status = statusReference[status_data["status"]]
+		)
 
 		embed = discord.Embed(
-			description = "✅ Successfully changed the bot's status!",
+			description = "✅ Successfully changed the bot's status message!",
 			colour = discord.Colour.gold()
 		)
 
@@ -102,7 +131,10 @@ class Admin(commands.Cog):
 		status_data["activity"] = newActivityStr
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(activity = discord.Activity(type = newActivity, name = status_data["status"]))
+		await self.client.change_presence(
+			activity = discord.Activity(type = newActivity, name = status_data["message"]),
+			status = statusReference[status_data["status"]]
+		)
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",
