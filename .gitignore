@@ -2,3 +2,4 @@
 cpython # cache file
 __pycache__ # cache folder
 __pycache__/ # cache folder
+.DS_Store # MacOS file
