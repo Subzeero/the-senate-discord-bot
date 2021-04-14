@@ -99,7 +99,7 @@ class Admin(commands.Cog):
 		db.set("bot_status", status_data)
 
 		await self.client.change_presence(
-			activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatus),
+			activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatusMessage),
 			status = statusReference[status_data["status"]]
 		)
 
