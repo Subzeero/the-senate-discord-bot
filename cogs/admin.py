@@ -74,11 +74,6 @@ class Admin(commands.Cog):
 
 		bot_status.update_status()
 
-		# await self.client.change_presence(
-		# 	activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
-		# 	status = newStatus
-		# )
-
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
 			colour = discord.Colour.gold()
@@ -102,11 +97,6 @@ class Admin(commands.Cog):
 		db.set("bot_status", status_data)
 
 		bot_status.update_status()
-
-		# await self.client.change_presence(
-		# 	activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatusMessage),
-		# 	status = statusReference[status_data["status"]]
-		# )
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status message!",
@@ -138,11 +128,6 @@ class Admin(commands.Cog):
 
 		bot_status.update_status()
 
-		# await self.client.change_presence(
-		# 	activity = discord.Activity(type = newActivity, name = status_data["message"]),
-		# 	status = statusReference[status_data["status"]]
-		# )
-
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",
 			colour = discord.Colour.gold()
@@ -157,13 +142,47 @@ class Admin(commands.Cog):
 	@commands.is_owner()
 	async def startMaintenance(self, ctx):
 		"""Enter maintenance mode."""
-		None
+		
+		await ctx.message.delete()
+
+		status_data = db.get("bot_status")
+		status_data["maintenance"] = True
+		db.set("bot_status", status_data)
+
+		bot_status.update_status()
+
+		embed = discord.Embed(
+			description = "✅ Successfully enabled maintenance mode!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
 
 	@commands.command()
 	@commands.is_owner()
 	async def stopMaintenance(self, ctx):
 		"""End maintenance mode."""
-		None
+		
+		await ctx.message.delete()
+
+		status_data = db.get("bot_status")
+		status_data["maintenance"] = False
+		db.set("bot_status", status_data)
+
+		bot_status.update_status()
+
+		embed = discord.Embed(
+			description = "✅ Successfully disabled maintenance mode!",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
 
 	@commands.command(aliases = ["close", "stop"])
 	@commands.is_owner()
