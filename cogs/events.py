@@ -5,6 +5,21 @@ import database as db
 suggestionsChannelId = 796553486677311510
 bannedWords = ["🖕"]
 
+activityReference = {
+	"playing": discord.ActivityType.playing,
+	"streaming": discord.ActivityType.streaming,
+	"listening": discord.ActivityType.listening,
+	"watching": discord.ActivityType.watching,
+	"competing": discord.ActivityType.competing
+}
+
+statusReference = {
+	"online": discord.Status.online,
+	"idle": discord.Status.idle,
+	"dnd": discord.Status.dnd,
+	"invisible": discord.Status.invisible
+}
+
 class Events(commands.Cog):
 	"""Listen for the bot's events."""
 
@@ -14,7 +29,11 @@ class Events(commands.Cog):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
-		await self.client.change_presence(activity = discord.Activity(type = discord.ActivityType.watching, name = "over you."))
+		status_data = db.get("bot_status")
+		await self.client.change_presence(
+			activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
+			status = statusReference[status_data["status"]]
+		)
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
