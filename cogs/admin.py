@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import database as db
+from helpers import bot_status
 # View DB:
 # curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
@@ -71,10 +72,12 @@ class Admin(commands.Cog):
 		status_data["status"] = newStatusStr
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(
-			activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
-			status = newStatus
-		)
+		bot_status.update_status()
+
+		# await self.client.change_presence(
+		# 	activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
+		# 	status = newStatus
+		# )
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
@@ -98,10 +101,12 @@ class Admin(commands.Cog):
 		status_data["message"] = newStatusMessage
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(
-			activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatusMessage),
-			status = statusReference[status_data["status"]]
-		)
+		bot_status.update_status()
+
+		# await self.client.change_presence(
+		# 	activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatusMessage),
+		# 	status = statusReference[status_data["status"]]
+		# )
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status message!",
@@ -131,10 +136,12 @@ class Admin(commands.Cog):
 		status_data["activity"] = newActivityStr
 		db.set("bot_status", status_data)
 
-		await self.client.change_presence(
-			activity = discord.Activity(type = newActivity, name = status_data["message"]),
-			status = statusReference[status_data["status"]]
-		)
+		bot_status.update_status()
+
+		# await self.client.change_presence(
+		# 	activity = discord.Activity(type = newActivity, name = status_data["message"]),
+		# 	status = statusReference[status_data["status"]]
+		# )
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",

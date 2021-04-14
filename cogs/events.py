@@ -1,6 +1,7 @@
 import discord, traceback
 from discord.ext import commands
 import database as db
+from helpers import bot_status
 
 suggestionsChannelId = 796553486677311510
 bannedWords = ["🖕"]
@@ -29,11 +30,7 @@ class Events(commands.Cog):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
-		status_data = db.get("bot_status")
-		await self.client.change_presence(
-			activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
-			status = statusReference[status_data["status"]]
-		)
+		bot_status.update_status()
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):

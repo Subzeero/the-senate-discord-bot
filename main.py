@@ -9,7 +9,7 @@ import database as db # Custom database wrapper
 from discord.ext import commands
 from pretty_help import PrettyHelp
 
-# from stayin_alive import keep_alive # Webserver to keep the bot running; not required with Hacker plan
+# from helpers import stayin_alive # Webserver to keep the bot running; not required with Hacker plan
 
 intents = discord.Intents.all() # All permissions
 
@@ -23,7 +23,7 @@ client = commands.Bot( # Initialize bot settings
 )
 
 #Startup web server to prevent sleep
-# keep_alive()
+# stayin_alive.keep_alive()
 
 # Load cogs on startup
 for fileName in db.get("loaded_cogs"):
