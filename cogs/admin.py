@@ -12,6 +12,13 @@ activityReference = {
 	"competing": discord.ActivityType.competing
 }
 
+statusReference = {
+	"online": discord.Status.online,
+	"idle": discord.status.idle,
+	"dnd": discord.status.dnd,
+	"invisible": discord.status.invisible
+}
+
 class Admin(commands.Cog):
 	"""Administrator commands."""
 
@@ -48,13 +55,21 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.is_owner()
-	async def changeStatus(self, ctx, *, newStatus: str):
-		"""Change the bot's status."""
+	async def changeStatusType(self, ctx, newStatusStr):
+		"""Change the bot's status type.
+		Valid status types: `online`, `idle`, `dnd`, `invisible`."""
+		None
+
+	@commands.command()
+	@commands.is_owner()
+	async def changeStatusMessage(self, ctx, *, newStatusMessage: str):
+		"""Change the bot's status.
+		Any text is valid."""
 
 		await ctx.message.delete()
 
 		status_data = db.get("bot_status")
-		status_data["status"] = newStatus
+		status_data["message"] = newStatusMessage
 		db.set("bot_status", status_data)
 
 		await self.client.change_presence(activity = discord.Activity(type = activityReference[status_data["activity"]], name = newStatus))
@@ -71,8 +86,9 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.is_owner()
-	async def changeActivity(self, ctx, *, newActivityStr: str):
-		"""Change the bot's activity."""
+	async def changeStatusActivity(self, ctx, newActivityStr: str):
+		"""Change the bot's activity.
+		Valid activity types: `playing`, `streaming`, `listening`, `watching`, `competing`."""
 
 		await ctx.message.delete()
 		
@@ -97,6 +113,18 @@ class Admin(commands.Cog):
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
+
+	@commands.command()
+	@commands.is_owner()
+	async def startMaintenance(self, ctx):
+		"""Enter maintenance mode."""
+		None
+
+	@commands.command()
+	@commands.is_owner()
+	async def stopMaintenance(self, ctx):
+		"""End maintenance mode."""
+		None
 
 	@commands.command(aliases = ["close", "stop"])
 	@commands.is_owner()
