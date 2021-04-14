@@ -14,9 +14,9 @@ activityReference = {
 
 statusReference = {
 	"online": discord.Status.online,
-	"idle": discord.status.idle,
-	"dnd": discord.status.dnd,
-	"invisible": discord.status.invisible
+	"idle": discord.Status.idle,
+	"dnd": discord.Status.dnd,
+	"invisible": discord.Status.invisible
 }
 
 class Admin(commands.Cog):
