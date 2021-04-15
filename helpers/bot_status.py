@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-def update_status():
+async def update_status():
 	status_data = db.get("bot_status")
 
 	if status_data["maintenance"]:
