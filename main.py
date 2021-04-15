@@ -33,4 +33,4 @@ for fileName in db.get("loaded_cogs"):
 	except:
 		print(f"Failed to load {fileName}.")
 
-client.run(os.getenv("DISCORD_TOKEN")) # Get bot token from secret ENV file and start running
+client.run(os.environ['DISCORD_TOKEN']) # Get bot token from secret ENV file and start running
