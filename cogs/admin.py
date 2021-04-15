@@ -5,21 +5,6 @@ from helpers import bot_status
 # View DB:
 # curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
-activityReference = {
-	"playing": discord.ActivityType.playing,
-	"streaming": discord.ActivityType.streaming,
-	"listening": discord.ActivityType.listening,
-	"watching": discord.ActivityType.watching,
-	"competing": discord.ActivityType.competing
-}
-
-statusReference = {
-	"online": discord.Status.online,
-	"idle": discord.Status.idle,
-	"dnd": discord.Status.dnd,
-	"invisible": discord.Status.invisible
-}
-
 class Admin(commands.Cog):
 	"""Administrator commands."""
 
