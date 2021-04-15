@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from database import db
 
 async def update_status():
 	status_data = db.get("bot_status")
