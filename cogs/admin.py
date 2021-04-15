@@ -72,7 +72,7 @@ class Admin(commands.Cog):
 		status_data["status"] = newStatusStr
 		db.set("bot_status", status_data)
 
-		bot_status.update_status()
+		await bot_status.update_status()
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
@@ -96,7 +96,7 @@ class Admin(commands.Cog):
 		status_data["message"] = newStatusMessage
 		db.set("bot_status", status_data)
 
-		bot_status.update_status()
+		await bot_status.update_status()
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status message!",
@@ -126,7 +126,7 @@ class Admin(commands.Cog):
 		status_data["activity"] = newActivityStr
 		db.set("bot_status", status_data)
 
-		bot_status.update_status()
+		await bot_status.update_status()
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",
@@ -149,7 +149,7 @@ class Admin(commands.Cog):
 		status_data["maintenance"] = True
 		db.set("bot_status", status_data)
 
-		bot_status.update_status()
+		await bot_status.update_status()
 
 		embed = discord.Embed(
 			description = "✅ Successfully enabled maintenance mode!",
@@ -172,7 +172,7 @@ class Admin(commands.Cog):
 		status_data["maintenance"] = False
 		db.set("bot_status", status_data)
 
-		bot_status.update_status()
+		await bot_status.update_status()
 
 		embed = discord.Embed(
 			description = "✅ Successfully disabled maintenance mode!",
