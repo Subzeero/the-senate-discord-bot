@@ -1,6 +1,18 @@
-.pyc # cache file
-cpython # cache file
-__pycache__ # cache folder
-__pycache__/ # cache folder
-.DS_Store # MacOS file
-.vscode # VS Code file
+# MacOS file
+.DS_Store
+# VS Code file
+.vscode/
+
+# Python things
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
