@@ -22,7 +22,7 @@ async def update_status(client):
 
 	if status_data["maintenance"]:
 		await client.change_presence(
-			activity = discord.Activity(type = activityReference["playing"], name = "maintenance mode."),
+			activity = discord.Activity(type = activityReference["playing"], name = "MAINTENANCE BREAK"),
 			status = statusReference["dnd"]
 		)
 	else:

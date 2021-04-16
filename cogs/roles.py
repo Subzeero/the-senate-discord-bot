@@ -20,7 +20,7 @@ class Roles(commands.Cog):
 	@commands.check(check_Server)
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def changeRole(self, ctx):
-		"""[WIP]"""
+		"""Change your role name and colour."""
 
 		global roleChangeInProgress
 		if roleChangeInProgress:

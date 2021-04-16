@@ -40,5 +40,10 @@ class Random(commands.Cog):
 		await ctx.message.delete()
 		await ctx.send("https://tenor.com/xU6p.gif")
 
+	@commands.command()
+	@commands.cooldown(1, 5, commands.BucketType.user)
+	async def timer(self, ctx):
+		"""Create a countdown timer."""
+
 def setup(client):
 	client.add_cog(Random(client))
