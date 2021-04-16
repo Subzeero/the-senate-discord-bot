@@ -17,16 +17,16 @@ statusReference = {
 	"invisible": discord.Status.invisible
 }
 
-async def update_status():
+async def update_status(client):
 	status_data = db.get("bot_status")
 
 	if status_data["maintenance"]:
-		await discord.Client.change_presence(
+		await client.change_presence(
 			activity = discord.Activity(type = activityReference["playing"], name = "maintenance mode."),
 			status = statusReference["dnd"]
 		)
 	else:
-		await discord.Client.change_presence(
+		await client.change_presence(
 				activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
 				status = statusReference[status_data["status"]]
 			)

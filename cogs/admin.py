@@ -59,7 +59,7 @@ class Admin(commands.Cog):
 		status_data["status"] = newStatusStr
 		db.set("bot_status", status_data)
 
-		await bot_status.update_status()
+		await bot_status.update_status(self.client)
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
@@ -83,7 +83,7 @@ class Admin(commands.Cog):
 		status_data["message"] = newStatusMessage
 		db.set("bot_status", status_data)
 
-		await bot_status.update_status()
+		await bot_status.update_status(self.client)
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status message!",
@@ -115,7 +115,7 @@ class Admin(commands.Cog):
 		status_data["activity"] = newActivityStr
 		db.set("bot_status", status_data)
 
-		await bot_status.update_status()
+		await bot_status.update_status(self.client)
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",
