@@ -138,7 +138,7 @@ class Admin(commands.Cog):
 		status_data["maintenance"] = True
 		db.set("bot_status", status_data)
 
-		await bot_status.update_status()
+		await bot_status.update_status(self.client)
 
 		embed = discord.Embed(
 			description = "✅ Successfully enabled maintenance mode!",
@@ -161,7 +161,7 @@ class Admin(commands.Cog):
 		status_data["maintenance"] = False
 		db.set("bot_status", status_data)
 
-		await bot_status.update_status()
+		await bot_status.update_status(self.client)
 
 		embed = discord.Embed(
 			description = "✅ Successfully disabled maintenance mode!",
