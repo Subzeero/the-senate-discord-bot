@@ -47,6 +47,8 @@ class Admin(commands.Cog):
 		
 		await ctx.message.delete()
 
+		statusReference = bot_status.get_reference("status")
+
 		if newStatusStr.lower() in statusReference:
 			newStatus = statusReference[newStatusStr]
 		else:
@@ -100,6 +102,8 @@ class Admin(commands.Cog):
 		Valid activity types: `playing`, `streaming`, `listening`, `watching`, `competing`."""
 
 		await ctx.message.delete()
+
+		activityReference = bot_status.get_reference("activity")
 		
 		if newActivityStr.lower() in activityReference:
 			newActivity = activityReference[newActivityStr]

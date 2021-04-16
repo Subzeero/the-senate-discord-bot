@@ -30,3 +30,11 @@ async def update_status():
 				activity = discord.Activity(type = activityReference[status_data["activity"]], name = status_data["message"]),
 				status = activityReference[status_data["status"]]
 			)
+
+def get_reference(referenceType):
+	if referenceType == "activity":
+		return activityReference
+	elif referenceType == "status":
+		return statusReference
+	else:
+		return
