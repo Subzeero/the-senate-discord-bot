@@ -109,7 +109,7 @@ class Roles(commands.Cog):
 						inline = False
 					)
 					embed.set_image(
-						url = "https://i.imgur.com/seUpcRU.png"
+						url = "https://i.imgur.com/DxmuP7P.png"
 					)
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
