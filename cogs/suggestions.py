@@ -1,5 +1,5 @@
 import discord
-from discord import commands
+from discord.ext import commands
 
 suggestionsChannelId = 796553486677311510
 
@@ -44,6 +44,8 @@ class Suggestions(commands.Cog):
 		owner = self.client.get_user(ownerId)
 
 		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id: `{suggestionID}` to be deleted.")
+
+		await ctx.send()
 
 def setup(client):
 	client.add_cog(Suggestions(client))
