@@ -31,7 +31,7 @@ async def update_status(client):
 				status = statusReference[status_data["status"]]
 			)
 
-def get_reference(referenceType):
+def get_reference_table(referenceType):
 	if referenceType == "activity":
 		return activityReference
 	elif referenceType == "status":

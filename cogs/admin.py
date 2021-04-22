@@ -47,7 +47,7 @@ class Admin(commands.Cog):
 		
 		await ctx.message.delete()
 
-		statusReference = bot_status.get_reference("status")
+		statusReference = bot_status.get_reference_table("status")
 
 		if newStatusStr.lower() in statusReference:
 			newStatus = statusReference[newStatusStr]
@@ -103,7 +103,7 @@ class Admin(commands.Cog):
 
 		await ctx.message.delete()
 
-		activityReference = bot_status.get_reference("activity")
+		activityReference = bot_status.get_reference_table("activity")
 		
 		if newActivityStr.lower() in activityReference:
 			newActivity = activityReference[newActivityStr]
