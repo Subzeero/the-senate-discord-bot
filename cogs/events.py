@@ -154,9 +154,10 @@ class Events(commands.Cog):
 				name = str(message.author),
 				icon_url = message.author.avatar_url
 			)
-			embed.set_footer("This message will self-destruct in 10 seconds.")
+			embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
-			await message.channel.send(embed = embed)
+			await message.delete()
+			await message.channel.send(embed = embed, delete_after = 10)
 
 		for bannedItem in bannedWords:
 			# print(bannedItem, message.content)
