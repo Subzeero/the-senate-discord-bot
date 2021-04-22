@@ -146,6 +146,18 @@ class Events(commands.Cog):
 			await message.add_reaction("👍")
 			await message.add_reaction("👎")
 
+		if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
+			embed = discord.Embed(
+				description = "🛑 The only messages allowed in this channel are `;suggest <suggestion>` messages! Use #suggestion-discussion instead."
+			)
+			embed.set_author(
+				name = str(message.author),
+				avatar_url = message.author.avatar_url
+			)
+			embed.set_footer("This message will self-destruct in 10 seconds.")
+
+			await message.channel.send(embed = embed)
+
 		for bannedItem in bannedWords:
 			# print(bannedItem, message.content)
 			if bannedItem in message.content:
