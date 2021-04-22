@@ -13,7 +13,7 @@ class Suggestions(commands.Cog):
 	def check_Channel(ctx):
 		whitelistedChannels = debug.get_testing_channels()
 		whitelistedChannels.append(suggestionsChannelId)
-		
+
 		return ctx.message.channel.id in whitelistedChannels
 
 	@commands.command()
@@ -21,27 +21,21 @@ class Suggestions(commands.Cog):
 	async def suggest(self, ctx, *, suggestion: str):
 		"""Make a suggestion; only works in #suggestions."""
 
-		suggestionsChannel = self.client.get_channel(suggestionsChannelId)
-
-		message = await suggestionsChannel.send("Working...")
+		message = await ctx.channel.send("Working...")
 		await ctx.message.delete()
 
 		await message.add_reaction("👍")
 		await message.add_reaction("👎")
 
 		embed = discord.Embed(
+			description = suggestion,
 			colour = discord.Colour.gold()
 		)
-		embed.add_field(
-			name = "\uFEFF",
-			value = ctx.message.content,
-			inline = False
-		)
 		embed.set_author(
-			name = f"Suggestion by {ctx.author.mention}",
+			name = f"Suggestion by {str(ctx.author)}",
 			icon_url = ctx.author.avatar_url
 		)
-		embed.set_footer(text = "Vote by reacting to the emotes below! ID: {message.id}")
+		embed.set_footer(text = f"Vote by reacting to the emotes below! SuggestionID: {message.id}")
 
 		await message.edit(content = None, embed = embed)
 
@@ -50,10 +44,10 @@ class Suggestions(commands.Cog):
 	async def deleteSuggestion(self, ctx, suggestionID: int):
 		"""Request for a suggestion to be deleted."""
 
-		ownerId = self.client.owner_id
-		owner = self.client.get_user(ownerId)
-
-		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id: `{suggestionID}` to be deleted.")
+		owner = ctx.guild.get_member(296406728818425857)
+		
+		await ctx.message.delete()
+		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id `{suggestionID}` to be deleted.")
 
 		embed = discord.Embed(
 			description = f"✅ Suggestion deletion requested.",
