@@ -11,7 +11,9 @@ class Suggestions(commands.Cog):
 		self.client = client
 
 	def check_Channel(ctx):
-		whitelistedChannels = debug.get_testing_channels().append(suggestionsChannelId)
+		whitelistedChannels = debug.get_testing_channels()
+		whitelistedChannels.append(suggestionsChannelId)
+		
 		return ctx.message.channel.id in whitelistedChannels
 
 	@commands.command()

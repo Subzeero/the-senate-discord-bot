@@ -16,7 +16,8 @@ class Roles(commands.Cog):
 		if not ctx.guild:
 			return False
 
-		whitelistedServers = debug.get_testing_servers().append(745683100788457614)
+		whitelistedServers = debug.get_testing_servers()
+		whitelistedServers.append(745683100788457614)
 		return ctx.guild.id in whitelistedServers
 
 	@commands.command()
