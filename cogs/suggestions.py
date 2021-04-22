@@ -20,12 +20,18 @@ class Suggestions(commands.Cog):
 		suggestionsChannel = self.client.get_channel(suggestionsChannelId)
 
 		message = await suggestionsChannel.send("Working...")
+		await ctx.message.delete()
 
 		await message.add_reaction("👍")
 		await message.add_reaction("👎")
 
 		embed = discord.Embed(
 			colour = discord.Colour.gold()
+		)
+		embed.add_field(
+			name = "\uFEFF",
+			value = ctx.message.content,
+			inline = False
 		)
 		embed.set_author(
 			name = f"Suggestion by {ctx.author.mention}",
@@ -45,7 +51,15 @@ class Suggestions(commands.Cog):
 
 		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id: `{suggestionID}` to be deleted.")
 
-		await ctx.send()
+		embed = discord.Embed(
+			description = f"✅ Suggestion deletion requested.",
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
 
 def setup(client):
 	client.add_cog(Suggestions(client))
