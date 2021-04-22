@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from helpers import debug
 
 suggestionsChannelId = 796553486677311510
 
@@ -10,7 +11,8 @@ class Suggestions(commands.Cog):
 		self.client = client
 
 	def check_Channel(ctx):
-		return ctx.message.channel.id == suggestionsChannelId
+		whitelistedChannels = debug.get_testing_channels().append(suggestionsChannelId)
+		return ctx.message.channel.id in whitelistedChannels
 
 	@commands.command()
 	@commands.check(check_Channel)
