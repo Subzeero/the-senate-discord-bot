@@ -46,7 +46,7 @@ class Suggestions(commands.Cog):
 	async def deleteSuggestion(self, ctx, suggestionID: int):
 		"""Request for a suggestion to be deleted."""
 
-		ownerId = self.client.owner_Id
+		ownerId = self.client.owner_id
 		owner = self.client.get_user(ownerId)
 
 		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id: `{suggestionID}` to be deleted.")
