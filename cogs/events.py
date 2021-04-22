@@ -152,7 +152,7 @@ class Events(commands.Cog):
 			)
 			embed.set_author(
 				name = str(message.author),
-				avatar_url = message.author.avatar_url
+				icon_url = message.author.avatar_url
 			)
 			embed.set_footer("This message will self-destruct in 10 seconds.")
 
@@ -186,7 +186,7 @@ class Events(commands.Cog):
 				)
 				embed.set_author(
 					name = str(message.author),
-					avatar_url = message.author.avatar_url
+					icon_url = message.author.avatar_url
 				)
 
 				await message.channel.send(embed = embed)
