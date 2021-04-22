@@ -163,11 +163,21 @@ class Events(commands.Cog):
 			else:
 				return
 
-			await message.delete()
+			# await message.delete()
 			if message.guild:
 				muterole = message.guild.get_role(755925817028247644)
 				await message.author.add_roles(muterole)
-				await message.channel.send(f"You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you.")
+
+				embed = discord.Embed(
+					description = f"🛑 You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you. 🙊",
+					colour = discord.Colour.gold()
+				)
+				embed.set_author(
+					name = str(message.author),
+					avatar_url = message.author.avatar_url
+				)
+
+				await message.channel.send(embed = embed)
 
 def setup(client):
 	client.add_cog(Events(client))
