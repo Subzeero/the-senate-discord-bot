@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-moderatorRole = 767956851772882944
+moderatorRole = "Moderator"
 
 class Moderation(commands.Cog):
 	"""Moderation commands."""
