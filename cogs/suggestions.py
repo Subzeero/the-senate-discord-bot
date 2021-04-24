@@ -41,6 +41,36 @@ class Suggestions(commands.Cog):
 
 	@commands.command()
 	@commands.check(check_Channel)
+	async def editSuggestion(self, ctx, suggestionID: int, *, newSuggestionText: str):
+		"""Edit one of your suggestions."""
+
+		progress = await ctx.send("Working...")
+		await ctx.message.delete()
+
+		try:
+			message = await ctx.fetch_message(suggestionID)
+		except discord.NotFound:
+			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
+			return
+
+		whitelistedChannels = debug.get_testing_channels()
+		whitelistedChannels.append(suggestionsChannelId)
+		if not message.channel.id in whitelistedChannels:
+			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
+
+		embedDict = message.embeds[0].to_dict()
+
+		if embedDict["author"]["name"] != str(ctx.author):
+			await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
+			return
+
+		embedDict["description"] = newSuggestionText
+
+		await message.edit(embed = discord.Embed.from_dict(embedDict))
+		await progress.edit(content = "✅ Suggestion successfully updated!", delete_after = 5)
+
+	@commands.command()
+	@commands.check(check_Channel)
 	async def deleteSuggestion(self, ctx, suggestionID: int):
 		"""Request for a suggestion to be deleted."""
 
