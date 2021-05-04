@@ -176,13 +176,12 @@ class Events(commands.Cog):
 			else:
 				return
 
-			# await message.delete()
 			if message.guild:
 				muterole = message.guild.get_role(755925817028247644)
 				await message.author.add_roles(muterole)
 
 				embed = discord.Embed(
-					description = f"🛑 You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you. 🙊",
+					description = f"You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you. 🙊",
 					colour = discord.Colour.gold()
 				)
 				embed.set_author(
