@@ -7,7 +7,10 @@ def validate_server(serverId: int):
 	data_template = {
 		"reaction_roles": [],
 		"custom_roles": {},
-		"auto_reactions": {},
+		"auto_reactions": [],
+		"auto_delete": {},
+		"admin_roles": [],
+		"moderator_roles": [],
 		"DATA_VERSION": 1
 	}
 
