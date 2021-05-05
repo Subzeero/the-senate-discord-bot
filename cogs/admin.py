@@ -1,6 +1,9 @@
 import discord
-from discord.ext import commands, RoleConverter
-from database import db
+from discord.ext import commands
+from discord.ext.commands import RoleConverter
+import database as db
+
+RoleConverter = RoleConverter()
 
 class Admin(commands.Cog):
 	"""Server administrator commands."""
@@ -8,9 +11,11 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
+	@commands.check
 	def checkAdminPerm(ctx):
 		return ctx.channel.permissions_for(ctx.author).administrator
 
+	@commands.check
 	def checkAdminRole(ctx):
 		valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
 		for role in ctx.author.roles:
@@ -28,6 +33,16 @@ class Admin(commands.Cog):
 		admin_roles = server_data["admin_roles"]
 		mod_roles = server_data["moderator_roles"]
 
+		if admin_roles:
+			adminStr = "\n".join(admin_roles)
+		else:
+			adminStr = "None!"
+
+		if mod_roles:
+			modStr = "\n".join(mod_roles)
+		else:
+			modStr = "None!"
+
 		embed = discord.Embed(
 			colour = discord.Colour.gold()
 		)
@@ -39,12 +54,14 @@ class Admin(commands.Cog):
 
 		embed.add_field(
 			name = "Admin Roles",
-			value = "\n".join(admin_roles)
+			value = adminStr,
+			inline = False
 		)
 
 		embed.add_field(
 			name = "Moderator Roles",
-			value = "\n".join(mod_roles)
+			value = modStr,
+			inline = False
 		)
 
 		await ctx.send(embed = embed)
@@ -57,7 +74,7 @@ class Admin(commands.Cog):
 
 		server_data = db.validate_server(ctx.guild.id)
 
-		role = await RoleConverter.convert(ctx, newAdminRole)
+		role = await RoleConverter.convert(self, ctx, newAdminRole)
 
 		if role:
 			print("Role Found:", role.mention)
@@ -72,7 +89,7 @@ class Admin(commands.Cog):
 
 		server_data = db.validate_server(ctx.guild.id)
 
-		role = await RoleConverter.convert(ctx, newAdminRole)
+		role = await RoleConverter.convert(self, ctx, adminRoleToRemove)
 
 		if role:
 			print("Role Found:", role.mention)
