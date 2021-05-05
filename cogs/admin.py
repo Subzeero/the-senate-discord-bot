@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, RoleConverter
 from database import db
 
 class Admin(commands.Cog):
@@ -14,11 +14,11 @@ class Admin(commands.Cog):
 	def checkAdminRole(ctx):
 		valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
 		for role in ctx.author.roles:
-			if str(role) in valid_roles or str(role.id) in valid_roles:
+			if str(role) in valid_roles or role.id in valid_roles:
 				return True
 		return False
 
-	@commands.command()
+	@commands.command(aliases = ["listAdminRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles", "moderatorRoles"])
 	@commands.guild_only()
 	@commands.check_any(checkAdminPerm, checkAdminRole)
 	async def listControlRoles(self, ctx):
@@ -48,6 +48,36 @@ class Admin(commands.Cog):
 		)
 
 		await ctx.send(embed = embed)
+
+	@commands.command()
+	@commands.guild_only()
+	@commands.check_any(checkAdminPerm, checkAdminRole)
+	async def addAdminRole(self, ctx, newAdminRole):
+		"""Grant a role access to access admin commands."""
+
+		server_data = db.validate_server(ctx.guild.id)
+
+		role = await RoleConverter.convert(ctx, newAdminRole)
+
+		if role:
+			print("Role Found:", role.mention)
+		else:
+			print("Invalid!")
+
+	@commands.command()
+	@commands.guild_only()
+	@commands.check_any(checkAdminPerm, checkAdminRole)
+	async def removeAdminRole(self, ctx, adminRoleToRemove):
+		"""Remove a role's access to access admin commands."""
+
+		server_data = db.validate_server(ctx.guild.id)
+
+		role = await RoleConverter.convert(ctx, newAdminRole)
+
+		if role:
+			print("Role Found:", role.mention)
+		else:
+			print("Invalid!")
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
