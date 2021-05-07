@@ -23,7 +23,7 @@ def infoEmbed(*, name = None, desc = None, colour = discord.Colour.gold(), autho
 	)
 	if author:
 		embed.set_author(
-			name = author.name,
+			name = author.name + "#" + author.discriminator,
 			icon_url = author.icon_url
 		)
 	if footer:
