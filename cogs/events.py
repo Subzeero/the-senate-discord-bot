@@ -31,11 +31,7 @@ class Events(commands.Cog):
 			if ctx.cog._get_overridden_method(ctx.cog.cog_command_error) is not None:
 				return
 
-		#ignored = [] # No items wanted to be ignored
 		error = getattr(error, "original", error)
-
-		#if isinstance(error, ignored):
-		#	return
 
 		if isinstance(error, commands.DisabledCommand):
 			await ctx.send(f"❌ {ctx.command} has been disabled!")
@@ -60,6 +56,9 @@ class Events(commands.Cog):
 
 		elif isinstance(error, commands.UserInputError):
 			await ctx.send(f"❌ Invalid Arguments. Type `;help {ctx.command}` to see the proper arguments.")
+
+		elif isinstance(error, commands.BadArgument):
+			await ctx.send(f"❌ An API error occurred or the requested content could not be found. Please try again later.")
 
 		elif isinstance(error, commands.CheckFailure):
 			await ctx.send("❌ You don't have permission to run this command! Maybe try in a different channel.")
