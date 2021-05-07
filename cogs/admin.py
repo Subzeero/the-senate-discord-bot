@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import RoleConverter
 import database as db
+from helpers import embeds
 
 RoleConverter = RoleConverter()
 
@@ -23,11 +24,11 @@ class Admin(commands.Cog):
 				return True
 		return False
 
-	@commands.command(aliases = ["listAdminRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles", "moderatorRoles"])
+	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles"])
 	@commands.guild_only()
 	@commands.check_any(checkAdminPerm, checkAdminRole)
 	async def listControlRoles(self, ctx):
-		"""List the admin and mod roles used by the bot."""
+		"""List the administrator and moderator roles used by the bot."""
 
 		server_data = db.validate_server(ctx.guild.id)
 		admin_roles = server_data["admin_roles"]
@@ -43,17 +44,13 @@ class Admin(commands.Cog):
 		else:
 			modStr = "None!"
 
-		embed = discord.Embed(
-			colour = discord.Colour.gold()
-		)
-
-		embed.set_author(
-			name = f"Bot Control Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon_url
+		embed = embeds.customEmbed(
+			authorName = f"Bot Control Roles in {ctx.guild.name}",
+			authorIconURL = ctx.guild.icon_url
 		)
 
 		embed.add_field(
-			name = "Admin Roles",
+			name = "Administrator Roles",
 			value = adminStr,
 			inline = False
 		)
@@ -66,35 +63,109 @@ class Admin(commands.Cog):
 
 		await ctx.send(embed = embed)
 
-	@commands.command()
+	@commands.command(aliases = ["addAdminRole"])
 	@commands.guild_only()
 	@commands.check_any(checkAdminPerm, checkAdminRole)
-	async def addAdminRole(self, ctx, newAdminRole):
-		"""Grant a role access to access admin commands."""
+	async def addAdministratorRole(self, ctx, newAdminRole):
+		"""Grant a role (name or id) access to administrator commands."""
+
+		role = await RoleConverter.convert(ctx, newAdminRole)
 
 		server_data = db.validate_server(ctx.guild.id)
 
-		role = await RoleConverter.convert(self, ctx, newAdminRole)
-
-		if role:
-			print("Role Found:", role.mention)
+		try:
+			int(newAdminRole)
+		except:
+			server_data["admin_roles"].append(str(role))
 		else:
-			print("Invalid!")
+			server_data["admin_roles"].append(role.id))
 
-	@commands.command()
+		embed = embeds.tempEmbed(
+			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
+			author = ctx.author
+		)
+
+		await ctx.send(embed = embed)
+
+	@commands.command(aliases = ["removeAdminRole"])
 	@commands.guild_only()
 	@commands.check_any(checkAdminPerm, checkAdminRole)
-	async def removeAdminRole(self, ctx, adminRoleToRemove):
+	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
+		"""Remove a role's (name or id) access to administrator commands."""
+
+		server_data = db.validate_server(ctx.guild.id)
+
+		try:
+			int(adminRoleToRemove)
+		except:
+			pass
+
+		try:
+			server_data["admin_roles"].remove(adminRoleToRemove)
+		except:
+			embed = embeds.tempEmbed(
+				desc = f"❌ `{adminRoleToRemove}` is not an admin role.",
+				author = ctx.author
+			)
+			await ctx.send(embed = embed)
+		else:
+			embed = embeds.tempEmbed(
+				desc = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
+				author = ctx.author
+			)
+			await ctx.send(embed = embed)
+
+	@commands.command(aliases = ["addModRole"])
+	@commands.guild_only()
+	@commands.check_any(checkAdminPerm, checkAdminRole)
+	async def addModeratorRole(self, ctx, newModRole):
+		"""Grant a role (name or id) access to moderator commands."""
+
+		role = await RoleConverter.convert(ctx, newModRole)
+
+		server_data = db.validate_server(ctx.guild.id)
+
+		try:
+			int(newModRole)
+		except:
+			server_data["mod_roles"].append(str(role))
+		else:
+			server_data["mod_roles"].append(role.id))
+
+		embed = embeds.tempEmbed(
+			desc = f"✅ Successfully set `{newModRole}` as an moderator role.",
+			author = ctx.author
+		)
+
+		await ctx.send(embed = embed)
+
+	@commands.command(aliases = ["removeModRole"])
+	@commands.guild_only()
+	@commands.check_any(checkAdminPerm, checkAdminRole)
+	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access admin commands."""
 
 		server_data = db.validate_server(ctx.guild.id)
 
-		role = await RoleConverter.convert(self, ctx, adminRoleToRemove)
+		try:
+			int(modRoleToRemove)
+		except:
+			pass
 
-		if role:
-			print("Role Found:", role.mention)
+		try:
+			server_data["moderator_roles"].remove(modRoleToRemove)
+		except:
+			embed = embeds.tempEmbed(
+				desc = f"❌ `{modRoleToRemove}` is not an moderator role.",
+				author = ctx.author
+			)
+			await ctx.send(embed = embed)
 		else:
-			print("Invalid!")
+			embed = embeds.tempEmbed(
+				desc = f"✅ `{modRoleToRemove}` is no longer an moderator role.",
+				author = ctx.author
+			)
+			await ctx.send(embed = embed)
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
@@ -115,9 +186,9 @@ class Admin(commands.Cog):
 
 		try:
 			message = ctx.fetch_message(messageID)
-		except discord.NotFound:
-			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
-			return
+		# except discord.NotFound:
+		# 	await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
+		# 	return
 
 		if message.author.id == self.user.id:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
