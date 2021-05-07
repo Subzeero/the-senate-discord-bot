@@ -523,7 +523,7 @@ class Roles(commands.Cog):
 
 					messagesList.append(await ctx.send(embed = embed))
 
-	@commands.command()
+	@commands.command(aliases = ["roles"])
 	@commands.guild_only()
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def listroles(self, ctx):
@@ -556,7 +556,7 @@ class Roles(commands.Cog):
 
 		await ctx.send(embed = embed)
 		
-	@commands.command(name = "rolePermissions", aliases = ["rperms"])
+	@commands.command(name = "rolePermissions", aliases = ["rperms", "roleperms"])
 	@commands.guild_only()
 	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def role_permissions(self, ctx, role: discord.Role):
@@ -578,7 +578,7 @@ class Roles(commands.Cog):
 
 		await ctx.send(embed = embed)
 
-	@commands.command(name = "userPermissions", aliases = ["uperms"])
+	@commands.command(name = "userPermissions", aliases = ["uperms", "userperms"])
 	@commands.guild_only()
 	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def user_permissions(self, ctx, member: discord.Member = None):
