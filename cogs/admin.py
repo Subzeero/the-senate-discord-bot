@@ -72,6 +72,7 @@ class Admin(commands.Cog):
 	@commands.command(aliases = ["addAdminRole"])
 	@commands.guild_only()
 	# @commands.check_any(checkAdminPerm, checkAdminRole)	async def addAdministratorRole(self, ctx, newAdminRole):
+	async def addAdministratorRole(self, ctx, newAdminRole):
 		"""Grant a role (name or id) access to administrator commands."""
 
 		role = await RoleConverter.convert(ctx, newAdminRole)
