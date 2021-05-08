@@ -11,7 +11,7 @@ def tempEmbed(*, name = None, desc = None, colour = discord.Colour.gold(), autho
 	if author:
 		embed.set_author(
 			name = author.name + "#" + author.discriminator,
-			icon_url = author.icon_url
+			icon_url = author.avatar_url
 		)
 	return embed
 
@@ -24,7 +24,7 @@ def infoEmbed(*, name = None, desc = None, colour = discord.Colour.gold(), autho
 	if author:
 		embed.set_author(
 			name = author.name + "#" + author.discriminator,
-			icon_url = author.icon_url
+			icon_url = author.avatar_url
 		)
 	if footer:
 		embed.set_footer(text = footer)
