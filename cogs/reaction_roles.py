@@ -12,7 +12,7 @@ class ReactionRoles(commands.Cog):
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
 	async def listReactionRoles(self, ctx):
-		"""Remove a reaction role."""
+		"""List all of the reaction roles."""
 
 		serverId = ctx.guild.id
 		server_data = db.validate_server(serverId)
