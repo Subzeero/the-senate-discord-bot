@@ -80,7 +80,9 @@ class Admin(commands.Cog):
 		else:
 			server_data["admin_roles"].append(role.id)
 
-		embed = embeds.tempEmbed(
+		db.set_server(ctx.guild.id, server_data)
+
+		embed = embeds.infoEmbed(
 			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
 			author = ctx.author
 		)
@@ -103,13 +105,14 @@ class Admin(commands.Cog):
 		try:
 			server_data["admin_roles"].remove(adminRoleToRemove)
 		except:
-			embed = embeds.tempEmbed(
+			embed = embeds.infoEmbed(
 				desc = f"❌ `{adminRoleToRemove}` is not an admin role.",
 				author = ctx.author
 			)
 			await ctx.send(embed = embed)
 		else:
-			embed = embeds.tempEmbed(
+			db.set_server(ctx.guild.id, server_data)
+			embed = embeds.infoEmbed(
 				desc = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
 				author = ctx.author
 			)
@@ -132,7 +135,9 @@ class Admin(commands.Cog):
 		else:
 			server_data["mod_roles"].append(role.id)
 
-		embed = embeds.tempEmbed(
+		db.set_server(ctx.guild.id, server_data)
+
+		embed = embeds.infoEmbed(
 			desc = f"✅ Successfully set `{newModRole}` as an moderator role.",
 			author = ctx.author
 		)
@@ -155,13 +160,14 @@ class Admin(commands.Cog):
 		try:
 			server_data["moderator_roles"].remove(modRoleToRemove)
 		except:
-			embed = embeds.tempEmbed(
+			embed = embeds.infoEmbed(
 				desc = f"❌ `{modRoleToRemove}` is not an moderator role.",
 				author = ctx.author
 			)
 			await ctx.send(embed = embed)
 		else:
-			embed = embeds.tempEmbed(
+			db.set_server(ctx.guild.id, server_data)
+			embed = embeds.infoEmbed(
 				desc = f"✅ `{modRoleToRemove}` is no longer an moderator role.",
 				author = ctx.author
 			)
@@ -184,8 +190,8 @@ class Admin(commands.Cog):
 
 		await ctx.message.delete()
 
-		try:
-			message = ctx.fetch_message(messageID)
+		# try:
+		message = ctx.fetch_message(messageID)
 		# except discord.NotFound:
 		# 	await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 		# 	return
