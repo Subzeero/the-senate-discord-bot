@@ -41,7 +41,7 @@ class Extensions(commands.Cog):
 
 		self.client.unload_extension(f"cogs.{extension}")
 
-		loadedCogs = db.get("loadedCogs")
+		loadedCogs = db.get("loaded_cogs")
 		if extension in loadedCogs:
 			loadedCogs.remove(extension)
 			db.set("loaded_cogs", loadedCogs)	
