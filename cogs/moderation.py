@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from helpers import embeds
+from helpers import checks, embeds
 
 class Moderation(commands.Cog):
 	"""Moderation commands."""
