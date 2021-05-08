@@ -81,7 +81,7 @@ class Roles(commands.Cog):
 				roleChangeInProgress = False
 				return
 
-			if response1.content == "cancel":
+			if response1.content.lower() == "cancel":
 				embed = discord.Embed(
 					title = "Custom Role Configuration",
 					description = "❌ Role creation cancelled.",
@@ -145,7 +145,7 @@ class Roles(commands.Cog):
 						roleChangeInProgress = False
 						break
 
-					if response2.content == "cancel":
+					if response2.content.lower() == "cancel":
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
 							description = "❌ Role creation cancelled.",
@@ -284,7 +284,7 @@ class Roles(commands.Cog):
 					await ctx.channel.delete_messages(messagesList)
 					break
 
-				if response1.content == "cancel":
+				if response1.content.lower() == "cancel":
 					embed = discord.Embed(
 						title = "Custom Role Configuration",
 						description = "❌ Role configuration cancelled.",
@@ -342,7 +342,7 @@ class Roles(commands.Cog):
 						await ctx.channel.delete_messages(messagesList)
 						break
 
-					if response2.content == "cancel":
+					if response2.content.lower() == "cancel":
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
 							description = "❌ Role configuration cancelled.",
@@ -432,7 +432,7 @@ class Roles(commands.Cog):
 						roleChangeInProgress = False
 						break
 
-					if response2.content == "cancel":
+					if response2.content.lower() == "cancel":
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
 							description = "❌ Role creation cancelled.",
