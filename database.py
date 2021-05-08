@@ -10,7 +10,7 @@ def validate_server(serverId: int):
 		"auto_reactions": [],
 		"auto_delete": {},
 		"admin_roles": [],
-		"moderator_roles": [],
+		"mod_roles": [],
 		"DATA_VERSION": 1
 	}
 
