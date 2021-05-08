@@ -11,4 +11,4 @@ def isMod():
 	async def predicate(ctx):
 		valid_roles = db.validate_server(ctx.guild.id)["mod_roles"]
 		return commands.has_any_role(valid_roles)
-	return predicate
+	return commands.check(predicate)
