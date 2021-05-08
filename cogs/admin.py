@@ -12,25 +12,11 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	# @commands.check
-	# def checkAdminPerm(ctx):
-	# 	return ctx.channel.permissions_for(ctx.author).administrator
-
-	# @commands.check
-	# def checkAdminRole(ctx):
-	# 	valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
-	# 	for role in ctx.author.roles:
-	# 		if str(role) in valid_roles or role.id in valid_roles:
-	# 			return True
-	# 	return False
-
 	async def cog_check(self, ctx):
 		return checks.isAdmin()
 
 	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles"])
 	@commands.guild_only()
-	# @checks.isAdmin()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
@@ -71,7 +57,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addAdminRole"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)	async def addAdministratorRole(self, ctx, newAdminRole):
 	async def addAdministratorRole(self, ctx, newAdminRole):
 		"""Grant a role (name or id) access to administrator commands."""
 
@@ -97,7 +82,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeAdminRole"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
 		"""Remove a role's (name or id) access to administrator commands."""
 
@@ -126,7 +110,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addModRole"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def addModeratorRole(self, ctx, newModRole):
 		"""Grant a role (name or id) access to moderator commands."""
 
@@ -152,7 +135,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeModRole"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access admin commands."""
 
@@ -181,7 +163,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def echo(self, ctx, *, content:str):
 		"""Echo a message back from the bot."""
 
@@ -190,17 +171,12 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["edit"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def editMessage(self, ctx, messageID:int, newContent:str):
 		"""Edit a message from the bot."""
 
 		await ctx.message.delete()
 
-		# try:
 		message = await ctx.fetch_message(messageID)
-		# except discord.NotFound:
-		# 	await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
-		# 	return
 
 		if message.author.id == self.user.id:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
@@ -210,7 +186,6 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["sayembed"])
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def echoEmbed(self, ctx, channel:discord.TextChannel, *, content:str):
 		"""Make an announcement."""
 
@@ -224,7 +199,6 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.guild_only()
-	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def editEmbedMessage(self, ctx, messageID:int, *, newContent:str):
 		"""Edit a message with an embed."""
 
