@@ -191,7 +191,7 @@ class Admin(commands.Cog):
 		await ctx.message.delete()
 
 		# try:
-		message = ctx.fetch_message(messageID)
+		message = await ctx.fetch_message(messageID)
 		# except discord.NotFound:
 		# 	await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 		# 	return
@@ -225,7 +225,7 @@ class Admin(commands.Cog):
 		await ctx.message.delete()
 
 		try:
-			message = ctx.fetch_message(messageID)
+			message = await ctx.fetch_message(messageID)
 		except discord.NotFound:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
