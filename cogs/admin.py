@@ -32,7 +32,7 @@ class Admin(commands.Cog):
 
 		server_data = db.validate_server(ctx.guild.id)
 		admin_roles = server_data["admin_roles"]
-		mod_roles = server_data["moderator_roles"]
+		mod_roles = server_data["mod_roles"]
 
 		if admin_roles:
 			adminStr = "\n".join(admin_roles)
@@ -158,7 +158,7 @@ class Admin(commands.Cog):
 			pass
 
 		try:
-			server_data["moderator_roles"].remove(modRoleToRemove)
+			server_data["mod_roles"].remove(modRoleToRemove)
 		except:
 			embed = embeds.infoEmbed(
 				desc = f"❌ `{modRoleToRemove}` is not an moderator role.",
