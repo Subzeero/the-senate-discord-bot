@@ -8,10 +8,8 @@ class Testing(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	# for key in db.get_keys():
-	# 	print(key)
-	# 	print(db.get(key))
-	# Hello There
+	async def cog_check(self, ctx):
+		return commands.is_owner()
 
 def setup(client):
 	client.add_cog(Testing(client))
