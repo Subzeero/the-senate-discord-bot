@@ -78,7 +78,7 @@ class Admin(commands.Cog):
 		except:
 			server_data["admin_roles"].append(str(role))
 		else:
-			server_data["admin_roles"].append(role.id))
+			server_data["admin_roles"].append(role.id)
 
 		embed = embeds.tempEmbed(
 			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
@@ -130,7 +130,7 @@ class Admin(commands.Cog):
 		except:
 			server_data["mod_roles"].append(str(role))
 		else:
-			server_data["mod_roles"].append(role.id))
+			server_data["mod_roles"].append(role.id)
 
 		embed = embeds.tempEmbed(
 			desc = f"✅ Successfully set `{newModRole}` as an moderator role.",
