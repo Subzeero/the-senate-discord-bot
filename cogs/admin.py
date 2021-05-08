@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import RoleConverter
 import database as db
-from helpers import embeds
+from helpers import checks, embeds
 
 RoleConverter = RoleConverter()
 
@@ -12,21 +12,25 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.check
-	def checkAdminPerm(ctx):
-		return ctx.channel.permissions_for(ctx.author).administrator
+	# @commands.check
+	# def checkAdminPerm(ctx):
+	# 	return ctx.channel.permissions_for(ctx.author).administrator
 
-	@commands.check
-	def checkAdminRole(ctx):
-		valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
-		for role in ctx.author.roles:
-			if str(role) in valid_roles or role.id in valid_roles:
-				return True
-		return False
+	# @commands.check
+	# def checkAdminRole(ctx):
+	# 	valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
+	# 	for role in ctx.author.roles:
+	# 		if str(role) in valid_roles or role.id in valid_roles:
+	# 			return True
+	# 	return False
+
+	async def cog_check(self, ctx):
+		return checks.isAdmin()
 
 	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @checks.isAdmin()
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
@@ -35,6 +39,8 @@ class Admin(commands.Cog):
 		mod_roles = server_data["mod_roles"]
 
 		if admin_roles:
+			for role in admin_roles:
+				adminStr.append()
 			adminStr = "\n".join(admin_roles)
 		else:
 			adminStr = "None!"
@@ -65,8 +71,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addAdminRole"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
-	async def addAdministratorRole(self, ctx, newAdminRole):
+	# @commands.check_any(checkAdminPerm, checkAdminRole)	async def addAdministratorRole(self, ctx, newAdminRole):
 		"""Grant a role (name or id) access to administrator commands."""
 
 		role = await RoleConverter.convert(ctx, newAdminRole)
@@ -91,7 +96,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeAdminRole"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
 		"""Remove a role's (name or id) access to administrator commands."""
 
@@ -120,7 +125,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addModRole"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def addModeratorRole(self, ctx, newModRole):
 		"""Grant a role (name or id) access to moderator commands."""
 
@@ -146,7 +151,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeModRole"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access admin commands."""
 
@@ -175,7 +180,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def echo(self, ctx, *, content:str):
 		"""Echo a message back from the bot."""
 
@@ -184,7 +189,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["edit"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def editMessage(self, ctx, messageID:int, newContent:str):
 		"""Edit a message from the bot."""
 
@@ -204,7 +209,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["sayembed"])
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def echoEmbed(self, ctx, channel:discord.TextChannel, *, content:str):
 		"""Make an announcement."""
 
@@ -218,7 +223,7 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.guild_only()
-	@commands.check_any(checkAdminPerm, checkAdminRole)
+	# @commands.check_any(checkAdminPerm, checkAdminRole)
 	async def editEmbedMessage(self, ctx, messageID:int, *, newContent:str):
 		"""Edit a message with an embed."""
 
