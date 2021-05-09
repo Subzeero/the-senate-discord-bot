@@ -77,7 +77,7 @@ class Extensions(commands.Cog):
 		await ctx.send(embed = embed, delete_after = 10)
 
 	@commands.command()
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.is_owner()
 	async def listcogs(self, ctx):
 		'''
 		List cog information.
