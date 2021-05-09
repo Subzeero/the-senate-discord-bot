@@ -15,7 +15,6 @@ class Events(commands.Cog):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
-		await bot_status.update_status(self.client)
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
