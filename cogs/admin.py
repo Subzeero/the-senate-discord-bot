@@ -12,11 +12,9 @@ class Admin(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	async def cog_check(self, ctx):
-		return checks.isAdmin()
-
 	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
@@ -26,13 +24,13 @@ class Admin(commands.Cog):
 
 		if admin_roles:
 			for role in admin_roles:
-				adminStr.append()
-			adminStr = "\n".join(admin_roles)
+				adminStr.append(f"`{role}`")
 		else:
 			adminStr = "None!"
 
 		if mod_roles:
-			modStr = "\n".join(mod_roles)
+			for role in mod_roles:
+				modStr.append(f"`{role}`")
 		else:
 			modStr = "None!"
 
@@ -57,6 +55,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addAdminRole"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def addAdministratorRole(self, ctx, newAdminRole):
 		"""Grant a role (name or id) access to administrator commands."""
 
@@ -82,6 +81,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeAdminRole"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
 		"""Remove a role's (name or id) access to administrator commands."""
 
@@ -110,6 +110,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["addModRole"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def addModeratorRole(self, ctx, newModRole):
 		"""Grant a role (name or id) access to moderator commands."""
 
@@ -135,6 +136,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["removeModRole"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access admin commands."""
 
@@ -163,6 +165,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def echo(self, ctx, *, content:str):
 		"""Echo a message back from the bot."""
 
@@ -171,6 +174,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["edit"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def editMessage(self, ctx, messageID:int, newContent:str):
 		"""Edit a message from the bot."""
 
@@ -186,6 +190,7 @@ class Admin(commands.Cog):
 
 	@commands.command(aliases = ["sayembed"])
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def echoEmbed(self, ctx, channel:discord.TextChannel, *, content:str):
 		"""Make an announcement."""
 
@@ -199,6 +204,7 @@ class Admin(commands.Cog):
 
 	@commands.command()
 	@commands.guild_only()
+	@checks.isAdmin()
 	async def editEmbedMessage(self, ctx, messageID:int, *, newContent:str):
 		"""Edit a message with an embed."""
 

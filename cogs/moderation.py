@@ -8,11 +8,10 @@ class Moderation(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	async def cog_check(self, ctx):
-		return commands.check_any(checks.isAdmin(), checks.isMod())
-
 	@commands.command(aliases = ["delete"])
 	@commands.cooldown(1, 10, commands.BucketType.user)
+	@commands.guild_only()
+	@commands.check_any(checks.isAdmin(), checks.isMod())
 	async def purge(self, ctx, numOfMessages: int, user: discord.User = None):
 		"""Purge a number of messages."""
 
@@ -53,6 +52,8 @@ class Moderation(commands.Cog):
 
 	@commands.command()
 	@commands.cooldown(1, 3, commands.BucketType.user)
+	@commands.guild_only()
+	@commands.check_any(checks.isAdmin(), checks.isMod())
 	async def react(self, ctx, messageId:int, *reactions:str):
 		"""Add reactions to the specified message."""
 
