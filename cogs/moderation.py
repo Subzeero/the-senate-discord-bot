@@ -21,6 +21,9 @@ class Moderation(commands.Cog):
 			if message.id == ctx.message.id:
 				return True
 
+			if message == response:
+				return False
+
 			if numPurged >= numOfMessages:
 				return False
 
@@ -34,7 +37,7 @@ class Moderation(commands.Cog):
 				numPurged += 1
 				return True
 
-		message = await ctx.send("Working...")
+		response = await ctx.send("Working...")
 
 		while True:
 			if numPurged < numOfMessages:
@@ -42,7 +45,8 @@ class Moderation(commands.Cog):
 			else:
 				break
 
-		await message.edit(
+		await response.edit(
+			content = None,
 			embed = embeds.tempEmbed(
 				desc = f"✅ Successfully deleted {numOfMessages} messages.",
 				author = ctx.author

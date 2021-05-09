@@ -6,9 +6,9 @@ def isAdmin():
 	async def predicate(ctx):
 		valid_roles = db.validate_server(ctx.guild.id)["admin_roles"]
 		if not valid_roles:
-			return commands.has_permissions(administrator = True)
+			return await commands.has_permissions(administrator = True).predicate(ctx)
 		else:
-			return commands.has_permissions(administrator = True) or commands.has_any_role(valid_roles)
+			return await commands.has_permissions(administrator = True).predicate(ctx) or await commands.has_any_role(valid_roles).predicate(ctx)
 	return commands.check(predicate)
 
 def isMod():
@@ -17,5 +17,5 @@ def isMod():
 		if not valid_roles:
 			return False
 		else:
-			return commands.has_any_role(valid_roles)
+			return await commands.has_any_role(valid_roles).predicate(ctx)
 	return commands.check(predicate)
