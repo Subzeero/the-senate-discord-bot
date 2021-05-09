@@ -21,6 +21,8 @@ class Admin(commands.Cog):
 		server_data = db.validate_server(ctx.guild.id)
 		admin_roles = server_data["admin_roles"]
 		mod_roles = server_data["mod_roles"]
+		adminStr = ""
+		modStr = ""
 
 		if admin_roles:
 			for role in admin_roles:
