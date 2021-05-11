@@ -60,7 +60,7 @@ class Suggestions(commands.Cog):
 
 		embedDict = message.embeds[0].to_dict()
 
-		if embedDict["author"]["name"] != str(ctx.author):
+		if str(ctx.author) in embedDict["author"]["name"]:
 			await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
 			return
 

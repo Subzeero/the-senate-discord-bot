@@ -26,13 +26,13 @@ class Admin(commands.Cog):
 
 		if admin_roles:
 			for role in admin_roles:
-				adminStr.append(f"`{role}`")
+				adminStr = f"{adminStr}\n`{role}`"
 		else:
 			adminStr = "None!"
 
 		if mod_roles:
 			for role in mod_roles:
-				modStr.append(f"`{role}`")
+				modStr = f"{modStr}\n`{role}`"
 		else:
 			modStr = "None!"
 

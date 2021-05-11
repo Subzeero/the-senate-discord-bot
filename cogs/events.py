@@ -137,7 +137,7 @@ class Events(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if message.author.id == 773066373693046826 or message.author.id == 716390085896962058: # Ignore self and @Poketwo
+		if message.author.bot:
 			return
 
 		if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):

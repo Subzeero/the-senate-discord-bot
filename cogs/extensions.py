@@ -97,6 +97,9 @@ class Extensions(commands.Cog):
 					cogDict[fileName[:-3]] = "❎ Not Loaded!"
 					self.client.unload_extension(f"cogs.{fileName[:-3]}")
 
+		print(cogDict)
+		print(self.client.cogs)
+
 		embed = discord.Embed(
 			title = 'Extension Information', 
 			description = "The following cogs have been registered:", 
