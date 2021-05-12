@@ -140,9 +140,9 @@ class Events(commands.Cog):
 		if message.author.bot:
 			return
 
-		if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):
-			await message.add_reaction("👍")
-			await message.add_reaction("👎")
+		# if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):
+		# 	await message.add_reaction("👍")
+		# 	await message.add_reaction("👎")
 
 		if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
 			embed = discord.Embed(
