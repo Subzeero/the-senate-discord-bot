@@ -6,7 +6,7 @@ def validate_server(serverId: int):
 	serverId = str(serverId)
 	data_template = {
 		"action_log": {
-			"enabled": False
+			"enabled": False,
 			"rules": [],
 			"excluded_channels": []
 		},
