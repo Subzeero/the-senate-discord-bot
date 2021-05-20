@@ -1,7 +1,11 @@
 # MacOS file
 .DS_Store
+
 # VS Code file
 .vscode/
+
+# Database
+db.json
 
 # Python things
 __pycache__/
