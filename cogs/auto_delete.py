@@ -22,6 +22,27 @@ class AutoDelete(commands.Cog):
 	async def listAutoDeleteChannels(self, ctx):
 		"""List the channels managed with auto delete and their rules."""
 
+		server_data = db.validate_server(ctx.guild.id)
+
+		if not server_data["auto_delete"]:
+			embed = embeds.customEmbed(
+				authorName = "Channels managed with Auto-Delete",
+				authorIconURL = ctx.guild.icon_url,
+				desc = "None!"
+			)
+		else:
+			embed = embeds.customEmbed(
+				authorName = "Channels managed with Auto-Delete",
+				authorIconURL = ctx.guild.icon_url,
+			)
+
+			for channelId in server_data["auto_delete"]:
+				channelObject = ctx.guild
+				embed.add_field(
+					name = str(channelObject),
+					value = ""
+				)
+
 	@commands.command()
 	@commands.guild_only()
 	@checks.isAdmin()
