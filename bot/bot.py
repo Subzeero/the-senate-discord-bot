@@ -10,8 +10,6 @@ from discord.ext import commands
 from pretty_help import PrettyHelp
 from helpers import bot_status
 
-# from helpers import stayin_alive # Webserver to keep the bot running; not required with Hacker plan
-
 intents = discord.Intents.all() # All permissions
 status_data = bot_status.get_status()
 
@@ -25,9 +23,6 @@ client = commands.Bot( # Initialize bot settings
 	activity = status_data["activity"],
 	status = status_data["status"]
 )
-
-#Startup web server to prevent sleep
-# stayin_alive.keep_alive()
 
 # Load cogs on startup
 for fileName in db.get("loaded_cogs"):
