@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from database import db
+import database as db
 
 activityReference = {
 	"playing": discord.ActivityType.playing,
@@ -18,7 +18,7 @@ statusReference = {
 }
 
 def get_status():
-	status_data = db.get("bot_status")
+	status_data = db.get("bot_config")
 	if status_data["maintenance"]:
 		return{
 			"activity": discord.Activity(type = activityReference["playing"], name = "MAINTENANCE"),
@@ -31,7 +31,7 @@ def get_status():
 			}
 
 async def update_status(client):
-	status_data = db.get("bot_status")
+	status_data = db.get("bot_config")
 
 	if status_data["maintenance"]:
 		await client.change_presence(
