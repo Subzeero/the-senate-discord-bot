@@ -165,6 +165,18 @@ class Admin(commands.Cog):
 			)
 			await ctx.send(embed = embed)
 
+	@commands.command()
+	@commands.guild_only()
+	@checks.isAdmin()
+	async def changePrefix(self, ctx, newPrefix:str = None):
+		"""Change the bot's prefix."""
+		server_data = db.validate_server(ctx.guild.id)
+		server_data["custom_prefix"] = newPrefix
+		db.set_server(ctx.guild.id, server_data)
+
+		prefix = await self.client.get_prefix(ctx.message)
+		await ctx.send(f"✅ prefix set to `{prefix}`.")
+
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
 	@checks.isAdmin()
