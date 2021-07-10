@@ -1,56 +1,63 @@
-import os
-from pymongo import MongoClient
+import os, pymongo
+from database.versions import DATABASE_VERSIONS
 
-MONGO_USER = os.environ["MONGO_INITDB_ROOT_USERNAME"]
-MONGO_PASS = os.environ["MONGO_INITDB_ROOT_PASSWORD"]
+class Database(object):
+	USER = os.environ["MONGO_INITDB_ROOT_USERNAME"]
+	PASS = os.environ["MONGO_INITDB_ROOT_PASSWORD"]
+	URI = f"mongodb://{USER}:{PASS}@db:27017/"
 
-# MAKE THIS A CLASS
-mongo_client = MongoClient(f"mongodb://{MONGO_USER}:{MONGO_PASS}@db:27017/")
-db_object = mongo_client["the-senate-db"]
+	DB = None
+	SERVERS_COLLECTION = 'servers'
+	LATEST_DATA_VERSION = 1
 
-server_collection = db_object["servers"]
+	@staticmethod
+	def init():
+		client = pymongo.MongoClient(Database.URI)
+		Database.DB = client['the-senate-db']
 
-def validate_server(serverId: int):
-	data_template = {
-		"_id": 0,
-		"custom_prefix": None,
-		"DATA_VERSION": 1,
-		"action_log": {
-			"enabled": False,
-			"rules": [],
-			"excluded_channels": []
-		},
-		"auto_delete": {},
-		"auto_reactions": [],
-		"custom_roles": {},
-		"reaction_roles": [],
-		"admin_roles": [],
-		"mod_roles": []
-	}
+	@staticmethod
+	def get_collections():
+		return Database.DB.list_collection_names()
 
-	server_data = server_collection.find_one({"_id":serverId})
+	@staticmethod
+	def insert(collection:str, data:dict):
+		return Database.DB[collection].insert(data)
 
-	if server_data is None:
-		server_data = data_template
-		server_data["_id"] = serverId
-		server_collection.insert_one(server_data)
- 
-	return server_data
+	@staticmethod
+	def find(collection:str, query:dict):
+		return Database.DB[collection].find(query)
 
-def get_server(serverId: int):
-	server_data = server_collection.find_one({"_id":serverId})
-	return server_data
+	@staticmethod
+	def find_one(collection:str, query:dict):
+		return Database.DB[collection].find_one(query)
 
-def set_server(serverId: int, newServerData: dict):
-	server_collection.replace_one({"_id":serverId}, newServerData, upsert=True)
+	@staticmethod
+	def replace_one(collection:str, query:dict, data:dict, _upsert:bool = False):
+		return Database.DB[collection].replace_one(query, data, upsert=_upsert)
 
-def get_collection(collectionName):
-	collection = db_object[collectionName]
-	return collection.find_one()
+	@staticmethod
+	def delete(collection:str, query:dict):
+		return Database.DB[collection].delete(query)
 
-def set_collection(collectionName, data: dict):
-	collection = db_object[collectionName]
-	collection.replace_one({})
+	@staticmethod
+	def delete_one(collection:str, query:dict):
+		return Database.DB[collection].delete_one(query)
 
-def get_collections():
-	return db_object.list_collection_names()
+	@staticmethod
+	def get_server(serverId: int):
+		server_data = Database.find_one(Database.SERVERS_COLLECTION, {"_id":serverId})
+		
+		if server_data is None:
+			server_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
+		else:
+			server_data_version = server_data['DATA_VERSION']
+
+			while server_data_version < Database.LATEST_DATA_VERSION:
+				server_data = DATABASE_VERSIONS[server_data_version + 1].upgrade(server_data)
+				server_data_version = server_data['DATA_VERSION']
+
+		return server_data
+
+	@staticmethod
+	def set_server(serverId: int, new_server_data: dict):
+		return Database.replace_one(Database.SERVERS_COLLECTION, {'_id':serverId}, new_server_data, True)
