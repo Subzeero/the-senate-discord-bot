@@ -1,10 +1,9 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import RoleConverter
 import database as db
 from helpers import checks, embeds
 
-RoleConverter = RoleConverter()
+RoleConverter = commands.RoleConverter()
 
 class Admin(commands.Cog):
 	"""Server administrator commands."""
