@@ -1,12 +1,12 @@
 import discord
 from discord.ext import commands
-import database as db
+from database.db import Database as db
 
-class ActionLog(commands.Cog):
+class AutoRoles(commands.Cog):
 	"""Internal testing."""
 
 	def __init__(self, client):
 		self.client = client
 
 def setup(client):
-	client.add_cog(ActionLog(client))
+	client.add_cog(AutoRoles(client))

@@ -1,7 +1,6 @@
 import discord, traceback
 from discord.ext import commands
-import database as db
-from helpers import bot_status
+from database.db import Database as db
 
 suggestionsChannelId = 796553486677311510
 bannedWords = ["🖕"]
@@ -18,8 +17,7 @@ class Events(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
-		serverId = str(guild.id)
-		db.validate_server(serverId)
+		db.get_server(guild.id)
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
@@ -36,10 +34,13 @@ class Events(commands.Cog):
 			await ctx.send(f"❌ {ctx.command} has been disabled!")
 
 		if isinstance(error, commands.CommandOnCooldown):
-			await ctx.send(f"❌ {ctx.author.mention}, you're running commands too fast.")
+			await ctx.send(f"❌ Woah {ctx.author.mention}, you're running commands too fast.")
+
+		if isinstance(error, commands.MaxConcurrencyReached):
+			await ctx.send(f"❌ Someone else is running this command. Please try again later.")
 
 		elif isinstance(error, commands.CommandNotFound):
-			await ctx.send(f"❌ `{ctx.message.content[1:]}` is not a registered command.")
+			await ctx.send(f"❌ `{ctx.message.content[1:]}` is not a registered command.") # FIX THIS
 
 		elif isinstance(error, commands.NoPrivateMessage):
 			try:
@@ -83,7 +84,7 @@ class Events(commands.Cog):
 		if not user:
 			return
 
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 
 		def emojiCheck(emojiObject, unicodeEmoji, customEmojiId):
 			isUnicodeEmoji = emoji.is_unicode_emoji()
@@ -116,7 +117,7 @@ class Events(commands.Cog):
 		if not user:
 			return
 
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 
 		def emojiCheck(emojiObject, unicodeEmoji, customEmojiId):
 			isUnicodeEmoji = emoji.is_unicode_emoji()
@@ -139,10 +140,6 @@ class Events(commands.Cog):
 	async def on_message(self, message):
 		if message.author.bot:
 			return
-
-		# if message.channel.id == suggestionsChannelId and db.get("suggestionReactionsEnabled"):
-		# 	await message.add_reaction("👍")
-		# 	await message.add_reaction("👎")
 
 		if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
 			embed = discord.Embed(

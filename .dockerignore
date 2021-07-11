@@ -3,11 +3,11 @@
 # VS Code file
 .vscode/
 
-# Python things
-__pycache__/
-*.py[cod]
-*$py.class
-
 # Environments
 *.env
 venv/
+
+#Git Stuff
+.git
+.gitignore
+.gitattributes
