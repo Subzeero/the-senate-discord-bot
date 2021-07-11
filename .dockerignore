@@ -1,6 +1,13 @@
-.vscode/
+# MacOS file
 .DS_Store
+# VS Code file
+.vscode/
 
+# Environments
+*.env
+venv/
+
+#Git Stuff
 .git
 .gitignore
 .gitattributes
