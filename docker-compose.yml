@@ -4,8 +4,8 @@ services:
     build: ./bot
     image: the-senate-bot:latest
     container_name: the-senate-bot
-    depends_on: 
-      - db
+    # depends_on: 
+    #   - db
     env_file: ./config.env
     logging: 
       driver: "json-file"
@@ -16,29 +16,29 @@ services:
       - backend
     restart: unless-stopped
 
-  db:
-    image: mongo:latest
-    container_name: the-senate-db
-    env_file: ./config.env
-    expose: 
-      - "27017"
-    logging: 
-      driver: "json-file"
-      options: 
-        max-size: "100k"
-        max-file: "10"
-    networks: 
-      - backend
-    restart: unless-stopped
-    volumes: 
-      - db_data:/data/db
+#   db:
+#     image: mongo:latest
+#     container_name: the-senate-db
+#     env_file: ./config.env
+#     expose: 
+#       - "27017"
+#     logging: 
+#       driver: "json-file"
+#       options: 
+#         max-size: "100k"
+#         max-file: "10"
+#     networks: 
+#       - backend
+#     restart: unless-stopped
+#     volumes: 
+#       - db_data:/data/db
 
 networks: 
   backend:
     driver: bridge
     name: the-senate-backend
 
-volumes:
-  db_data:
-    driver: local
-    name: the-senate-data
+# volumes:
+#   db_data:
+#     driver: local
+#     name: the-senate-data
