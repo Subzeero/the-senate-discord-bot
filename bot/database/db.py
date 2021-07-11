@@ -1,19 +1,22 @@
 import os, pymongo
-from database.versions import DATABASE_VERSIONS
+from database.data_versions import DATABASE_VERSIONS
 
 class Database(object):
-	USER = os.environ["MONGO_INITDB_ROOT_USERNAME"]
-	PASS = os.environ["MONGO_INITDB_ROOT_PASSWORD"]
-	URI = f"mongodb://{USER}:{PASS}@db:27017/"
+	if os.environ["DISCORD_BOT_ENV"] == "PROD":
+		URI = os.environ["MONGODB_URI_PROD"]
+		DB_NAME = os.environ["MONGODB_DB_PROD"]
+	elif os.environ["DISCORD_BOT_ENV"] == "DEV":
+		URI = os.environ["MONGODB_URI_DEV"]
+		DB_NAME = os.environ["MONGODB_DB_DEV"]
 
 	DB = None
-	SERVERS_COLLECTION = 'servers'
+	SERVERS_COLLECTION = "servers"
 	LATEST_DATA_VERSION = 1
 
 	@staticmethod
 	def init():
 		client = pymongo.MongoClient(Database.URI)
-		Database.DB = client['the-senate-db']
+		Database.DB = client[Database.DB_NAME]
 
 	@staticmethod
 	def get_collections():
@@ -50,14 +53,14 @@ class Database(object):
 		if server_data is None:
 			server_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
 		else:
-			server_data_version = server_data['DATA_VERSION']
+			server_data_version = server_data["DATA_VERSION"]
 
 			while server_data_version < Database.LATEST_DATA_VERSION:
 				server_data = DATABASE_VERSIONS[server_data_version + 1].upgrade(server_data)
-				server_data_version = server_data['DATA_VERSION']
+				server_data_version = server_data["DATA_VERSION"]
 
 		return server_data
 
 	@staticmethod
 	def set_server(serverId: int, new_server_data: dict):
-		return Database.replace_one(Database.SERVERS_COLLECTION, {'_id':serverId}, new_server_data, True)
+		return Database.replace_one(Database.SERVERS_COLLECTION, {"_id":serverId}, new_server_data, True)
