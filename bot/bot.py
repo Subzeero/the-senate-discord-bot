@@ -4,7 +4,7 @@
 
 # Imports
 import discord, os
-from database import db # Custom database wrapper
+from database.db import Database as db # Custom database wrapper
 
 from discord.ext import commands
 from pretty_help import PrettyHelp
@@ -15,10 +15,10 @@ BOT_ENV = os.environ["DISCORD_BOT_ENV"]
 BOT_TOKEN = None
 BOT_PREFIX = None
 
+db.init() # Initialize database
+
 intents = discord.Intents.all() # All permissions/intents
 status_data = bot_status.get_status()
-
-db.init() # Initialize database
 
 if BOT_ENV == "PROD":
 	BOT_TOKEN = os.environ["DISCORD_TOKEN_PROD"]

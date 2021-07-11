@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import database as db
+from database.db import Database as db
 
 class AutoRoles(commands.Cog):
 	"""Internal testing."""

@@ -1,7 +1,7 @@
 import discord, emoji as emoji_lib, regex
 from discord.ext import commands
 from typing import Union
-from database import db
+from database.db import Database as db
 
 class ReactionRoles(commands.Cog):
 	"""Random commands."""

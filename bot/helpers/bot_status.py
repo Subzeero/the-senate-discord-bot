@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from database import db
+from database.db import Database as db
 
 activityReference = {
 	"playing": discord.ActivityType.playing,

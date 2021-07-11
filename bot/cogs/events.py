@@ -1,6 +1,6 @@
 import discord, traceback
 from discord.ext import commands
-from database import db
+from database.db import Database as db
 
 suggestionsChannelId = 796553486677311510
 bannedWords = ["🖕"]

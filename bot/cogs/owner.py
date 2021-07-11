@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from database import db
+from database.db import Database as db
 from helpers import bot_status
 
 class Owner(commands.Cog):

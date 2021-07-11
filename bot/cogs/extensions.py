@@ -1,6 +1,6 @@
 import discord, os
 from discord.ext import commands
-from database import db
+from database.db import Database as db
 
 class Extensions(commands.Cog):
 	"""Manages the bot's extensions."""

@@ -1,6 +1,6 @@
 import discord, asyncio
 from discord.ext import commands
-from database import db
+from database.db import Database as db
 from helpers import debug
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
@@ -21,7 +21,7 @@ class Roles(commands.Cog):
 
 	@commands.command()
 	@commands.check(check_Server)
-	@commands.max_concurrency(1, commands.BucketType.guild, False)
+	@commands.max_concurrency(1, commands.BucketType.guild)
 	async def changeRole(self, ctx):
 		"""Change your role name and colour."""
 		serverId = ctx.guild.id
