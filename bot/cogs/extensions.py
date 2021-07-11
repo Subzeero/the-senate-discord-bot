@@ -1,6 +1,6 @@
 import discord, os
 from discord.ext import commands
-import database as db
+from database import db
 
 class Extensions(commands.Cog):
 	"""Manages the bot's extensions."""
@@ -17,10 +17,10 @@ class Extensions(commands.Cog):
 
 		self.client.load_extension(f"cogs.{extension}")
 
-		loadedCogs = db.get("loaded_cogs")
-		if not extension in loadedCogs:
-			loadedCogs.append(extension)
-			db.set("loaded_cogs", loadedCogs)
+		bot_data = db.find_one("bot", {})
+		if not extension in bot_data["loaded_cogs"]:
+			bot_data["loaded_cogs"].append(extension)
+			db.replace_one("bot", {}, bot_data)
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been loaded!",
@@ -41,10 +41,10 @@ class Extensions(commands.Cog):
 
 		self.client.unload_extension(f"cogs.{extension}")
 
-		loadedCogs = db.get("loaded_cogs")
-		if extension in loadedCogs:
-			loadedCogs.remove(extension)
-			db.set("loaded_cogs", loadedCogs)	
+		bot_data = db.find_one("bot", {})
+		if extension in bot_data["loaded_cogs"]:
+			bot_data["loaded_cogs"].remove(extension)
+			db.replace_one("bot", {}, bot_data)
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been unloaded!",

@@ -4,7 +4,7 @@
 
 # Imports
 import discord, os
-import database as db # Custom database wrapper
+from database import db # Custom database wrapper
 
 from discord.ext import commands
 from pretty_help import PrettyHelp
@@ -15,7 +15,7 @@ BOT_ENV = os.environ["DISCORD_BOT_ENV"]
 BOT_TOKEN = None
 BOT_PREFIX = None
 
-intents = discord.Intents.all() # All permissions
+intents = discord.Intents.all() # All permissions/intents
 status_data = bot_status.get_status()
 
 db.init() # Initialize database
@@ -28,8 +28,8 @@ elif BOT_ENV == "DEV":
 	BOT_PREFIX = os.environ["DISCORD_BOT_PREFIX_DEV"]
 
 def get_prefix(bot, message):
-	custom_prefix = db.validate_server(message.guild.id)["custom_prefix"]
-	if custom_prefix:
+	custom_prefix = db.get_server(message.guild.id)["custom_prefix"]
+	if custom_prefix is not None:
 		return commands.when_mentioned_or(custom_prefix)(bot, message)
 	else:
 		return commands.when_mentioned_or(BOT_PREFIX)(bot, message)
@@ -46,7 +46,7 @@ client = commands.Bot( # Initialize bot settings
 )
 
 # Load cogs on startup
-for fileName in db.get("bot_config")["loaded_cogs"]:
+for fileName in db.find_one("bot", {})["loaded_cogs"]:
 	try:
 		client.load_extension(f"cogs.{fileName}")
 		print(f"Loaded {fileName}.")

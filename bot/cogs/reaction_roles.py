@@ -1,7 +1,7 @@
 import discord, emoji as emoji_lib, regex
 from discord.ext import commands
 from typing import Union
-import database as db
+from database import db
 
 class ReactionRoles(commands.Cog):
 	"""Random commands."""
@@ -15,7 +15,7 @@ class ReactionRoles(commands.Cog):
 		"""List all of the reaction roles."""
 
 		serverId = ctx.guild.id
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 
 		if not server_data["reaction_roles"]:
 			embed = discord.Embed(
@@ -90,7 +90,7 @@ class ReactionRoles(commands.Cog):
 		await message.add_reaction(emoji)
 
 		serverId = ctx.guild.id
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 
 		server_data["reaction_roles"].append({
 			"messageId": messageId,
@@ -120,7 +120,7 @@ class ReactionRoles(commands.Cog):
 		"""Remove a reaction role."""
 
 		serverId = ctx.guild.id
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 
 		try:
 			server_data["reaction_roles"][reactionRoleId]

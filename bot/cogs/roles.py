@@ -1,9 +1,8 @@
 import discord, asyncio
 from discord.ext import commands
-import database as db
+from database import db
 from helpers import debug
 
-roleChangeInProgress = False
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
 class Roles(commands.Cog):
@@ -22,19 +21,12 @@ class Roles(commands.Cog):
 
 	@commands.command()
 	@commands.check(check_Server)
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.max_concurrency(1, commands.BucketType.guild, False)
 	async def changeRole(self, ctx):
 		"""Change your role name and colour."""
-
-		global roleChangeInProgress
-		if roleChangeInProgress:
-			await ctx.send("Someone else is changing their role right now. Please try again later.")
-			return
-		roleChangeInProgress = True
-
 		serverId = ctx.guild.id
 		userId = ctx.author.id
-		server_data = db.validate_server(serverId)
+		server_data = db.get_server(serverId)
 		messagesList = [ctx.message]
 
 		def validateMessage(message):
@@ -78,7 +70,6 @@ class Roles(commands.Cog):
 
 				await ctx.send(embed = embed, delete_after = 300)
 				await ctx.channel.delete_messages(messagesList)
-				roleChangeInProgress = False
 				return
 
 			if response1.content.lower() == "cancel":
@@ -97,7 +88,6 @@ class Roles(commands.Cog):
 
 				await ctx.send(embed = embed, delete_after = 300)
 				await ctx.channel.delete_messages(messagesList)
-				roleChangeInProgress = False
 				return
 			
 			else:
@@ -142,7 +132,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed, delete_after = 300)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 					if response2.content.lower() == "cancel":
@@ -161,7 +150,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed, delete_after = 300)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 					else:
@@ -187,7 +175,6 @@ class Roles(commands.Cog):
 						if colourValue:
 							hackerRole = ctx.guild.get_role(745863515998519360)
 							if not hackerRole:
-								roleChangeInProgress = False
 								await ctx.send("❌ Discord is being mean, please try again later.")
 								break
 
@@ -204,7 +191,7 @@ class Roles(commands.Cog):
 
 							await ctx.author.add_roles(newRole)
 
-							server_data = db.validate_server(serverId)
+							server_data = db.get_server(serverId)
 							server_data["custom_roles"][str(userId)] = newRole.id
 							db.set_server(serverId, server_data)
 
@@ -220,7 +207,6 @@ class Roles(commands.Cog):
 
 							await ctx.send(embed = embed)
 							await ctx.channel.delete_messages(messagesList)
-							roleChangeInProgress = False
 							break
 
 						else:
@@ -300,7 +286,6 @@ class Roles(commands.Cog):
 
 					await ctx.send(embed = embed, delete_after = 300)
 					await ctx.channel.delete_messages(messagesList)
-					roleChangeInProgress = False
 					break
 
 				elif response1.content == "1":
@@ -358,7 +343,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed, delete_after = 300)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 					else:
@@ -367,7 +351,6 @@ class Roles(commands.Cog):
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
-							roleChangeInProgress = False
 							break
 
 						await userRole.edit(
@@ -386,7 +369,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 				elif response1.content == "2":
@@ -429,7 +411,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed, delete_after = 300)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 					if response2.content.lower() == "cancel":
@@ -448,7 +429,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed, delete_after = 300)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 					else:
@@ -488,7 +468,6 @@ class Roles(commands.Cog):
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
-							roleChangeInProgress = False
 							break
 
 						await userRole.edit(
@@ -507,7 +486,6 @@ class Roles(commands.Cog):
 
 						await ctx.send(embed = embed)
 						await ctx.channel.delete_messages(messagesList)
-						roleChangeInProgress = False
 						break
 
 				else:

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import database as db
+from database import db
 from helpers import checks, embeds
 
 RoleConverter = commands.RoleConverter()
@@ -17,7 +17,7 @@ class Admin(commands.Cog):
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 		admin_roles = server_data["admin_roles"]
 		mod_roles = server_data["mod_roles"]
 		adminStr = ""
@@ -62,7 +62,7 @@ class Admin(commands.Cog):
 
 		role = await RoleConverter.convert(ctx, newAdminRole)
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 
 		try:
 			int(newAdminRole)
@@ -86,7 +86,7 @@ class Admin(commands.Cog):
 	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
 		"""Remove a role's (name or id) access to administrator commands."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 
 		try:
 			int(adminRoleToRemove)
@@ -117,7 +117,7 @@ class Admin(commands.Cog):
 
 		role = await RoleConverter.convert(ctx, newModRole)
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 
 		try:
 			int(newModRole)
@@ -141,7 +141,7 @@ class Admin(commands.Cog):
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access admin commands."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 
 		try:
 			int(modRoleToRemove)
@@ -169,7 +169,7 @@ class Admin(commands.Cog):
 	@checks.isAdmin()
 	async def changePrefix(self, ctx, newPrefix:str = None):
 		"""Change the bot's prefix."""
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 		server_data["custom_prefix"] = newPrefix
 		db.set_server(ctx.guild.id, server_data)
 

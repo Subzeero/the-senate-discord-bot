@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
-import database as db
+from database import db
 from helpers import bot_status
-# View DB:
-# curl "https://databasemanager.ironblockhd.repl.co/g/" --get -d $REPLIT_DB_URL
 
 class Owner(commands.Cog):
 	"""Owner commands."""
@@ -11,45 +9,24 @@ class Owner(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(aliases = ["ssr", "sr"])
-	@commands.is_owner()
-	async def suggestionReactions(self, ctx, toggle:bool = True):
-		"""Toggle auto-reactions for #server-suggestions."""
-
-		await ctx.message.delete()
-
-		db.set("suggestionReactionsEnabled", toggle)
-		option = "enabled" if toggle else "disabled"
-
-		embed = discord.Embed(
-			description = f"✅ Auto reactions are now {option}!",
-			colour = discord.Colour.gold()
-		)
-
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
-
-		await ctx.send(embed = embed, delete_after = 10)
-
 	@commands.command()
 	@commands.is_owner()
-	async def changeStatusType(self, ctx, newStatusStr):
+	async def changeStatusType(self, ctx, newStatusStr:str):
 		"""Change the bot's status type.
 		Valid status types: `online`, `idle`, `dnd`, `invisible`."""
 		
 		await ctx.message.delete()
 
 		statusReference = bot_status.get_reference_table("status")
+		newStatusStr = newStatusStr.lower()
 
-		if newStatusStr.lower() in statusReference:
-			newStatus = statusReference[newStatusStr]
-		else:
+		if not newStatusStr in statusReference:
 			await ctx.send("❌ That is not a valid status type!")
 			return
 
-		status_data = db.get("bot_status")
-		status_data["status"] = newStatusStr
-		db.set("bot_status", status_data)
+		bot_data = db.find_one("bot", {})
+		bot_data["status"] = newStatusStr
+		db.replace_one("bot", {}, bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -71,9 +48,9 @@ class Owner(commands.Cog):
 
 		await ctx.message.delete()
 
-		status_data = db.get("bot_status")
-		status_data["message"] = newStatusMessage
-		db.set("bot_status", status_data)
+		bot_data = db.find_one("bot", {})
+		bot_data["message"] = newStatusMessage
+		db.replace_one("bot", {}, bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -96,16 +73,15 @@ class Owner(commands.Cog):
 		await ctx.message.delete()
 
 		activityReference = bot_status.get_reference_table("activity")
+		newActivityStr = newActivityStr.lower()
 		
-		if newActivityStr.lower() in activityReference:
-			newActivity = activityReference[newActivityStr]
-		else:
+		if not newActivityStr in activityReference:
 			await ctx.send("❌ That is not a valid activity type!")
 			return
 		
-		status_data = db.get("bot_status")
-		status_data["activity"] = newActivityStr
-		db.set("bot_status", status_data)
+		bot_data = db.find_one("bot", {})
+		bot_data["activity"] = newActivityStr
+		db.replace_one("bot", {}, bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -126,9 +102,9 @@ class Owner(commands.Cog):
 		
 		await ctx.message.delete()
 
-		status_data = db.get("bot_status")
-		status_data["maintenance"] = True
-		db.set("bot_status", status_data)
+		bot_data = db.find_one("bot", {})
+		bot_data["maintenance"] = True
+		db.replace_one("bot", {}, bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -149,9 +125,9 @@ class Owner(commands.Cog):
 		
 		await ctx.message.delete()
 
-		status_data = db.get("bot_status")
-		status_data["maintenance"] = False
-		db.set("bot_status", status_data)
+		bot_data = db.find_one("bot", {})
+		bot_data["maintenance"] = False
+		db.replace_one("bot", {}, bot_data)
 
 		await bot_status.update_status(self.client)
 

@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-import database as db
+from database import db
 from helpers import checks, embeds
 
 ruleTypes = ["startswith", "endswith", "contains", "matches", "command"]
@@ -22,7 +22,7 @@ class AutoDelete(commands.Cog):
 	async def listAutoDeleteChannels(self, ctx):
 		"""List the channels managed with auto delete and their rules."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 
 		if not server_data["auto_delete"]:
 			embed = embeds.customEmbed(
@@ -49,7 +49,7 @@ class AutoDelete(commands.Cog):
 	async def addAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Enable auto delete on a given channel."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 		server_data["auto_delete"][str(channel.id)] = {
 			"enabled": False,
 			"rules": []
@@ -61,7 +61,7 @@ class AutoDelete(commands.Cog):
 	async def editAutoDeleteChannelRules(self, ctx, channel:discord.TextChannel, editOption:str = None, ruleType:str = None, ruleExpression:str = None):
 		"""Edit the rules of a channel managed with auto delete."""
 
-		server_data = db.validate_server(ctx.guild.id)
+		server_data = db.get_server(ctx.guild.id)
 		if not str(channel.id) in server_data["auto_delete"]:
 			return await ctx.send(f"❌ {channel.mention} has not been configured. Use `;addAutoDeleteChannel` to get it set up.")
 
