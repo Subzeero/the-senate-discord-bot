@@ -2,6 +2,8 @@
 
 FROM python:3.8-slim-buster
 
+ENV PYTHONUNBUFFERED True
+
 WORKDIR /bot
 
 COPY requirements.txt requirements.txt
