@@ -52,6 +52,7 @@ class Database(object):
 		
 		if server_data is None:
 			server_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
+			server_data["SERVER_ID"] = serverId
 		else:
 			server_data_version = server_data["DATA_VERSION"]
 
