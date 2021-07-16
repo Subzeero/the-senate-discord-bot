@@ -1,8 +1,8 @@
 class VERSION1(object):
 	BASE_STRUCTURE = {
-		"_id": 0,
-		"custom_prefix": None,
+		"SERVER_ID": 0,
 		"DATA_VERSION": 1,
+		"custom_prefix": None,
 		"action_log": {
 			"enabled": False,
 			"rules": [],

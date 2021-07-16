@@ -48,7 +48,7 @@ class Database(object):
 
 	@staticmethod
 	def get_server(serverId: int):
-		server_data = Database.find_one(Database.SERVERS_COLLECTION, {"_id":serverId})
+		server_data = Database.find_one(Database.SERVERS_COLLECTION, {"SERVER_ID":serverId})
 		
 		if server_data is None:
 			server_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
@@ -63,4 +63,4 @@ class Database(object):
 
 	@staticmethod
 	def set_server(serverId: int, new_server_data: dict):
-		return Database.replace_one(Database.SERVERS_COLLECTION, {"_id":serverId}, new_server_data, True)
+		return Database.replace_one(Database.SERVERS_COLLECTION, {"SERVER_ID":serverId}, new_server_data, True)
