@@ -31,7 +31,7 @@ def get_status():
 			}
 
 async def update_status(client):
-	bot_data = db.find_one("bot")
+	bot_data = db.find_one("bot", {})
 
 	if bot_data["maintenance"]:
 		await client.change_presence(
