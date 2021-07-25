@@ -1,4 +1,4 @@
-import datetime, discord, math, psutil, datetime
+import datetime, discord, math, psutil
 from discord.ext import commands
 
 class Random(commands.Cog):
