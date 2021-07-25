@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from database.db import Database as db
-from helpers import checks, embeds
+from helpers import checks
 
 ruleTypes = ["startswith", "endswith", "contains", "matches", "command"]
 
@@ -25,15 +25,21 @@ class AutoDelete(commands.Cog):
 		server_data = db.get_server(ctx.guild.id)
 
 		if not server_data["auto_delete"]:
-			embed = embeds.customEmbed(
-				authorName = "Channels managed with Auto-Delete",
-				authorIconURL = ctx.guild.icon_url,
-				desc = "None!"
+			embed = discord.Embed(
+				description = "None!",
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = "Channels with Auto Delete Rules",
+				icon_url = ctx.guild.icon_url
 			)
 		else:
-			embed = embeds.customEmbed(
-				authorName = "Channels managed with Auto-Delete",
-				authorIconURL = ctx.guild.icon_url,
+			embed = discord.Embed(
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = "Channels with Auto Delete Rules",
+				icon_url = ctx.guild.icon_url
 			)
 
 			for channelId in server_data["auto_delete"]:
@@ -73,16 +79,20 @@ class AutoDelete(commands.Cog):
 
 		else:
 			if not server_data["auto_delete"][str(channel.id)]["rules"]:
+				embed = discord.Embed(
+					description = "None!",
+					colour = discord.Colour.gold()
+				)
+				embed.set_author(
+					name = f"Auto Delete Rules for #{str(channel)}",
+					icon_url = ctx.guild.icon_url
+				)
 				return await ctx.send(
-					embed = embeds.customEmbed(
-						authorName = f"Auto Delete Rules for {str(channel)}",
-						desc = "None!",
-						footer = "Call this command with the `add` or `remove` editOption to configure rules."
-					)
+					embed = embed
 				)
 
 			else:
-				embed = embeds.customEmbed(
+				embed = discord.Embed(
 					authorName = f"Auto Delete Rules for {str(channel)}",
 					footer = "Call this command with the `add` or `remove` editOption to configure rules."
 				)
