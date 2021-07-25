@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from database.db import Database as db
-from helpers import checks, embeds
+from helpers import checks
 
 RoleConverter = commands.RoleConverter()
 
@@ -35,9 +35,11 @@ class Admin(commands.Cog):
 		else:
 			modStr = "None!"
 
-		embed = embeds.customEmbed(
-			authorName = f"Bot Control Roles in {ctx.guild.name}",
-			authorIconURL = ctx.guild.icon_url
+		embed = discord.Embed(colour = discord.Colour.gold())
+
+		embed.set_author(
+			name = f"Bot Control Roles in {ctx.guild.name}",
+			icon_url = ctx.guild.icon_url
 		)
 
 		embed.add_field(
@@ -73,9 +75,14 @@ class Admin(commands.Cog):
 
 		db.set_server(ctx.guild.id, server_data)
 
-		embed = embeds.infoEmbed(
+		embed = discord.Embed(
 			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
-			author = ctx.author
+			colour = discord.Colour.gold()
+		)
+		
+		embed.set_author(
+			name = f"{ctx.author.name}#{ctx.author.discriminator}",
+			icon_url = ctx.author.avatar_url
 		)
 
 		await ctx.send(embed = embed)
@@ -96,16 +103,25 @@ class Admin(commands.Cog):
 		try:
 			server_data["admin_roles"].remove(adminRoleToRemove)
 		except:
-			embed = embeds.infoEmbed(
+			embed = discord.Embed(
 				desc = f"❌ `{adminRoleToRemove}` is not an admin role.",
-				author = ctx.author
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = f"{ctx.author.name}#{ctx.author.discriminator}",
+				icon_url = ctx.author.avatar_url
 			)
 			await ctx.send(embed = embed)
+		
 		else:
 			db.set_server(ctx.guild.id, server_data)
-			embed = embeds.infoEmbed(
+			embed = discord.Embed(
 				desc = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
-				author = ctx.author
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = f"{ctx.author.name}#{ctx.author.discriminator}",
+				icon_url = ctx.author.avatar_url
 			)
 			await ctx.send(embed = embed)
 
@@ -128,9 +144,14 @@ class Admin(commands.Cog):
 
 		db.set_server(ctx.guild.id, server_data)
 
-		embed = embeds.infoEmbed(
-			desc = f"✅ Successfully set `{newModRole}` as an moderator role.",
-			author = ctx.author
+		embed = discord.Embed(
+			desc = f"✅ Successfully set `{newModRole}` as an mod role.",
+			colour = discord.Colour.gold()
+		)
+		
+		embed.set_author(
+			name = f"{ctx.author.name}#{ctx.author.discriminator}",
+			icon_url = ctx.author.avatar_url
 		)
 
 		await ctx.send(embed = embed)
@@ -139,7 +160,7 @@ class Admin(commands.Cog):
 	@commands.guild_only()
 	@checks.isAdmin()
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
-		"""Remove a role's access to access admin commands."""
+		"""Remove a role's access to access mod commands."""
 
 		server_data = db.get_server(ctx.guild.id)
 
@@ -151,16 +172,25 @@ class Admin(commands.Cog):
 		try:
 			server_data["mod_roles"].remove(modRoleToRemove)
 		except:
-			embed = embeds.infoEmbed(
-				desc = f"❌ `{modRoleToRemove}` is not an moderator role.",
-				author = ctx.author
+			embed = discord.Embed(
+				desc = f"❌ `{modRoleToRemove}` is not an mod role.",
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = f"{ctx.author.name}#{ctx.author.discriminator}",
+				icon_url = ctx.author.avatar_url
 			)
 			await ctx.send(embed = embed)
+		
 		else:
 			db.set_server(ctx.guild.id, server_data)
-			embed = embeds.infoEmbed(
-				desc = f"✅ `{modRoleToRemove}` is no longer an moderator role.",
-				author = ctx.author
+			embed = discord.Embed(
+				desc = f"✅ `{modRoleToRemove}` is no longer an mod role.",
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = f"{ctx.author.name}#{ctx.author.discriminator}",
+				icon_url = ctx.author.avatar_url
 			)
 			await ctx.send(embed = embed)
 
