@@ -5,7 +5,7 @@ chardet==4.0.0
 discord-pretty-help==1.3.0
 discord.py==1.7.3
 dnspython==2.1.0
-emoji==1.2.0
+emojis==0.6.0
 idna==3.2
 multidict==5.1.0
 psutil==5.8.0
