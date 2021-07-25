@@ -1,4 +1,4 @@
-import datetime, discord, math, psutil
+import datetime, discord, math, psutil, datetime
 from discord.ext import commands
 
 class Random(commands.Cog):
@@ -6,6 +6,7 @@ class Random(commands.Cog):
 
 	def __init__(self, client):
 		self.client = client
+		self.start_time = datetime.datetime.now()
 
 	@commands.command(aliases = ["ping", "statistics"])
 	@commands.cooldown(1, 5, commands.BucketType.user)
@@ -18,9 +19,8 @@ class Random(commands.Cog):
 		memory = psutil.virtual_memory()
 		latency = self.client.latency
 
-		boot_time = datetime.datetime.fromtimestamp(psutil.boot_time())
 		current_time = datetime.datetime.now()
-		uptime = (current_time - boot_time).total_seconds()
+		uptime = (current_time - self.start_time).total_seconds()
 
 		embed = discord.Embed(title = "Global Statistics", colour = discord.Colour.gold())
 
