@@ -198,8 +198,8 @@ class Admin(commands.Cog):
 	@commands.guild_only()
 	@checks.isAdmin()
 	async def changePrefix(self, ctx, newPrefix:str = None):
-		"""Change the bot's prefix."""
 		server_data = db.get_server(ctx.guild.id)
+		"""Change the bot's prefix. Pass nothing to reset to default prefix."""
 		server_data["custom_prefix"] = newPrefix
 		db.set_server(ctx.guild.id, server_data)
 
