@@ -4,7 +4,7 @@ from database.db import Database as db
 
 def isAdmin():
 	async def predicate(ctx):
-		valid_roles = db.get_server(ctx.guild.id)["admin_roles"]
+		valid_roles = db.get_guild(ctx.guild.id)["admin_roles"]
 		if not valid_roles:
 			return await commands.has_permissions(administrator = True).predicate(ctx)
 		else:
@@ -13,7 +13,7 @@ def isAdmin():
 
 def isMod():
 	async def predicate(ctx):
-		valid_roles = db.get_server(ctx.guild.id)["mod_roles"]
+		valid_roles = db.get_guild(ctx.guild.id)["mod_roles"]
 		if not valid_roles:
 			return False
 		else:

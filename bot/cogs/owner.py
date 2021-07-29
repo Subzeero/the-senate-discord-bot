@@ -3,7 +3,7 @@ from discord.ext import commands
 from database.db import Database as db
 from helpers import bot_status
 
-class Owner(commands.Cog):
+class owner(commands.Cog, name = "Owner"):
 	"""Owner commands."""
 
 	def __init__(self, client):
@@ -152,4 +152,4 @@ class Owner(commands.Cog):
 
 
 def setup(client):
-	client.add_cog(Owner(client))
+	client.add_cog(owner(client))

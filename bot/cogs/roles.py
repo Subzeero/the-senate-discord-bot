@@ -5,7 +5,7 @@ from helpers import debug
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
-class Roles(commands.Cog):
+class roles(commands.Cog, name = "Roles"):
 	"""Role-related commands."""
 
 	def __init__(self, client):
@@ -26,7 +26,7 @@ class Roles(commands.Cog):
 		"""Change your role name and colour."""
 		serverId = ctx.guild.id
 		userId = ctx.author.id
-		server_data = db.get_server(serverId)
+		server_data = db.get_guild(serverId)
 		messagesList = [ctx.message]
 
 		def validateMessage(message):
@@ -191,9 +191,9 @@ class Roles(commands.Cog):
 
 							await ctx.author.add_roles(newRole)
 
-							server_data = db.get_server(serverId)
+							server_data = db.get_guild(serverId)
 							server_data["custom_roles"][str(userId)] = newRole.id
-							db.set_server(serverId, server_data)
+							db.set_guild(serverId, server_data)
 
 							embed = discord.Embed(
 								title = "Custom Role Configuration",
@@ -587,4 +587,4 @@ class Roles(commands.Cog):
 
 
 def setup(client):
-	client.add_cog(Roles(client))
+	client.add_cog(roles(client))

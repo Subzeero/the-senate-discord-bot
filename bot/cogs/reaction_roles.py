@@ -4,7 +4,7 @@ from typing import Union
 from database.db import Database as db
 from helpers import converters, find_object
 
-class ReactionRoles(commands.Cog):
+class reaction_roles(commands.Cog, name = "Reaction Roles"):
 	"""Random commands."""
 
 	def __init__(self, client):
@@ -27,7 +27,7 @@ class ReactionRoles(commands.Cog):
 			return
 
 		emoji_object = payload.emoji
-		guild_data = db.get_server(guild_id)
+		guild_data = db.get_guild(guild_id)
 		rr_data = None
 
 		for data in guild_data["reaction_roles"]:
@@ -63,7 +63,7 @@ class ReactionRoles(commands.Cog):
 			return
 
 		emoji_object = payload.emoji
-		guild_data = db.get_server(guild_id)
+		guild_data = db.get_guild(guild_id)
 		rr_data = None
 
 		for data in guild_data["reaction_roles"]:
@@ -83,7 +83,7 @@ class ReactionRoles(commands.Cog):
 		"""List all of the reaction roles."""
 
 		guild_id = ctx.guild.id
-		guild_data = db.get_server(guild_id)
+		guild_data = db.get_guild(guild_id)
 
 		if not guild_data["reaction_roles"]:
 			embed = discord.Embed(
@@ -135,7 +135,7 @@ class ReactionRoles(commands.Cog):
 		await message.add_reaction(emoji)
 
 		guild_id = ctx.guild.id
-		guild_data = db.get_server(guild_id)
+		guild_data = db.get_guild(guild_id)
 
 		is_unicode_emoij = isinstance(emoji, str)
 		is_custom_emoji = isinstance(emoji, discord.Emoji)
@@ -148,7 +148,7 @@ class ReactionRoles(commands.Cog):
 			"role_id": role.id
 		})
 
-		db.set_server(guild_id, guild_data)
+		db.set_guild(guild_id, guild_data)
 
 		embed = discord.Embed(title = "✅ Reaction Role Successfully Created!", colour = discord.Colour.gold())
 
@@ -167,7 +167,7 @@ class ReactionRoles(commands.Cog):
 		"""Remove a reaction role."""
 
 		guild_id = ctx.guild.id
-		guild_data = db.get_server(guild_id)
+		guild_data = db.get_guild(guild_id)
 
 		try:
 			guild_data["reaction_roles"][reactionRoleId]
@@ -176,7 +176,7 @@ class ReactionRoles(commands.Cog):
 			return
 
 		rr_data = guild_data["reaction_roles"].pop(reactionRoleId)
-		db.set_server(guild_id, guild_data)
+		db.set_guild(guild_id, guild_data)
 
 		if rr_data["unicode_emoji"]:
 			emoji_object = rr_data["unicode_emoji"]
@@ -206,4 +206,4 @@ class ReactionRoles(commands.Cog):
 		await ctx.send(embed = embed)
 
 def setup(client):
-	client.add_cog(ReactionRoles(client))
+	client.add_cog(reaction_roles(client))

@@ -2,7 +2,7 @@ import discord, os
 from discord.ext import commands
 from database.db import Database as db
 
-class Extensions(commands.Cog):
+class extensions(commands.Cog, name = "Extensions"):
 	"""Manages the bot's extensions."""
 
 	def __init__(self, client):
@@ -79,40 +79,34 @@ class Extensions(commands.Cog):
 	@commands.command()
 	@commands.is_owner()
 	async def listcogs(self, ctx):
-		'''
-		List cog information.
-		'''
+		"""List cog information."""
 
-		cogDict = {}
+		loaded_cogs = []
+		cogs = {}
+
+		for cog in self.client.cogs.values():
+			loaded_cogs.append(cog.__class__.__name__)
 
 		for fileName in os.listdir("./cogs"):
 			if fileName.endswith(".py"):
-				try:
-					self.client.load_extension(f"cogs.{fileName[:-3]}")
-				except commands.ExtensionAlreadyLoaded:
-					cogDict[fileName[:-3]] = "✅ Loaded!"
-				except commands.ExtensionNotFound:
-					cogDict[fileName[:-3]] = "❌ Not Found!"
+				if fileName[:-3] in loaded_cogs:
+					cogs[fileName[:-3]] = "✅ Loaded!"
 				else:
-					cogDict[fileName[:-3]] = "❎ Not Loaded!"
-					self.client.unload_extension(f"cogs.{fileName[:-3]}")
-
-		print(cogDict)
-		print(self.client.cogs)
+					cogs[fileName[:-3]] = "❎ Not Loaded!"
 
 		embed = discord.Embed(
 			title = 'Extension Information', 
 			description = "The following cogs have been registered:", 
 			colour = discord.Color.gold())
 
-		for cogName in cogDict:
+		for cog_name, cog_info in cogs.items():
 			embed.add_field(
-				name = cogName, 
-				value = cogDict[cogName], 
+				name = cog_name, 
+				value = cog_info, 
 				inline = True
 			)
 					
 		await ctx.send(embed = embed)
 
 def setup(client):
-	client.add_cog(Extensions(client))
+	client.add_cog(extensions(client))

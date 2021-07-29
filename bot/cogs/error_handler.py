@@ -1,7 +1,7 @@
 import traceback
 from discord.ext import commands
 
-class ErrorHandler(commands.Cog):
+class error_handler(commands.Cog, name = "Error Handler"):
 	"""Global error handler"""
 
 	def __init__(self, client):
@@ -58,4 +58,4 @@ class ErrorHandler(commands.Cog):
 			traceback.print_exception(type(error), error, error.__traceback__)
 
 def setup(client):
-	client.add_cog(ErrorHandler(client))
+	client.add_cog(error_handler(client))

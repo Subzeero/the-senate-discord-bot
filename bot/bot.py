@@ -28,7 +28,7 @@ elif BOT_ENV == "DEV":
 
 # Determine prefix
 def get_prefix(bot, message):
-	custom_prefix = db.get_server(message.guild.id)["custom_prefix"]
+	custom_prefix = db.get_guild(message.guild.id)["custom_prefix"]
 	if custom_prefix is not None:
 		return commands.when_mentioned_or(custom_prefix)(bot, message)
 	else:
@@ -49,8 +49,8 @@ client = commands.Bot(
 	status = status_data["status"]
 )
 
-# Load cogs on startup
-for fileName in db.find_one("bot", {})["loaded_cogs"]:
+# Load previous cogs on startup
+for fileName in db.find_one("bot")["loaded_cogs"]:
 	try:
 		client.load_extension(f"cogs.{fileName}")
 		print(f"Loaded {fileName}.")

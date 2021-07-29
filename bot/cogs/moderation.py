@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from helpers import checks
 
-class Moderation(commands.Cog):
+class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
 
 	def __init__(self, client):
@@ -88,4 +88,4 @@ class Moderation(commands.Cog):
 		await ctx.send(embed = embed, delete_after = 10)
 
 def setup(client):
-	client.add_cog(Moderation(client))
+	client.add_cog(moderation(client))

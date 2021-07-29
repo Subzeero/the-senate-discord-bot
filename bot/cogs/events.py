@@ -1,10 +1,10 @@
-import discord, traceback
+import discord, os
 from discord.ext import commands
 from database.db import Database as db
 
 suggestionsChannelId = 796553486677311510
 
-class Events(commands.Cog):
+class events(commands.Cog, name = "Events"):
 	"""Listen for the bot's events."""
 
 	def __init__(self, client):
@@ -16,7 +16,7 @@ class Events(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
-		db.get_server(guild.id)
+		db.set_guild(db.get_guild(guild.id))
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -84,4 +84,4 @@ class Events(commands.Cog):
 				await message.channel.send(embed = embed)
 
 def setup(client):
-	client.add_cog(Events(client))
+	client.add_cog(events(client))

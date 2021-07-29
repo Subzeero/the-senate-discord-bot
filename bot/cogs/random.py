@@ -1,7 +1,7 @@
 import datetime, discord, math, psutil
 from discord.ext import commands
 
-class Random(commands.Cog):
+class random(commands.Cog, name = "Random"):
 	"""Random commands."""
 
 	def __init__(self, client):
@@ -65,4 +65,4 @@ class Random(commands.Cog):
 		"""Create a countdown timer."""
 
 def setup(client):
-	client.add_cog(Random(client))
+	client.add_cog(random(client))

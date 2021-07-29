@@ -5,7 +5,7 @@ from helpers import checks
 
 RoleConverter = commands.RoleConverter()
 
-class Admin(commands.Cog):
+class admin(commands.Cog, name = "Admin"):
 	"""Server administrator commands."""
 
 	def __init__(self, client):
@@ -17,7 +17,7 @@ class Admin(commands.Cog):
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 		admin_roles = server_data["admin_roles"]
 		mod_roles = server_data["mod_roles"]
 		adminStr = ""
@@ -64,7 +64,7 @@ class Admin(commands.Cog):
 
 		role = await RoleConverter.convert(ctx, newAdminRole)
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 
 		try:
 			int(newAdminRole)
@@ -73,7 +73,7 @@ class Admin(commands.Cog):
 		else:
 			server_data["admin_roles"].append(role.id)
 
-		db.set_server(ctx.guild.id, server_data)
+		db.set_guild(ctx.guild.id, server_data)
 
 		embed = discord.Embed(
 			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
@@ -93,7 +93,7 @@ class Admin(commands.Cog):
 	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
 		"""Remove a role's (name or id) access to administrator commands."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 
 		try:
 			int(adminRoleToRemove)
@@ -114,7 +114,7 @@ class Admin(commands.Cog):
 			await ctx.send(embed = embed)
 		
 		else:
-			db.set_server(ctx.guild.id, server_data)
+			db.set_guild(ctx.guild.id, server_data)
 			embed = discord.Embed(
 				desc = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
 				colour = discord.Colour.gold()
@@ -133,7 +133,7 @@ class Admin(commands.Cog):
 
 		role = await RoleConverter.convert(ctx, newModRole)
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 
 		try:
 			int(newModRole)
@@ -142,7 +142,7 @@ class Admin(commands.Cog):
 		else:
 			server_data["mod_roles"].append(role.id)
 
-		db.set_server(ctx.guild.id, server_data)
+		db.set_guild(ctx.guild.id, server_data)
 
 		embed = discord.Embed(
 			desc = f"✅ Successfully set `{newModRole}` as an mod role.",
@@ -162,7 +162,7 @@ class Admin(commands.Cog):
 	async def removeModeratorRole(self, ctx, modRoleToRemove):
 		"""Remove a role's access to access mod commands."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 
 		try:
 			int(modRoleToRemove)
@@ -183,7 +183,7 @@ class Admin(commands.Cog):
 			await ctx.send(embed = embed)
 		
 		else:
-			db.set_server(ctx.guild.id, server_data)
+			db.set_guild(ctx.guild.id, server_data)
 			embed = discord.Embed(
 				desc = f"✅ `{modRoleToRemove}` is no longer an mod role.",
 				colour = discord.Colour.gold()
@@ -198,10 +198,10 @@ class Admin(commands.Cog):
 	@commands.guild_only()
 	@checks.isAdmin()
 	async def changePrefix(self, ctx, newPrefix:str = None):
-		server_data = db.get_server(ctx.guild.id)
 		"""Change the bot's prefix. Pass nothing to reset to default prefix."""
+		server_data = db.get_guild(ctx.guild.id)
 		server_data["custom_prefix"] = newPrefix
-		db.set_server(ctx.guild.id, server_data)
+		db.set_guild(ctx.guild.id, server_data)
 
 		prefix = await self.client.get_prefix(ctx.message)
 		await ctx.send(f"✅ prefix set to `{prefix}`.")
@@ -271,4 +271,4 @@ class Admin(commands.Cog):
 		await message.edit(content = None, embed = embed)
 
 def setup(client):
-	client.add_cog(Admin(client))
+	client.add_cog(admin(client))
