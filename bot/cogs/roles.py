@@ -1,7 +1,7 @@
 import discord, asyncio
 from discord.ext import commands
 from database.db import Database as db
-from helpers import debug
+from helpers import debug, find_object
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
@@ -15,8 +15,7 @@ class roles(commands.Cog, name = "Roles"):
 		if not ctx.guild:
 			return False
 
-		whitelistedServers = debug.get_testing_servers()
-		whitelistedServers.append(745683100788457614)
+		whitelistedServers = debug.get_testing_guilds()
 		return ctx.guild.id in whitelistedServers
 
 	@commands.command()
