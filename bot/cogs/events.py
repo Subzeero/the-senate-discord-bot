@@ -29,20 +29,17 @@ class events(commands.Cog, name = "Events"):
 
 			if isinstance(prefixes, list):
 				for prefix in prefixes:
-					if prefix.find(self.client.user.id) == -1:
-						prefix_str = prefix_str + prefix
+					if not str(self.client.user.id) in prefix:
+						prefix_str = prefix
 			elif isinstance(prefixes, str):
 				prefix_str = prefixes
 
 			embed = discord.Embed(
-				description = f"My prefix in this server is `{prefix_str}`. You can also use my commands by pinging me before the command like: {self.client.user.mention}` help`",
+				description = f"My prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.client.user.display_name} help`.",
 				colour = discord.Colour.gold()
 			)
 
-			embed.set_author(name = str(message.author), icon_url = message.author.avatar_url)
-			embed.set_footer(text = f"Use `{prefix_str}changePrefix` to change my prefix.")
-
-			await message.channel.send(embed = embed)
+			await message.reply(embed = embed)
 
 		if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
 			embed = discord.Embed(

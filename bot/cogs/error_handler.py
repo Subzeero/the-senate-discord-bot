@@ -45,13 +45,14 @@ class error_handler(commands.Cog, name = "Error Handler"):
 				pass
 
 		elif isinstance(error, commands.UserInputError):
-			await ctx.send(f"❌ {error}. Type `;help {ctx.command}` to see the proper arguments.")
+			await ctx.send(f"❌ {error} Type `;help {ctx.command}` for more information.")
 
 		elif isinstance(error, commands.CheckFailure):
 			await ctx.send("❌ You don't have permission to run this command!")
 
 		elif isinstance(error, commands.ExtensionError):
 			await ctx.send(f"❌ Extension Error: {error}")
+			traceback.print_exception(type(error), error, error.__traceback__)
 
 		else:
 			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
