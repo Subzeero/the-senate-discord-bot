@@ -55,7 +55,7 @@ class moderation(commands.Cog, name = "Moderation"):
 			icon_url = ctx.author.avatar_url
 		)
 
-		embed.set_footer("This message will self-destruct in 10 seconds.")
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 		
 		await response.edit(content = None, embed = embed, delete_after = 10)
 
@@ -83,7 +83,7 @@ class moderation(commands.Cog, name = "Moderation"):
 			icon_url = ctx.author.avatar_url
 		)
 
-		embed.set_footer("This message will self-destruct in 10 seconds.")
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
 
