@@ -4,7 +4,7 @@ from helpers import debug
 
 suggestionsChannelId = 796553486677311510
 
-class Suggestions(commands.Cog):
+class suggestions(commands.Cog, name = "Suggestions"):
 	"""Command for server suggestions"""
 
 	def __init__(self, client):
@@ -90,4 +90,4 @@ class Suggestions(commands.Cog):
 		await ctx.send(embed = embed, delete_after = 10)
 
 def setup(client):
-	client.add_cog(Suggestions(client))
+	client.add_cog(suggestions(client))

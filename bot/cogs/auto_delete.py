@@ -1,11 +1,11 @@
 import discord
 from discord.ext import commands
 from database.db import Database as db
-from helpers import checks, embeds
+from helpers import checks
 
 ruleTypes = ["startswith", "endswith", "contains", "matches", "command"]
 
-class AutoDelete(commands.Cog):
+class auto_delete(commands.Cog, name = "Auto Delete"):
 	"""Internal testing."""
 
 	def __init__(self, client):
@@ -22,18 +22,24 @@ class AutoDelete(commands.Cog):
 	async def listAutoDeleteChannels(self, ctx):
 		"""List the channels managed with auto delete and their rules."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 
 		if not server_data["auto_delete"]:
-			embed = embeds.customEmbed(
-				authorName = "Channels managed with Auto-Delete",
-				authorIconURL = ctx.guild.icon_url,
-				desc = "None!"
+			embed = discord.Embed(
+				description = "None!",
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = "Channels with Auto Delete Rules",
+				icon_url = ctx.guild.icon_url
 			)
 		else:
-			embed = embeds.customEmbed(
-				authorName = "Channels managed with Auto-Delete",
-				authorIconURL = ctx.guild.icon_url,
+			embed = discord.Embed(
+				colour = discord.Colour.gold()
+			)
+			embed.set_author(
+				name = "Channels with Auto Delete Rules",
+				icon_url = ctx.guild.icon_url
 			)
 
 			for channelId in server_data["auto_delete"]:
@@ -49,7 +55,7 @@ class AutoDelete(commands.Cog):
 	async def addAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Enable auto delete on a given channel."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 		server_data["auto_delete"][str(channel.id)] = {
 			"enabled": False,
 			"rules": []
@@ -61,7 +67,7 @@ class AutoDelete(commands.Cog):
 	async def editAutoDeleteChannelRules(self, ctx, channel:discord.TextChannel, editOption:str = None, ruleType:str = None, ruleExpression:str = None):
 		"""Edit the rules of a channel managed with auto delete."""
 
-		server_data = db.get_server(ctx.guild.id)
+		server_data = db.get_guild(ctx.guild.id)
 		if not str(channel.id) in server_data["auto_delete"]:
 			return await ctx.send(f"❌ {channel.mention} has not been configured. Use `;addAutoDeleteChannel` to get it set up.")
 
@@ -73,16 +79,20 @@ class AutoDelete(commands.Cog):
 
 		else:
 			if not server_data["auto_delete"][str(channel.id)]["rules"]:
+				embed = discord.Embed(
+					description = "None!",
+					colour = discord.Colour.gold()
+				)
+				embed.set_author(
+					name = f"Auto Delete Rules for #{str(channel)}",
+					icon_url = ctx.guild.icon_url
+				)
 				return await ctx.send(
-					embed = embeds.customEmbed(
-						authorName = f"Auto Delete Rules for {str(channel)}",
-						desc = "None!",
-						footer = "Call this command with the `add` or `remove` editOption to configure rules."
-					)
+					embed = embed
 				)
 
 			else:
-				embed = embeds.customEmbed(
+				embed = discord.Embed(
 					authorName = f"Auto Delete Rules for {str(channel)}",
 					footer = "Call this command with the `add` or `remove` editOption to configure rules."
 				)
@@ -103,4 +113,4 @@ class AutoDelete(commands.Cog):
 		"""Disable auto delete on a given channel."""
 
 def setup(client):
-	client.add_cog(AutoDelete(client))
+	client.add_cog(auto_delete(client))

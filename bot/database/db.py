@@ -23,45 +23,45 @@ class Database(object):
 		return Database.DB.list_collection_names()
 
 	@staticmethod
-	def insert(collection:str, data:dict):
+	def insert(collection:str, data:dict = {}):
 		return Database.DB[collection].insert(data)
 
 	@staticmethod
-	def find(collection:str, query:dict):
+	def find(collection:str, query:dict = {}):
 		return Database.DB[collection].find(query)
 
 	@staticmethod
-	def find_one(collection:str, query:dict):
+	def find_one(collection:str, query:dict = {}):
 		return Database.DB[collection].find_one(query)
 
 	@staticmethod
-	def replace_one(collection:str, query:dict, data:dict, _upsert:bool = False):
-		return Database.DB[collection].replace_one(query, data, upsert=_upsert)
+	def replace_one(collection:str, query:dict = {}, data:dict = {}, upsert:bool = False):
+		return Database.DB[collection].replace_one(query, data, upsert=upsert)
 
 	@staticmethod
-	def delete(collection:str, query:dict):
+	def delete(collection:str, query:dict = {}):
 		return Database.DB[collection].delete(query)
 
 	@staticmethod
-	def delete_one(collection:str, query:dict):
+	def delete_one(collection:str, query:dict = {}):
 		return Database.DB[collection].delete_one(query)
 
 	@staticmethod
-	def get_server(serverId: int):
-		server_data = Database.find_one(Database.SERVERS_COLLECTION, {"SERVER_ID":serverId})
-		
-		if server_data is None:
-			server_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
-			server_data["SERVER_ID"] = serverId
+	def get_guild(guild_id: int):
+		guild_data = Database.find_one(Database.SERVERS_COLLECTION, {"SERVER_ID":guild_id})
+
+		if guild_data is None:
+			guild_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
+			guild_data["SERVER_ID"] = guild_id
 		else:
-			server_data_version = server_data["DATA_VERSION"]
+			guild_data_version = guild_data["DATA_VERSION"]
 
-			while server_data_version < Database.LATEST_DATA_VERSION:
-				server_data = DATABASE_VERSIONS[server_data_version + 1].upgrade(server_data)
-				server_data_version = server_data["DATA_VERSION"]
+			while guild_data_version < Database.LATEST_DATA_VERSION:
+				guild_data = DATABASE_VERSIONS[guild_data_version + 1].upgrade(guild_data)
+				guild_data_version = guild_data["DATA_VERSION"]
 
-		return server_data
+		return guild_data
 
 	@staticmethod
-	def set_server(serverId: int, new_server_data: dict):
-		return Database.replace_one(Database.SERVERS_COLLECTION, {"SERVER_ID":serverId}, new_server_data, True)
+	def set_guild(guild_id: int, new_guild_data: dict):
+		return Database.replace_one(Database.SERVERS_COLLECTION, {"SERVER_ID":guild_id}, new_guild_data, True)

@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from helpers import checks, embeds
+from helpers import checks
 
-class Moderation(commands.Cog):
+class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
 
 	def __init__(self, client):
@@ -45,14 +45,19 @@ class Moderation(commands.Cog):
 			else:
 				break
 
-		await response.edit(
-			content = None,
-			embed = embeds.tempEmbed(
-				desc = f"✅ Successfully deleted {numOfMessages} messages.",
-				author = ctx.author
-			), 
-			delete_after = 10
+		embed = discord.Embed(
+			description = f"✅ Successfully deleted {numOfMessages} messages.",
+			colour = discord.Colour.gold()
 		)
+
+		embed.set_author(
+			name = f"{ctx.author.name}#{ctx.author.discriminator}",
+			icon_url = ctx.author.avatar_url
+		)
+
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+		
+		await response.edit(content = None, embed = embed, delete_after = 10)
 
 	@commands.command()
 	@commands.cooldown(1, 3, commands.BucketType.user)
@@ -68,13 +73,19 @@ class Moderation(commands.Cog):
 		for reaction in reactions:
 			await message.add_reaction(reaction)
 
-		await ctx.send(
-			embed = embeds.tempEmbed(
-				desc = f"✅ Successfully added {reactionsStr} to message #{messageId}.",
-				author = ctx.author
-			),
-			delete_after = 10
+		embed = discord.Embed(
+			description = f"✅ Successfully added {reactionsStr} to message #{messageId}.",
+			colour = discord.Colour.gold()
 		)
 
+		embed.set_author(
+			name = f"{ctx.author.name}#{ctx.author.discriminator}",
+			icon_url = ctx.author.avatar_url
+		)
+
+		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+
+		await ctx.send(embed = embed, delete_after = 10)
+
 def setup(client):
-	client.add_cog(Moderation(client))
+	client.add_cog(moderation(client))

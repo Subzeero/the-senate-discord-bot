@@ -1,16 +1,14 @@
-import discord
-from discord.ext import commands
-
-testingServers = [
-	831000735671123988
+testing_guilds = [
+	831000735671123988,
+	745683100788457614
 ]
 
-testingChannels = [
+testing_channels = [
 	831000736115458089
 ]
 
-def get_testing_servers():
-	return testingServers
+def get_testing_guilds():
+	return testing_guilds
 
 def get_testing_channels():
-	return testingChannels
+	return testing_channels
