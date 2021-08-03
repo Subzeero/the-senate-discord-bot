@@ -24,9 +24,9 @@ class owner(commands.Cog, name = "Owner"):
 			await ctx.send("❌ That is not a valid status type!")
 			return
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		bot_data["status"] = newStatusStr
-		db.replace_one("bot", {}, bot_data)
+		db.replace_one("bot", data = bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -48,9 +48,9 @@ class owner(commands.Cog, name = "Owner"):
 
 		await ctx.message.delete()
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		bot_data["message"] = newStatusMessage
-		db.replace_one("bot", {}, bot_data)
+		db.replace_one("bot", data = bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -79,9 +79,9 @@ class owner(commands.Cog, name = "Owner"):
 			await ctx.send("❌ That is not a valid activity type!")
 			return
 		
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		bot_data["activity"] = newActivityStr
-		db.replace_one("bot", {}, bot_data)
+		db.replace_one("bot", data = bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -102,9 +102,9 @@ class owner(commands.Cog, name = "Owner"):
 		
 		await ctx.message.delete()
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		bot_data["maintenance"] = True
-		db.replace_one("bot", {}, bot_data)
+		db.replace_one("bot", data = bot_data)
 
 		await bot_status.update_status(self.client)
 
@@ -125,9 +125,9 @@ class owner(commands.Cog, name = "Owner"):
 		
 		await ctx.message.delete()
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		bot_data["maintenance"] = False
-		db.replace_one("bot", {}, bot_data)
+		db.replace_one("bot", data = bot_data)
 
 		await bot_status.update_status(self.client)
 

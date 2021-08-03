@@ -17,10 +17,10 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		self.client.load_extension(f"cogs.{extension}")
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		if not extension in bot_data["loaded_cogs"]:
 			bot_data["loaded_cogs"].append(extension)
-			db.replace_one("bot", {}, bot_data)
+			db.replace_one("bot", data = bot_data)
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been loaded!",
@@ -41,10 +41,10 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		self.client.unload_extension(f"cogs.{extension}")
 
-		bot_data = db.find_one("bot", {})
+		bot_data = db.find_one("bot")
 		if extension in bot_data["loaded_cogs"]:
 			bot_data["loaded_cogs"].remove(extension)
-			db.replace_one("bot", {}, bot_data)
+			db.replace_one("bot", data = bot_data)
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been unloaded!",
