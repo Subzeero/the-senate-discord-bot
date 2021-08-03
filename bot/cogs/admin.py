@@ -3,8 +3,6 @@ from discord.ext import commands
 from database.db import Database as db
 from helpers import checks
 
-RoleConverter = commands.RoleConverter()
-
 class admin(commands.Cog, name = "Admin"):
 	"""Server administrator commands."""
 
@@ -56,13 +54,13 @@ class admin(commands.Cog, name = "Admin"):
 
 		await ctx.send(embed = embed)
 
-	@commands.command(aliases = ["addAdminRole"])
+	@commands.command(aliases = ["addAdminRole", "newAdminRole", "newAdministratorRole"])
 	@commands.guild_only()
 	@checks.isAdmin()
 	async def addAdministratorRole(self, ctx, newAdminRole):
 		"""Grant a role (name or id) access to administrator commands."""
 
-		role = await RoleConverter.convert(ctx, newAdminRole)
+		role = await commands.RoleConverter().convert(ctx, newAdminRole)
 
 		server_data = db.get_guild(ctx.guild.id)
 
@@ -76,7 +74,7 @@ class admin(commands.Cog, name = "Admin"):
 		db.set_guild(ctx.guild.id, server_data)
 
 		embed = discord.Embed(
-			desc = f"✅ Successfully set `{newAdminRole}` as an admin role.",
+			description = f"✅ Successfully set `{newAdminRole}` as an admin role.",
 			colour = discord.Colour.gold()
 		)
 		
@@ -104,7 +102,7 @@ class admin(commands.Cog, name = "Admin"):
 			server_data["admin_roles"].remove(adminRoleToRemove)
 		except:
 			embed = discord.Embed(
-				desc = f"❌ `{adminRoleToRemove}` is not an admin role.",
+				description = f"❌ `{adminRoleToRemove}` is not an admin role.",
 				colour = discord.Colour.gold()
 			)
 			embed.set_author(
@@ -116,7 +114,7 @@ class admin(commands.Cog, name = "Admin"):
 		else:
 			db.set_guild(ctx.guild.id, server_data)
 			embed = discord.Embed(
-				desc = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
+				description = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
 				colour = discord.Colour.gold()
 			)
 			embed.set_author(
@@ -131,7 +129,7 @@ class admin(commands.Cog, name = "Admin"):
 	async def addModeratorRole(self, ctx, newModRole):
 		"""Grant a role (name or id) access to moderator commands."""
 
-		role = await RoleConverter.convert(ctx, newModRole)
+		role = await commands.RoleConverter().convert(ctx, newModRole)
 
 		server_data = db.get_guild(ctx.guild.id)
 
@@ -145,7 +143,7 @@ class admin(commands.Cog, name = "Admin"):
 		db.set_guild(ctx.guild.id, server_data)
 
 		embed = discord.Embed(
-			desc = f"✅ Successfully set `{newModRole}` as an mod role.",
+			description = f"✅ Successfully set `{newModRole}` as an mod role.",
 			colour = discord.Colour.gold()
 		)
 		
@@ -173,7 +171,7 @@ class admin(commands.Cog, name = "Admin"):
 			server_data["mod_roles"].remove(modRoleToRemove)
 		except:
 			embed = discord.Embed(
-				desc = f"❌ `{modRoleToRemove}` is not an mod role.",
+				description = f"❌ `{modRoleToRemove}` is not an mod role.",
 				colour = discord.Colour.gold()
 			)
 			embed.set_author(
@@ -185,7 +183,7 @@ class admin(commands.Cog, name = "Admin"):
 		else:
 			db.set_guild(ctx.guild.id, server_data)
 			embed = discord.Embed(
-				desc = f"✅ `{modRoleToRemove}` is no longer an mod role.",
+				description = f"✅ `{modRoleToRemove}` is no longer an mod role.",
 				colour = discord.Colour.gold()
 			)
 			embed.set_author(
@@ -198,13 +196,32 @@ class admin(commands.Cog, name = "Admin"):
 	@commands.guild_only()
 	@checks.isAdmin()
 	async def changePrefix(self, ctx, newPrefix:str = None):
-		"""Change the bot's prefix. Pass nothing to reset to default prefix."""
+		"""Change the bot's prefix. Pass nothing to reset to the default prefix."""
 		server_data = db.get_guild(ctx.guild.id)
 		server_data["custom_prefix"] = newPrefix
 		db.set_guild(ctx.guild.id, server_data)
 
-		prefix = await self.client.get_prefix(ctx.message)
-		await ctx.send(f"✅ prefix set to `{prefix}`.")
+		prefixes = await self.client.get_prefix(ctx.message)
+		prefix_str = ""
+
+		if isinstance(prefixes, list):
+			for prefix in prefixes:
+				if not str(self.client.user.id) in prefix:
+					prefix_str = prefix
+		elif isinstance(prefixes, str):
+			prefix_str = prefixes
+
+		embed = discord.Embed(
+			description = f"My prefix in this server is now: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.client.user.display_name} help`.",
+			colour = discord.Colour.gold()
+		)
+
+		if newPrefix:
+			embed.set_author(name = "✅ Prefix Reset to Default!")
+		else:
+			embed.set_author(name = "✅ Prefix Changed!")
+
+		await ctx.send(embed = embed)
 
 	@commands.command(aliases = ["say"])
 	@commands.guild_only()
@@ -225,7 +242,7 @@ class admin(commands.Cog, name = "Admin"):
 
 		message = await ctx.fetch_message(messageID)
 
-		if message.author.id == self.user.id:
+		if message.author.id == self.client.user.id:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
 
@@ -259,7 +276,7 @@ class admin(commands.Cog, name = "Admin"):
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
 
-		if message.author.id == self.user.id:
+		if message.author.id == self.client.user.id:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
 
