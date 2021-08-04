@@ -23,15 +23,13 @@ class roles(commands.Cog, name = "Roles"):
 	@commands.max_concurrency(1, commands.BucketType.guild)
 	async def changeRole(self, ctx):
 		"""Change your role name and colour."""
-		serverId = ctx.guild.id
-		userId = ctx.author.id
-		server_data = db.get_guild(serverId)
-		messagesList = [ctx.message]
+		guild_data = db.get_guild(ctx.guild.id)
+		messages_to_delete = [ctx.message]
 
 		def validateMessage(message):
 			return message.author == ctx.author
 
-		if not str(userId) in server_data["custom_roles"]:
+		if not str(ctx.author.id) in guild_data["custom_roles"].keys():
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
 				description = "It looks like you don't have a custom role yet; let's create one!",
@@ -48,11 +46,11 @@ class roles(commands.Cog, name = "Roles"):
 			)
 			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-			messagesList.append(await ctx.send(embed = embed))
+			messages_to_delete.append(await ctx.send(embed = embed))
 
 			try:
 				response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-				messagesList.append(response1)
+				messages_to_delete.append(response1)
 			except asyncio.TimeoutError:
 				embed = discord.Embed(
 					title = "Custom Role Configuration",
@@ -68,7 +66,7 @@ class roles(commands.Cog, name = "Roles"):
 				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 				await ctx.send(embed = embed, delete_after = 300)
-				await ctx.channel.delete_messages(messagesList)
+				await ctx.channel.delete_messages(messages_to_delete)
 				return
 
 			if response1.content.lower() == "cancel":
@@ -86,7 +84,7 @@ class roles(commands.Cog, name = "Roles"):
 				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 				await ctx.send(embed = embed, delete_after = 300)
-				await ctx.channel.delete_messages(messagesList)
+				await ctx.channel.delete_messages(messages_to_delete)
 				return
 			
 			else:
@@ -110,11 +108,11 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-					messagesList.append(await ctx.send(embed = embed))
+					messages_to_delete.append(await ctx.send(embed = embed))
 
 					try:
 						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-						messagesList.append(response2)
+						messages_to_delete.append(response2)
 					except asyncio.TimeoutError:
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
@@ -130,7 +128,7 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					if response2.content.lower() == "cancel":
@@ -148,35 +146,26 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					else:
-						def isHex(input):
-							def removePrefix(input):
-								if input.startswith("#"):
-									return input[1:]
-								else:
-									return input
-							
-							formattedInput = removePrefix(input)
-							
-							if len(formattedInput) != 6:
-								return False
+						try:
+							colourValue = await commands.ColourConverter().convert(ctx, response2.content)
+						except commands.BadColourArgument:
+							embed = discord.Embed(
+								title = "Custom Role Configuration",
+								description = "❌ That's not a valid hex colour code.",
+								colour = discord.Colour.gold()
+							)
+							embed.set_author(
+								name = ctx.author.name + "#" + ctx.author.discriminator,
+								icon_url = ctx.author.avatar_url
+							)
 
-							try:
-								return int(removePrefix(input), 16)
-							except ValueError:
-								return False
-
-						colourValue = isHex(response2.content)
+							messages_to_delete.append(await ctx.send(embed = embed))
 						
 						if colourValue:
-							hackerRole = ctx.guild.get_role(745863515998519360)
-							if not hackerRole:
-								await ctx.send("❌ Discord is being mean, please try again later.")
-								break
-
 							newRole = await ctx.guild.create_role(
 								name = response1.content,
 								colour = colourValue,
@@ -184,15 +173,15 @@ class roles(commands.Cog, name = "Roles"):
 							)
 
 							await newRole.edit(
-								position = hackerRole.position - 1,
+								position = ctx.guild.roles[-1].position - 11,
 								reason = "Reorder the role created by user command."
 							)
 
 							await ctx.author.add_roles(newRole)
 
-							server_data = db.get_guild(serverId)
-							server_data["custom_roles"][str(userId)] = newRole.id
-							db.set_guild(serverId, server_data)
+							new_data = db.get_guild(ctx.guild.id)
+							new_data["custom_roles"][str(ctx.author.id)] = newRole.id
+							db.set_guild(ctx.guild.id, new_data)
 
 							embed = discord.Embed(
 								title = "Custom Role Configuration",
@@ -205,21 +194,8 @@ class roles(commands.Cog, name = "Roles"):
 							)
 
 							await ctx.send(embed = embed)
-							await ctx.channel.delete_messages(messagesList)
+							await ctx.channel.delete_messages(messages_to_delete)
 							break
-
-						else:
-							embed = discord.Embed(
-								title = "Custom Role Configuration",
-								description = "❌ That's not a valid hex colour code.",
-								colour = discord.Colour.gold()
-							)
-							embed.set_author(
-								name = ctx.author.name + "#" + ctx.author.discriminator,
-								icon_url = ctx.author.avatar_url
-							)
-
-							messagesList.append(await ctx.send(embed = embed))
 
 		else:
 			while True:
@@ -246,11 +222,11 @@ class roles(commands.Cog, name = "Roles"):
 				)
 				embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-				messagesList.append(await ctx.send(embed = embed))
+				messages_to_delete.append(await ctx.send(embed = embed))
 
 				try:
 					response1 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-					messagesList.append(response1)
+					messages_to_delete.append(response1)
 				except asyncio.TimeoutError:
 					embed = discord.Embed(
 						title = "Custom Role Configuration",
@@ -266,7 +242,7 @@ class roles(commands.Cog, name = "Roles"):
 					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 					await ctx.send(embed = embed, delete_after = 300)
-					await ctx.channel.delete_messages(messagesList)
+					await ctx.channel.delete_messages(messages_to_delete)
 					break
 
 				if response1.content.lower() == "cancel":
@@ -284,7 +260,7 @@ class roles(commands.Cog, name = "Roles"):
 					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 					await ctx.send(embed = embed, delete_after = 300)
-					await ctx.channel.delete_messages(messagesList)
+					await ctx.channel.delete_messages(messages_to_delete)
 					break
 
 				elif response1.content == "1":
@@ -303,11 +279,11 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-					messagesList.append(await ctx.send(embed = embed))
+					messages_to_delete.append(await ctx.send(embed = embed))
 
 					try:
 						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-						messagesList.append(response2)
+						messages_to_delete.append(response2)
 					except asyncio.TimeoutError:
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
@@ -323,7 +299,7 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					if response2.content.lower() == "cancel":
@@ -341,12 +317,12 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					else:
-						userRoleId = server_data["custom_roles"][str(userId)]
-						userRole = ctx.guild.get_role(userRoleId)
+						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
+						userRole = await find_object.find_role(ctx.guild.id, userRoleId)
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
@@ -367,7 +343,7 @@ class roles(commands.Cog, name = "Roles"):
 						)
 
 						await ctx.send(embed = embed)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 				elif response1.content == "2":
@@ -389,11 +365,11 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
-					messagesList.append(await ctx.send(embed = embed))
+					messages_to_delete.append(await ctx.send(embed = embed))
 
 					try:
 						response2 = await self.client.wait_for("message", check = validateMessage, timeout = 300)
-						messagesList.append(response2)
+						messages_to_delete.append(response2)
 					except asyncio.TimeoutError:
 						embed = discord.Embed(
 							title = "Custom Role Configuration",
@@ -409,7 +385,7 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					if response2.content.lower() == "cancel":
@@ -427,33 +403,14 @@ class roles(commands.Cog, name = "Roles"):
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
 
 						await ctx.send(embed = embed, delete_after = 300)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 					else:
-						def isHex(input):
-							def removePrefix(input):
-								if input.startswith("#"):
-									return input[1:]
-								else:
-									return input
-							
-							formattedInput = removePrefix(input)
-							
-							if len(formattedInput) != 6:
-								return False
-
-							try:
-								return int(removePrefix(input), 16)
-							except ValueError:
-								return False
-
-						colourValue = isHex(response2.content)
-						userRoleId = server_data["custom_roles"][str(userId)]
-						userRole = ctx.guild.get_role(userRoleId)
-						
-						if not colourValue:
-							embed = discord.Embed(
+						try:
+							colourValue = await commands.ColourConverter().convert(ctx, response2.content)
+						except commands.BadColourArgument:
+							embed	= discord.Embed(
 								title = "Custom Role Configuration",
 								description = "❌ That's not a valid hex colour code.",
 								colour = discord.Colour.gold()
@@ -463,7 +420,10 @@ class roles(commands.Cog, name = "Roles"):
 								icon_url = ctx.author.avatar_url
 							)
 
-							messagesList.append(await ctx.send(embed = embed))
+							messages_to_delete.append(await ctx.send(embed = embed))
+							
+						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
+						userRole = await find_object.find_role(ctx.guild.id, userRoleId)
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
@@ -484,7 +444,7 @@ class roles(commands.Cog, name = "Roles"):
 						)
 
 						await ctx.send(embed = embed)
-						await ctx.channel.delete_messages(messagesList)
+						await ctx.channel.delete_messages(messages_to_delete)
 						break
 
 				else:
@@ -498,7 +458,7 @@ class roles(commands.Cog, name = "Roles"):
 						icon_url = ctx.author.avatar_url
 					)
 
-					messagesList.append(await ctx.send(embed = embed))
+					messages_to_delete.append(await ctx.send(embed = embed))
 
 	@commands.command(aliases = ["roles"])
 	@commands.guild_only()
