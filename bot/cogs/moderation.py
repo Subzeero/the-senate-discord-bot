@@ -11,7 +11,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	@commands.command(aliases = ["delete"])
 	@commands.cooldown(1, 10, commands.BucketType.user)
 	@commands.guild_only()
-	@commands.check_any(checks.isAdmin(), checks.isMod())
+	@commands.check_any(checks.is_admin(), checks.is_mod())
 	async def purge(self, ctx, numOfMessages: int, user: discord.User = None):
 		"""Purge a number of messages."""
 
@@ -62,7 +62,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	@commands.command()
 	@commands.cooldown(1, 3, commands.BucketType.user)
 	@commands.guild_only()
-	@commands.check_any(checks.isAdmin(), checks.isMod())
+	@commands.check_any(checks.is_admin(), checks.is_mod())
 	async def react(self, ctx, messageId:int, *reactions:str):
 		"""Add reactions to the specified message."""
 

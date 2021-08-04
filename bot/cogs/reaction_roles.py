@@ -2,7 +2,7 @@ import discord, regex
 from discord.ext import commands
 from typing import Union
 from database.db import Database as db
-from helpers import converters, find_object
+from helpers import checks, converters, find_object
 
 class reaction_roles(commands.Cog, name = "Reaction Roles"):
 	"""Random commands."""
@@ -79,6 +79,8 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
+	@commands.cooldown(1, 10, commands.BucketType.guild)
+	@commands.check_any(checks.is_mod(), checks.is_admin())
 	async def listReactionRoles(self, ctx):
 		"""List all of the reaction roles."""
 

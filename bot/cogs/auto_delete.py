@@ -18,7 +18,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 
 	@commands.command()
 	@commands.guild_only()
-	@checks.isAdmin()
+	@checks.is_admin()
 	async def listAutoDeleteChannels(self, ctx):
 		"""List the channels managed with auto delete and their rules."""
 
@@ -51,7 +51,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 
 	@commands.command()
 	@commands.guild_only()
-	@checks.isAdmin()
+	@checks.is_admin()
 	async def addAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Enable auto delete on a given channel."""
 
@@ -63,7 +63,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 
 	@commands.command()
 	@commands.guild_only()
-	@checks.isAdmin()
+	@checks.is_admin()
 	async def editAutoDeleteChannelRules(self, ctx, channel:discord.TextChannel, editOption:str = None, ruleType:str = None, ruleExpression:str = None):
 		"""Edit the rules of a channel managed with auto delete."""
 
@@ -108,7 +108,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 
 	@commands.command()
 	@commands.guild_only()
-	@checks.isAdmin()
+	@checks.is_admin()
 	async def removeAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Disable auto delete on a given channel."""
 
