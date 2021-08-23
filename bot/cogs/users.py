@@ -36,19 +36,13 @@ class users(commands.Cog, name = "Users"):
 		perms = "\n".join(perm for perm, value in member.guild_permissions if value)
 
 		embed = discord.Embed(
-			title = "Permissions",
+			description = perms,
 			colour = member.colour
 		)
 
 		embed.set_author(
 			icon_url = member.avatar_url,
-			name = str(member)
-		)
-
-		embed.add_field(
-			name = "\uFEFF",
-			value = perms,
-			inline = False
+			name = f"{str(member)}'s Permissions"
 		)
 
 		await ctx.send(embed = embed)
