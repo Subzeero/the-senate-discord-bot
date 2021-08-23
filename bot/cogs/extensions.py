@@ -8,7 +8,7 @@ class extensions(commands.Cog, name = "Extensions"):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command()
+	@commands.command(aliases = ["lo"])
 	@commands.is_owner()
 	async def load(self, ctx, extension):
 		"""Load an extension."""
@@ -32,7 +32,7 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		await ctx.send(embed = embed, delete_after = 10)
 		
-	@commands.command()
+	@commands.command(aliases = ["un"])
 	@commands.is_owner()
 	async def unload(self, ctx, extension):
 		"""Unload an extension."""
@@ -56,7 +56,7 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		await ctx.send(embed = embed, delete_after = 10)
 
-	@commands.command()
+	@commands.command(aliases = ["re"])
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		"""Reload an extension."""
@@ -83,11 +83,21 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		loaded_cogs = []
 		cogs = {}
+		cogs_dirs = ["cogs", "bot/cogs"]
+		cogs_path = ""
+
+		for dir in cogs_dirs:
+			if os.path.exists(dir):
+				cogs_path = dir
+				break
+		else:
+			await ctx.send("❌ No `cogs` folder could be located!")
+			return
 
 		for cog in self.client.cogs.values():
 			loaded_cogs.append(cog.__class__.__name__)
 
-		for fileName in os.listdir("./cogs"):
+		for fileName in os.listdir(cogs_path):
 			if fileName.endswith(".py"):
 				if fileName[:-3] in loaded_cogs:
 					cogs[fileName[:-3]] = "✅ Loaded!"

@@ -1,8 +1,12 @@
 # The Senate Discord Bot
 # Subzeero
-# Development code for The Senate Discord Bot
+# Main code file for The Senate Discord Bot
 
 # Imports
+from helpers import config
+
+config.load_config()
+
 import discord, os
 from database.db import Database as db
 
@@ -54,7 +58,7 @@ for fileName in db.find_one("bot")["loaded_cogs"]:
 	try:
 		client.load_extension(f"cogs.{fileName}")
 		print(f"Loaded {fileName}.")
-	except:
-		print(f"Failed to load {fileName}.")
+	except Exception as e:
+		print(f"Failed to load {fileName}: {e}")
 
 client.run(BOT_TOKEN) # Run the bot
