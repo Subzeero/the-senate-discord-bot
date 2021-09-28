@@ -29,7 +29,7 @@ class roles(commands.Cog, name = "Roles"):
 		def validateMessage(message):
 			return message.author == ctx.author
 
-		if not str(ctx.author.id) in guild_data["custom_roles"].keys():
+		if not str(ctx.author.id) in guild_data["custom_roles"]["user_roles"].keys():
 			embed = discord.Embed(
 				title = "Custom Role Configuration",
 				description = "It looks like you don't have a custom role yet; let's create one!",
@@ -96,7 +96,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.add_field(
 						name = "Step 2) Role Colour",
-						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
+						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/color-picker/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
 						inline = False
 					)
 					embed.set_image(
@@ -151,7 +151,11 @@ class roles(commands.Cog, name = "Roles"):
 
 					else:
 						try:
-							colourValue = await commands.ColourConverter().convert(ctx, response2.content)
+							user_input = response2.content.strip()
+							if not user_input.startswith("#"):
+								user_input = "#" + user_input
+
+							colourValue = await commands.ColourConverter().convert(ctx, user_input)
 						except commands.BadColourArgument:
 							embed = discord.Embed(
 								title = "Custom Role Configuration",
@@ -164,38 +168,43 @@ class roles(commands.Cog, name = "Roles"):
 							)
 
 							messages_to_delete.append(await ctx.send(embed = embed))
+							continue
 						
-						if colourValue:
-							newRole = await ctx.guild.create_role(
-								name = response1.content,
-								colour = colourValue,
-								reason = "Created by user command."
-							)
+						newRole = await ctx.guild.create_role(
+							name = response1.content,
+							colour = colourValue,
+							reason = "Created by user command."
+						)
 
-							await newRole.edit(
-								position = ctx.guild.roles[-1].position - 11,
-								reason = "Reorder the role created by user command."
-							)
+						role_position = 1
+						if guild_data["custom_roles"]["placement_role_id"]:
+							positioning_role = await find_object.find_role(ctx.guild, guild_data["custom_roles"]["placement_role_id"])
+							role_position = positioning_role.position - 1
 
-							await ctx.author.add_roles(newRole)
+						await newRole.edit(
+							position = role_position,
+							reason = "Reorder the role created by user command."
+						)
 
-							new_data = db.get_guild(ctx.guild.id)
-							new_data["custom_roles"][str(ctx.author.id)] = newRole.id
-							db.set_guild(ctx.guild.id, new_data)
+						await ctx.author.add_roles(newRole)
 
-							embed = discord.Embed(
-								title = "Custom Role Configuration",
-								description = f"✅ Role created: {newRole.mention}",
-								colour = discord.Colour.gold()
-							)
-							embed.set_author(
-								name = ctx.author.name + "#" + ctx.author.discriminator,
-								icon_url = ctx.author.avatar_url
-							)
+						new_data = db.get_guild(ctx.guild.id)
+						new_data["custom_roles"]["user_roles"][str(ctx.author.id)] = newRole.id
+						db.set_guild(ctx.guild.id, new_data)
 
-							await ctx.send(embed = embed)
-							await ctx.channel.delete_messages(messages_to_delete)
-							break
+						embed = discord.Embed(
+							title = "Custom Role Configuration",
+							description = f"✅ Role created: {newRole.mention}",
+							colour = discord.Colour.gold()
+						)
+						embed.set_author(
+							name = ctx.author.name + "#" + ctx.author.discriminator,
+							icon_url = ctx.author.avatar_url
+						)
+
+						await ctx.send(embed = embed)
+						await ctx.channel.delete_messages(messages_to_delete)
+						break
 
 		else:
 			while True:
@@ -321,11 +330,11 @@ class roles(commands.Cog, name = "Roles"):
 						break
 
 					else:
-						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
+						userRoleId = guild_data["custom_roles"]["user_roles"][str(ctx.author.id)]
 						userRole = await find_object.find_role(ctx.guild, userRoleId)
 
 						if not userRole:
-							await ctx.send("❌ Discord is being mean, please try again later.")
+							await ctx.send("❌ Discord is being mean, please try again later.\n`ERR: ROLE NOT FOUND`")
 							break
 
 						await userRole.edit(
@@ -353,7 +362,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.add_field(
 						name = "2) Role Colour",
-						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
+						value = "What do you want your role colour to be? Go to the link: https://htmlcolorcodes.com/color-picker/ and find the HEX colour code (#00BD1A in the image below) for the colour you want. Paste the HEX code below and send it.",
 						inline = False
 					)
 					embed.set_image(
@@ -408,7 +417,11 @@ class roles(commands.Cog, name = "Roles"):
 
 					else:
 						try:
-							colourValue = await commands.ColourConverter().convert(ctx, response2.content)
+							user_input = response2.content.strip()
+							if not user_input.startswith("#"):
+								user_input = "#" + user_input
+
+							colourValue = await commands.ColourConverter().convert(ctx, user_input)
 						except commands.BadColourArgument:
 							embed	= discord.Embed(
 								title = "Custom Role Configuration",
@@ -421,12 +434,13 @@ class roles(commands.Cog, name = "Roles"):
 							)
 
 							messages_to_delete.append(await ctx.send(embed = embed))
+							continue
 							
-						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
+						userRoleId = guild_data["custom_roles"]["user_roles"][str(ctx.author.id)]
 						userRole = await find_object.find_role(ctx.guild, userRoleId)
 
 						if not userRole:
-							await ctx.send("❌ Discord is being mean, please try again later.")
+							await ctx.send("❌ Discord is being mean, please try again later.\n`ERR: ROLE NOT FOUND`")
 							break
 
 						await userRole.edit(
