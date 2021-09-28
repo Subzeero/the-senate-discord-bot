@@ -322,7 +322,7 @@ class roles(commands.Cog, name = "Roles"):
 
 					else:
 						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
-						userRole = await find_object.find_role(ctx.guild.id, userRoleId)
+						userRole = await find_object.find_role(ctx.guild, userRoleId)
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
@@ -423,7 +423,7 @@ class roles(commands.Cog, name = "Roles"):
 							messages_to_delete.append(await ctx.send(embed = embed))
 							
 						userRoleId = guild_data["custom_roles"][str(ctx.author.id)]
-						userRole = await find_object.find_role(ctx.guild.id, userRoleId)
+						userRole = await find_object.find_role(ctx.guild, userRoleId)
 
 						if not userRole:
 							await ctx.send("❌ Discord is being mean, please try again later.")
