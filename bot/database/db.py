@@ -1,5 +1,5 @@
 import os, pymongo
-from database.data_versions import DATABASE_VERSIONS
+from database.data_versions import DATABASE_VERSIONS, LATEST_DATA_VERSION
 
 class Database(object):
 	if os.environ["DISCORD_BOT_ENV"] == "PROD":
@@ -10,8 +10,7 @@ class Database(object):
 		DB_NAME = os.environ["MONGODB_DB_DEV"]
 
 	DB = None
-	SERVERS_COLLECTION = "servers"
-	LATEST_DATA_VERSION = 1
+	GUILDS_COLLECTION = "servers"
 
 	@staticmethod
 	def init():
@@ -48,20 +47,19 @@ class Database(object):
 
 	@staticmethod
 	def get_guild(guild_id: int):
-		guild_data = Database.find_one(Database.SERVERS_COLLECTION, {"SERVER_ID":guild_id})
+		guild_data = Database.find_one(Database.GUILDS_COLLECTION, {"GUILD_ID":guild_id})
 
 		if guild_data is None:
-			guild_data = DATABASE_VERSIONS[Database.LATEST_DATA_VERSION].BASE_STRUCTURE
-			guild_data["SERVER_ID"] = guild_id
+			guild_data = DATABASE_VERSIONS[LATEST_DATA_VERSION].create(guild_id)
 		else:
 			guild_data_version = guild_data["DATA_VERSION"]
 
-			while guild_data_version < Database.LATEST_DATA_VERSION:
-				guild_data = DATABASE_VERSIONS[guild_data_version + 1].upgrade(guild_data)
+			while guild_data_version < LATEST_DATA_VERSION:
+				guild_data = DATABASE_VERSIONS[guild_data_version + 1].upgrade(Database, guild_data)
 				guild_data_version = guild_data["DATA_VERSION"]
 
 		return guild_data
 
 	@staticmethod
 	def set_guild(guild_id: int, new_guild_data: dict):
-		return Database.replace_one(Database.SERVERS_COLLECTION, {"SERVER_ID":guild_id}, new_guild_data, True)
+		return Database.replace_one(Database.GUILDS_COLLECTION, {"GUILD_ID":guild_id}, new_guild_data, True)
