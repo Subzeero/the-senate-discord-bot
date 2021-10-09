@@ -1,5 +1,6 @@
 import datetime, discord, math, psutil
 from discord.ext import commands
+from helpers import converters
 
 class random(commands.Cog, name = "Random"):
 	"""Random commands."""
@@ -66,8 +67,14 @@ class random(commands.Cog, name = "Random"):
 
 	@commands.command()
 	@commands.cooldown(1, 5, commands.BucketType.user)
-	async def timer(self, ctx):
-		"""Create a countdown timer."""
+	async def timer(self, ctx, *, relativeTime: converters.TimeConverter):
+		"""Create a Discord rich-embed to countdown to a time, rounded to the nearest minute."""
+		unix = datetime.datetime.now(datetime.timezone.utc).timestamp()
+		timestamp = int(datetime.datetime.fromtimestamp(unix + relativeTime + 59).replace(second = 0).timestamp())
+		# timestamp = int(unix.timestamp() + datetime.time(second = relativeTime).replace(second = 0))
+		timestamp_relative = f"<t:{timestamp}:R>"
+		timestamp_exact = f"<t:{timestamp}:F>"
+		await ctx.send(timestamp_relative + "\n" + timestamp_exact)
 
 def setup(client):
 	client.add_cog(random(client))
