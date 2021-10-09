@@ -17,10 +17,15 @@ class random(commands.Cog, name = "Random"):
 		
 		cpu = psutil.cpu_percent(interval = 1)
 		memory = psutil.virtual_memory()
-		latency = self.client.latency
+		memory_total_GB = memory.total / 2**30
+		memory_available_GB = memory.available / 2**30
+		latency = math.floor(self.client.latency * 1000)
 
 		current_time = datetime.datetime.now()
 		uptime = (current_time - self.start_time).total_seconds()
+		uptime_days = math.floor(uptime / 86400)
+		uptime_hours = math.floor(uptime % 86400 / 3600)
+		uptime_minutes = math.floor(uptime % 3600 / 60)
 
 		embed = discord.Embed(title = "Global Statistics", colour = discord.Colour.gold())
 
@@ -28,10 +33,10 @@ class random(commands.Cog, name = "Random"):
 		
 		embed.add_field(name = "Total Servers", value = str(len(self.client.guilds)))
 		embed.add_field(name = "Total Users", value = str(len(self.client.users)))
-		embed.add_field(name = "Uptime", value = f"{math.floor(uptime / 86400)} days, {math.floor(uptime % 86400 / 3600)} hours, {math.floor(uptime % 3600 / 60)} minutes")
+		embed.add_field(name = "Uptime", value = f"{uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes")
 		embed.add_field(name = "CPU Usage", value = f"{round(cpu)}%")
-		embed.add_field(name = "Memory Usage", value = f"{round((memory.total - memory.available) / math.pow(10, 9), 2)}GB / {round(memory.total / math.pow(10, 9), 2)}GB")
-		embed.add_field(name = "Latency", value = f"{math.floor(latency * 1000)} ms")
+		embed.add_field(name = "Memory Usage", value = "{:0.2f}GB / {:0.2f}GB".format(memory_total_GB - memory_available_GB, memory_total_GB))
+		embed.add_field(name = "Latency", value = f"{latency} ms")
 
 		await message.edit(content = None, embed = embed)
 
