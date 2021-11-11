@@ -16,9 +16,30 @@ class error_handler(commands.Cog, name = "Error Handler"):
 
 	@tasks.loop(seconds=30)
 	async def manage_cooldowns(self):
-		for user, secs in self.users_on_cooldown.items():
-			if secs < time.time():
-				self.users_on_cooldown.pop(user)
+		users_to_remove = []
+		for user, data in self.users_on_cooldown.items():
+			if data["time"] < time.time():
+				users_to_remove.append(user)
+
+		for user in users_to_remove:
+			self.users_on_cooldown.pop(user)
+
+	async def abide_cooldown(self, user, ctx, content = None, embed = None):
+		if not str(user.id) in self.users_on_cooldown.keys():
+			self.users_on_cooldown[str(user.id)] = {
+				"quota": 0,
+				"time": 0
+			}
+
+		if self.users_on_cooldown[str(user.id)]["quota"] < 3 and self.users_on_cooldown[str(user.id)]["time"] == 0:
+			self.users_on_cooldown[str(user.id)]["quota"] += 1
+			if self.users_on_cooldown[str(user.id)]["quota"] == 3:
+				self.users_on_cooldown[str(user.id)]["time"] = time.time() + 20
+				if not content:
+					content = f"Easy on the spam {user.mention}! Consider yourself ignored for the next while 🙊."
+				else:
+					content += f"\n\nEasy on the spam {user.mention}! Consider yourself ignored for the next while 🙊."
+			await ctx.send(content = content, embed = embed)
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
@@ -32,41 +53,48 @@ class error_handler(commands.Cog, name = "Error Handler"):
 		error = getattr(error, "original", error)
 
 		if isinstance(error, commands.DisabledCommand):
-			await ctx.send(f"❌ {ctx.command} has been disabled!")
+			message = f"❌ {ctx.command} has been disabled!"
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.CommandOnCooldown):
-			if not str(ctx.author.id) in self.users_on_cooldown.keys():
-				await ctx.send(f"❌ Slow down {ctx.author.mention}, you're running commands too fast!")
-				self.users_on_cooldown[str(ctx.author.id)] = time.time() + 15
+			message = f"❌ Slow down {ctx.author.mention}, you're running commands too fast!"
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.MaxConcurrencyReached):
-			await ctx.send(f"❌ The maximum number of users (`{error.number}`) are already running this command. Please try again later.")
+			message = f"❌ The maximum number of users (`{error.number}`) are already running this command. Please try again later."
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.CommandNotFound):
 			prefix = ctx.prefix
 			content = ctx.message.content
-			await ctx.send(f"❌ `{content.replace(prefix, '')}` is not a registered command.")
+			message = f"❌ `{content.replace(prefix, '')}` is not a registered command."
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.NoPrivateMessage):
 			try:
-				await ctx.author.send(f"❌ `{ctx.command}` cannot be used in Private Messages.")
+				message = f"❌ `{ctx.command}` cannot be used in Private Messages."
+				await self.abide_cooldown(ctx.author, ctx, content = message)
 			except:
 				pass
 
 		elif isinstance(error, commands.PrivateMessageOnly):
 			try:
-				await ctx.send(f"❌ `{ctx.command}` can only be used in Private Messages.")
+				message = f"❌ `{ctx.command}` can only be used in Private Messages."
+				await self.abide_cooldown(ctx.author, ctx, content = message)
 			except:
 				pass
 
 		elif isinstance(error, commands.UserInputError):
-			await ctx.send(f"❌ {error} Type `{ctx.prefix}help {ctx.command}` for more information.")
+			message = f"❌ {error} Type `{ctx.prefix}help {ctx.command}` for more information."
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.NotOwner):
-			return
+			pass # Ignore
 
 		elif isinstance(error, commands.CheckFailure):
-			await ctx.send("❌ You don't have permission to run this command!")
+			print(ctx.command.checks)
+			message = "❌ You don't have permission to run this command!"
+			await self.abide_cooldown(ctx.author, ctx, content = message)
 
 		elif isinstance(error, commands.ExtensionError):
 			await ctx.send(f"❌ Extension Error: {error}")
