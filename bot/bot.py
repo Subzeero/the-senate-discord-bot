@@ -32,6 +32,9 @@ elif BOT_ENV == "DEV":
 
 # Determine prefix
 def get_prefix(bot, message):
+	if message.guild == None:
+		return commands.when_mentioned_or(BOT_PREFIX)(bot, message)
+
 	custom_prefix = db.get_guild(message.guild.id)["custom_prefix"]
 	if custom_prefix is not None:
 		return commands.when_mentioned_or(custom_prefix)(bot, message)
