@@ -68,17 +68,17 @@ class random(commands.Cog, name = "Random"):
 	@commands.command()
 	@commands.max_concurrency(3, commands.BucketType.user)
 	async def timer(self, ctx, *, relativeTime: converters.TimeConverter):
-		"""Create a Discord rich-embed to countdown to a time, rounded to the nearest minute. 
+		"""Create a Discord rich-embed to countdown to a relative time. 
 		An ending notification will be sent for timers under six hours."""
 
-		unix = datetime.datetime.now(datetime.timezone.utc).timestamp()
-		timestamp = int(datetime.datetime.fromtimestamp(unix + relativeTime + 59).replace(second = 0).timestamp())
-		timestamp_relative = f"<t:{timestamp}:R>"
-		timestamp_exact = f"<t:{timestamp}:t>"
+		unix = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+		target = unix + relativeTime
+		timestamp_relative = f"<t:{target}:R>"
+		timestamp_exact = f"<t:{target}:T>"
 		await ctx.send(f"A timer has been set for {timestamp_exact}.\nThat is {timestamp_relative}.")
 
-		if timestamp - unix <= 60 * 60 * 6:
-			await asyncio.sleep(timestamp - unix)
+		if relativeTime <= 60 * 60 * 6:
+			await asyncio.sleep(relativeTime)
 			await ctx.message.reply(content = "https://tenor.com/FUGa.gif")
 
 def setup(client):
