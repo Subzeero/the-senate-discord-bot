@@ -1,4 +1,4 @@
-import datetime, discord, math, psutil
+import asyncio, datetime, discord, math, psutil
 from discord.ext import commands
 from utils import converters, cooldown
 
@@ -9,7 +9,7 @@ class random(commands.Cog, name = "Random"):
 		self.client = client
 		self.start_time = datetime.datetime.now()
 
-	@commands.command(aliases = ["ping", "statistics"])
+	@commands.command(aliases = ["ping", "statistics", "uptime"])
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def stats(self, ctx):
 		"""Get some stats about the bot."""
@@ -66,15 +66,20 @@ class random(commands.Cog, name = "Random"):
 		await ctx.send("https://tenor.com/xU6p.gif")
 
 	@commands.command()
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.max_concurrency(3, commands.BucketType.user)
 	async def timer(self, ctx, *, relativeTime: converters.TimeConverter):
-		"""Create a Discord rich-embed to countdown to a time, rounded to the nearest minute."""
+		"""Create a Discord rich-embed to countdown to a time, rounded to the nearest minute. 
+		An ending notification will be sent for timers under six hours."""
+
 		unix = datetime.datetime.now(datetime.timezone.utc).timestamp()
 		timestamp = int(datetime.datetime.fromtimestamp(unix + relativeTime + 59).replace(second = 0).timestamp())
-		# timestamp = int(unix.timestamp() + datetime.time(second = relativeTime).replace(second = 0))
 		timestamp_relative = f"<t:{timestamp}:R>"
-		timestamp_exact = f"<t:{timestamp}:F>"
-		await ctx.send(timestamp_relative + "\n" + timestamp_exact)
+		timestamp_exact = f"<t:{timestamp}:t>"
+		await ctx.send(f"A timer has been set for {timestamp_exact}.\nThat is {timestamp_relative}.")
+
+		if timestamp - unix <= 60 * 60 * 6:
+			await asyncio.sleep(timestamp - unix)
+			await ctx.message.reply(content = "https://tenor.com/FUGa.gif")
 
 def setup(client):
 	client.add_cog(random(client))
