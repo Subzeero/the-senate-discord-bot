@@ -9,72 +9,123 @@ class admin(commands.Cog, name = "Admin"):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles"])
+	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles", "controlRoles"])
 	@commands.guild_only()
 	@checks.is_admin()
 	async def listControlRoles(self, ctx):
 		"""List the administrator and moderator roles used by the bot."""
 
-		server_data = db.get_guild(ctx.guild.id)
-		admin_roles = server_data["admin_roles"]
-		mod_roles = server_data["mod_roles"]
-		adminStr = ""
-		modStr = ""
+		message = await ctx.send("Working...")
+		
+		guild_data = db.get_guild(ctx.guild.id)
+		admin_str = ""
+		mod_str = ""
+		admin_roles_to_remove = []
+		mod_roles_to_remove = []
 
-		if admin_roles:
-			for role in admin_roles:
-				adminStr = f"{adminStr}\n`{role}`"
+		if guild_data["admin_roles"]:
+			for role_id in guild_data["admin_roles"]:
+				role_object = await find_object.find_role(ctx.guild, role_id)
+				if role_object:
+					admin_str = f"{admin_str}\n{role_object.mention}"
+				else:
+					admin_roles_to_remove.append(role_id)
 		else:
-			adminStr = "None!"
+			admin_str = "None!"
 
-		if mod_roles:
-			for role in mod_roles:
-				modStr = f"{modStr}\n`{role}`"
+		if guild_data["mod_roles"]:
+			for role_id in guild_data["mod_roles"]:
+				role_object = await find_object.find_role(ctx.guild, role_id)
+				if role_object:
+					mod_str = f"{mod_str}\n{role_object.mention}"
+				else:
+					mod_roles_to_remove.append(role_id)
 		else:
-			modStr = "None!"
+			mod_str = "None!"
 
 		embed = discord.Embed(colour = discord.Colour.gold())
 
 		embed.set_author(
-			name = f"Bot Control Roles in {ctx.guild.name}",
+			name = f"Control Roles in {ctx.guild.name}",
 			icon_url = ctx.guild.icon_url
 		)
 
 		embed.add_field(
 			name = "Administrator Roles",
-			value = adminStr,
+			value = admin_str,
 			inline = False
 		)
 
 		embed.add_field(
 			name = "Moderator Roles",
-			value = modStr,
+			value = mod_str,
 			inline = False
 		)
 
-		await ctx.send(embed = embed)
+		if admin_roles_to_remove:
+			remove_str = ""
+			for role_id in admin_roles_to_remove:
+				guild_data["admin_roles"].remove(role_id)
+				remove_str = f"{remove_str}\n`{role_id}`"
+			db.set_guild(ctx.guild.id, guild_data)
+
+			embed.add_field(
+				name = "⚠️ Important Notice",
+				value = f"The following role IDs could be not be found in your server (possibly deleted):{remove_str}\nThey have been removed as admin roles.",
+				inline = False
+			)
+
+		if mod_roles_to_remove:
+			remove_str = ""
+			for role_id in mod_roles_to_remove:
+				guild_data["mod_roles"].remove(role_id)
+				remove_str = f"{remove_str}\n`{role_id}`"
+			db.set_guild(ctx.guild.id, guild_data)
+
+			embed.add_field(
+				name = "⚠️ Important Notice",
+				value = f"The following role IDs could be not be found in your server (possibly deleted):{remove_str}\nThey have been removed as mod roles.",
+				inline = False
+			)
+
+		await message.edit(content = None, embed = embed)
 
 	@commands.command(aliases = ["addAdminRole", "newAdminRole", "newAdministratorRole"])
 	@commands.guild_only()
 	@checks.is_admin()
-	async def addAdministratorRole(self, ctx, newAdminRole):
-		"""Grant a role (name or id) access to administrator commands."""
+	async def addAdministratorRole(self, ctx, newAdminRole: discord.Role):
+		"""Grant a role access to administrator commands."""
 
-		role = await commands.RoleConverter().convert(ctx, newAdminRole)
+		guild_data = db.get_guild(ctx.guild.id)
+		guild_data["admin_roles"].append(newAdminRole.id)
 
-		server_data = db.get_guild(ctx.guild.id)
-
-		try:
-			int(newAdminRole)
-		except:
-			server_data["admin_roles"].append(str(role))
-		else:
-			server_data["admin_roles"].append(role.id)
-
-		db.set_guild(ctx.guild.id, server_data)
+		db.set_guild(ctx.guild.id, guild_data)
 
 		embed = discord.Embed(
-			description = f"✅ Successfully set `{newAdminRole}` as an admin role.",
+			description = f"✅ Successfully set {newAdminRole.mention} as an admin role.",
+			colour = discord.Colour.green()
+		)
+		
+		embed.set_author(
+			name = f"{ctx.author.name}#{ctx.author.discriminator}",
+			icon_url = ctx.author.avatar_url
+		)
+
+		await ctx.send(embed = embed)
+
+	@commands.command(aliases = ["addModRole"])
+	@commands.guild_only()
+	@checks.is_admin()
+	async def addModeratorRole(self, ctx, newModRole: discord.Role):
+		"""Grant a role access to moderator commands."""
+
+		guild_data = db.get_guild(ctx.guild.id)
+		guild_data["mod_roles"].append(newModRole.id)
+
+		db.set_guild(ctx.guild.id, guild_data)
+
+		embed = discord.Embed(
+			description = f"✅ Successfully set {newModRole.mention} as a mod role.",
 			colour = discord.Colour.gold()
 		)
 		
@@ -88,118 +139,73 @@ class admin(commands.Cog, name = "Admin"):
 	@commands.command(aliases = ["removeAdminRole"])
 	@commands.guild_only()
 	@checks.is_admin()
-	async def removeAdministratorRole(self, ctx, adminRoleToRemove):
-		"""Remove a role's (name or id) access to administrator commands."""
+	async def removeAdministratorRole(self, ctx, adminRoleToRemove: discord.Role):
+		"""Remove a role's access to administrator commands."""
 
-		server_data = db.get_guild(ctx.guild.id)
-
-		try:
-			int(adminRoleToRemove)
-		except:
-			pass
-
-		try:
-			server_data["admin_roles"].remove(adminRoleToRemove)
-		except:
+		guild_data = db.get_guild(ctx.guild.id)
+		if not adminRoleToRemove.id in guild_data["admin_roles"]:
 			embed = discord.Embed(
-				description = f"❌ `{adminRoleToRemove}` is not an admin role.",
-				colour = discord.Colour.gold()
+				description = f"❌ {adminRoleToRemove.mention} is not an admin role.",
+				colour = discord.Colour.red()
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
 				icon_url = ctx.author.avatar_url
 			)
-			await ctx.send(embed = embed)
-		
-		else:
-			db.set_guild(ctx.guild.id, server_data)
+
+		else: 
+			guild_data["admin_roles"].remove(adminRoleToRemove.id)
+			db.set_guild(ctx.guild.id, guild_data)
 			embed = discord.Embed(
-				description = f"✅ `{adminRoleToRemove}` is no longer an admin role.",
-				colour = discord.Colour.gold()
+				description = f"✅ {adminRoleToRemove} is no longer an admin role.",
+				colour = discord.Colour.green()
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
 				icon_url = ctx.author.avatar_url
 			)
-			await ctx.send(embed = embed)
-
-	@commands.command(aliases = ["addModRole"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def addModeratorRole(self, ctx, newModRole):
-		"""Grant a role (name or id) access to moderator commands."""
-
-		role = await commands.RoleConverter().convert(ctx, newModRole)
-
-		server_data = db.get_guild(ctx.guild.id)
-
-		try:
-			int(newModRole)
-		except:
-			server_data["mod_roles"].append(str(role))
-		else:
-			server_data["mod_roles"].append(role.id)
-
-		db.set_guild(ctx.guild.id, server_data)
-
-		embed = discord.Embed(
-			description = f"✅ Successfully set `{newModRole}` as an mod role.",
-			colour = discord.Colour.gold()
-		)
-		
-		embed.set_author(
-			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.avatar_url
-		)
 
 		await ctx.send(embed = embed)
 
 	@commands.command(aliases = ["removeModRole"])
 	@commands.guild_only()
 	@checks.is_admin()
-	async def removeModeratorRole(self, ctx, modRoleToRemove):
-		"""Remove a role's access to access mod commands."""
+	async def removeModeratorRole(self, ctx, modRoleToRemove: discord.Role):
+		"""Remove a role's access to moderator commands."""
 
-		server_data = db.get_guild(ctx.guild.id)
-
-		try:
-			int(modRoleToRemove)
-		except:
-			pass
-
-		try:
-			server_data["mod_roles"].remove(modRoleToRemove)
-		except:
+		guild_data = db.get_guild(ctx.guild.id)
+		if not modRoleToRemove.id in guild_data["mod_roles"]:
 			embed = discord.Embed(
-				description = f"❌ `{modRoleToRemove}` is not an mod role.",
-				colour = discord.Colour.gold()
+				description = f"❌ {modRoleToRemove.mention} is not an mod role.",
+				colour = discord.Colour.red()
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
 				icon_url = ctx.author.avatar_url
 			)
-			await ctx.send(embed = embed)
-		
-		else:
-			db.set_guild(ctx.guild.id, server_data)
+
+		else: 
+			guild_data["mod_roles"].remove(modRoleToRemove.id)
+			db.set_guild(ctx.guild.id, guild_data)
 			embed = discord.Embed(
-				description = f"✅ `{modRoleToRemove}` is no longer an mod role.",
-				colour = discord.Colour.gold()
+				description = f"✅ {modRoleToRemove} is no longer an mod role.",
+				colour = discord.Colour.green()
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
 				icon_url = ctx.author.avatar_url
 			)
-			await ctx.send(embed = embed)
+
+		await ctx.send(embed = embed)
 
 	@commands.command()
 	@commands.guild_only()
 	@checks.is_admin()
 	async def changePrefix(self, ctx, newPrefix:str = None):
-		"""Change the bot's prefix. Pass nothing to reset to the default prefix."""
-		server_data = db.get_guild(ctx.guild.id)
-		server_data["custom_prefix"] = newPrefix
-		db.set_guild(ctx.guild.id, server_data)
+		"""Change the bot's prefix. Send nothing to reset to the default prefix."""
+		guild_data = db.get_guild(ctx.guild.id)
+		guild_data["custom_prefix"] = newPrefix
+		db.set_guild(ctx.guild.id, guild_data)
 
 		prefixes = await self.client.get_prefix(ctx.message)
 		prefix_str = ""
@@ -265,18 +271,18 @@ class admin(commands.Cog, name = "Admin"):
 	@commands.command()
 	@commands.guild_only()
 	@checks.is_admin()
-	async def editEmbedMessage(self, ctx, messageID:int, *, newContent:str):
+	async def editEmbedMessage(self, ctx, channel:discord.TextChannel, messageID:int, *, newContent:str):
 		"""Edit a message with an embed."""
 
 		await ctx.message.delete()
 
 		try:
-			message = await ctx.fetch_message(messageID)
+			message = await channel.fetch_message(messageID)
 		except discord.NotFound:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
 
-		if message.author.id == self.client.user.id:
+		if message.author.id != self.client.user.id:
 			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
 			return
 
