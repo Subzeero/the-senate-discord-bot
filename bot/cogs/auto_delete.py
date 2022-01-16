@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from database.db import Database as db
-from helpers import checks
+from utils import checks
 
 ruleTypes = ["startswith", "endswith", "contains", "matches", "command"]
 

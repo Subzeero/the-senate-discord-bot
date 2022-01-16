@@ -3,7 +3,7 @@
 # Main code file for The Senate Discord Bot
 
 # Imports
-from helpers import config
+from utils import config
 
 config.load_config()
 
@@ -12,7 +12,7 @@ from database.db import Database as db
 
 from discord.ext import commands
 from pretty_help import PrettyHelp
-from helpers import bot_status
+from utils import bot_status, checks, exceptions
 
 # Declare Constants
 BOT_ENV = os.environ["DISCORD_BOT_ENV"]

@@ -1,6 +1,6 @@
 import datetime, discord, math, psutil
 from discord.ext import commands
-from helpers import converters
+from utils import converters, cooldown
 
 class random(commands.Cog, name = "Random"):
 	"""Random commands."""

@@ -1,7 +1,7 @@
 import discord, asyncio
 from discord.ext import commands
 from database.db import Database as db
-from helpers import debug, find_object
+from utils import debug, find_object
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 

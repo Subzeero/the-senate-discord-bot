@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from helpers import checks
+from utils import checks, converters
 
 class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""

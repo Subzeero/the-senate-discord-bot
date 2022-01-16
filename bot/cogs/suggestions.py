@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
-from helpers import debug
 
 suggestionsChannelId = 796553486677311510
+from utils import debug
 
 class suggestions(commands.Cog, name = "Suggestions"):
 	"""Command for server suggestions"""

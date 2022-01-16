@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from typing import Union
 from database.db import Database as db
-from helpers import checks, converters, find_object
+from utils import checks, converters, find_object
 
 class reaction_roles(commands.Cog, name = "Reaction Roles"):
 	"""Random commands."""

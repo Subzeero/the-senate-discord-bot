@@ -1,19 +1,15 @@
 from discord.ext import commands
+from utils import exceptions
 import emojis, re
 
 time_regex = re.compile(r"(\d{1,5}(?:[.,]?\d{1,5})?)([smhd])")
 time_dict = {"h":3600, "s":1, "m":60, "d":86400}
 whitespace_regex = re.compile(r'\s+')
 
-class UnicodeEmojiNotFound(commands.BadArgument):
-	def __init__(self, argument):
-		self.argument = argument
-		super().__init__(f"Unicode emoji '{argument}' not found.")
-
 class UnicodeEmojiConverter(commands.Converter):
 	async def convert(self, ctx, argument):
 		if not (emoji := emojis.db.get_emoji_by_code(argument)):
-			raise UnicodeEmojiNotFound(argument)
+			raise exceptions.UnicodeEmojiNotFound(argument)
 		return emoji.emoji
 
 class TimeConverter(commands.Converter):
