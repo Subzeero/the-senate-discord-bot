@@ -1,2 +1,2 @@
 # the-senate-discord-bot
-The Senate Discord Bot
+This is an ongoing project of mine. Feel free to explore.
