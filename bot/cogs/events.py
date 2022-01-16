@@ -54,31 +54,31 @@ class events(commands.Cog, name = "Events"):
 			await message.delete()
 			await message.channel.send(embed = embed, delete_after = 10)
 
+		# TEMPORARILY DISABLE THIS. WORKING ON BETTER SOLUTION
+
 		# print("author:", message.author.id, "message:", message.content)
-		if message.author.id == 397879157029077002:
-			invalidMention = None
+		# if message.author.id == 397879157029077002:
+		# 	invalidMention = None
 			
-			if "<@!296406728818425857>" in message.content:
-				invalidMention = "<@!296406728818425857>"
-			elif "<@!355099018113843200>" in message.content:
-				invalidMention = "<@!355099018113843200>"
-			else:
-				return
+		# 	if "<@!296406728818425857>" in message.content:
+		# 		invalidMention = "<@!296406728818425857>"
+		# 	else:
+		# 		return
 
-			if message.guild:
-				muterole = message.guild.get_role(755925817028247644)
-				await message.author.add_roles(muterole)
+		# 	if message.guild:
+		# 		muterole = message.guild.get_role(755925817028247644)
+		# 		await message.author.add_roles(muterole)
 
-				embed = discord.Embed(
-					description = f"You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you. 🙊",
-					colour = discord.Colour.gold()
-				)
-				embed.set_author(
-					name = str(message.author),
-					icon_url = message.author.avatar_url
-				)
+		# 		embed = discord.Embed(
+		# 			description = f"You're not allowed to ping {invalidMention}! Now you can sit in silence until someone decides to unmute you. 🙊",
+		# 			colour = discord.Colour.gold()
+		# 		)
+		# 		embed.set_author(
+		# 			name = str(message.author),
+		# 			icon_url = message.author.avatar_url
+		# 		)
 
-				await message.channel.send(embed = embed)
+		# 		await message.channel.send(embed = embed)
 
 def setup(client):
 	client.add_cog(events(client))
