@@ -16,7 +16,7 @@ class roles(commands.Cog, name = "Roles"):
 			return False
 
 		debug_data = debug.get_debug_data()
-		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["testing_channels"]
+		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["role_channels"]
 
 	@commands.command()
 	@commands.check(debug_check)

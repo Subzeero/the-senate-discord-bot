@@ -13,7 +13,7 @@ class suggestions(commands.Cog, name = "Suggestions"):
 			return False
 
 		debug_data = debug.get_debug_data()
-		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["testing_channels"]
+		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["suggestion_channels"]
 
 	@commands.command()
 	@commands.check(debug_check)
@@ -53,7 +53,7 @@ class suggestions(commands.Cog, name = "Suggestions"):
 			return
 
 		debug_data = debug.get_debug_data()
-		if message.channel.id in debug_data["testing_channels"] or message.guild.id in debug_data["testing_guilds"]:
+		if message.channel.id in debug_data["suggestion_channels"] or message.guild.id in debug_data["testing_guilds"]:
 			embedDict = message.embeds[0].to_dict()
 			if not str(ctx.author) in embedDict["author"]["name"]:
 				await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
