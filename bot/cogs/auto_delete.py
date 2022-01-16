@@ -22,9 +22,9 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 	async def listAutoDeleteChannels(self, ctx):
 		"""List the channels managed with auto delete and their rules."""
 
-		server_data = db.get_guild(ctx.guild.id)
+		guild_data = db.get_guild(ctx.guild.id)
 
-		if not server_data["auto_delete"]:
+		if not guild_data["auto_delete"]:
 			embed = discord.Embed(
 				description = "None!",
 				colour = discord.Colour.gold()
@@ -42,7 +42,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 				icon_url = ctx.guild.icon_url
 			)
 
-			for channelId in server_data["auto_delete"]:
+			for channelId in guild_data["auto_delete"]:
 				channelObject = ctx.guild
 				embed.add_field(
 					name = str(channelObject),
@@ -55,8 +55,8 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 	async def addAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Enable auto delete on a given channel."""
 
-		server_data = db.get_guild(ctx.guild.id)
-		server_data["auto_delete"][str(channel.id)] = {
+		guild_data = db.get_guild(ctx.guild.id)
+		guild_data["auto_delete"][str(channel.id)] = {
 			"enabled": False,
 			"rules": []
 		}
@@ -67,8 +67,8 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 	async def editAutoDeleteChannelRules(self, ctx, channel:discord.TextChannel, editOption:str = None, ruleType:str = None, ruleExpression:str = None):
 		"""Edit the rules of a channel managed with auto delete."""
 
-		server_data = db.get_guild(ctx.guild.id)
-		if not str(channel.id) in server_data["auto_delete"]:
+		guild_data = db.get_guild(ctx.guild.id)
+		if not str(channel.id) in guild_data["auto_delete"]:
 			return await ctx.send(f"❌ {channel.mention} has not been configured. Use `;addAutoDeleteChannel` to get it set up.")
 
 		if editOption and editOption.lower() == "add" and ruleType and ruleType.lower() in ruleTypes and ruleExpression:
@@ -78,7 +78,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 			pass
 
 		else:
-			if not server_data["auto_delete"][str(channel.id)]["rules"]:
+			if not guild_data["auto_delete"][str(channel.id)]["rules"]:
 				embed = discord.Embed(
 					description = "None!",
 					colour = discord.Colour.gold()
@@ -96,7 +96,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 					authorName = f"Auto Delete Rules for {str(channel)}",
 					footer = "Call this command with the `add` or `remove` editOption to configure rules."
 				)
-				for rule in server_data["auto_delete"][str(channel.id)]["rules"]:
+				for rule in guild_data["auto_delete"][str(channel.id)]["rules"]:
 					embed.add_field(
 						name = rule["type"],
 						value = rule["expression"],
