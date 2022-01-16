@@ -47,5 +47,43 @@ class users(commands.Cog, name = "Users"):
 
 		await ctx.send(embed = embed)
 
+	@commands.command(name = "userRoles", aliases = ["uroles"])
+	@commands.guild_only()
+	@commands.cooldown(1, 3, commands.BucketType.user)
+	async def user_roles(self, ctx, member: discord.Member = None):
+		"""List the roles of a given user."""
+
+		if not member:
+			member = ctx.author
+
+		def sortPos(role):
+			return role.position
+
+		sortedRoles = sorted(member.roles, key = sortPos, reverse = True)
+
+		roleList = []
+
+		for role in sortedRoles:
+			roleList.append(role.mention)
+		
+		roleStr = "\n".join(roleList)
+
+		embed = discord.Embed(
+			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(
+			icon_url = member.avatar_url,
+			name = f"{str(member)}'s Roles in {ctx.guild.name}"
+		)
+
+		embed.add_field(
+			name = "\uFEFF",
+			value = roleStr,
+			inline = False
+		)
+
+		await ctx.send(embed = embed)
+
 def setup(client):
 	client.add_cog(users(client))
