@@ -126,7 +126,7 @@ class admin(commands.Cog, name = "Admin"):
 
 		embed = discord.Embed(
 			description = f"✅ Successfully set {newModRole.mention} as a mod role.",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 		
 		embed.set_author(
@@ -157,7 +157,7 @@ class admin(commands.Cog, name = "Admin"):
 			guild_data["admin_roles"].remove(adminRoleToRemove.id)
 			db.set_guild(ctx.guild.id, guild_data)
 			embed = discord.Embed(
-				description = f"✅ {adminRoleToRemove} is no longer an admin role.",
+				description = f"✅ {adminRoleToRemove.mention} is no longer an admin role.",
 				colour = discord.Colour.green()
 			)
 			embed.set_author(
@@ -188,7 +188,7 @@ class admin(commands.Cog, name = "Admin"):
 			guild_data["mod_roles"].remove(modRoleToRemove.id)
 			db.set_guild(ctx.guild.id, guild_data)
 			embed = discord.Embed(
-				description = f"✅ {modRoleToRemove} is no longer an mod role.",
+				description = f"✅ {modRoleToRemove.mention} is no longer an mod role.",
 				colour = discord.Colour.green()
 			)
 			embed.set_author(
@@ -219,7 +219,7 @@ class admin(commands.Cog, name = "Admin"):
 
 		embed = discord.Embed(
 			description = f"My prefix in this server is now: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.client.user.display_name} help`.",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		if newPrefix:
@@ -241,17 +241,10 @@ class admin(commands.Cog, name = "Admin"):
 	@commands.command(aliases = ["edit"])
 	@commands.guild_only()
 	@checks.is_admin()
-	async def editMessage(self, ctx, messageID:int, newContent:str):
+	async def editMessage(self, ctx, message:discord.Message, newContent:str):
 		"""Edit a message from the bot."""
 
 		await ctx.message.delete()
-
-		message = await ctx.fetch_message(messageID)
-
-		if message.author.id == self.client.user.id:
-			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
-			return
-
 		await message.edit(content = newContent, embed = None)
 
 	@commands.command(aliases = ["sayembed"])
@@ -271,20 +264,10 @@ class admin(commands.Cog, name = "Admin"):
 	@commands.command()
 	@commands.guild_only()
 	@checks.is_admin()
-	async def editEmbedMessage(self, ctx, channel:discord.TextChannel, messageID:int, *, newContent:str):
+	async def editEmbedMessage(self, ctx, message:discord.Message, *, newContent:str):
 		"""Edit a message with an embed."""
 
 		await ctx.message.delete()
-
-		try:
-			message = await channel.fetch_message(messageID)
-		except discord.NotFound:
-			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
-			return
-
-		if message.author.id != self.client.user.id:
-			await ctx.send(content = f"❌ Invalid messageID: `{messageID}`!", delete_after = 3)
-			return
 
 		embed = discord.Embed(
 			description = newContent,
