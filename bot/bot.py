@@ -7,9 +7,8 @@ from utils import config
 
 config.load_config()
 
-import discord, os
+import discord, os, traceback
 from database.db import Database as db
-
 from discord.ext import commands
 from pretty_help import PrettyHelp
 from utils import bot_status, checks, exceptions
@@ -56,12 +55,22 @@ client = commands.Bot(
 	status = status_data["status"]
 )
 
+# Global cooldown check
+@client.check
+async def cooldown_check(ctx):
+	on_cooldown, time = await checks.is_on_global_cooldown().predicate(ctx)
+	if on_cooldown:
+		raise exceptions.UserOnGlobalCooldown()
+	else:
+		return True
+
 # Load previous cogs on startup
 for fileName in db.find_one("bot")["loaded_cogs"]:
 	try:
 		client.load_extension(f"cogs.{fileName}")
 		print(f"Loaded {fileName}.")
-	except Exception as e:
-		print(f"Failed to load {fileName}: {e}")
+	except Exception as error:
+		print(f"Failed to load {fileName}")
+		traceback.print_exception(type(error), error, error.__traceback__)
 
 client.run(BOT_TOKEN) # Run the bot
