@@ -153,7 +153,7 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 		db.set_guild(guild_id, guild_data)
 
-		embed = discord.Embed(title = "✅ Reaction Role Successfully Created!", colour = discord.Colour.gold())
+		embed = discord.Embed(title = "✅ Reaction Role Successfully Created!", colour = discord.Colour.green())
 
 		embed.add_field(name = "ReactionRoleID: ", value = len(guild_data["reaction_roles"]) - 1, inline = False)
 		embed.add_field(name = "Channel: ", value = channel.mention, inline = False)
@@ -198,7 +198,7 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 		embed = discord.Embed(
 			title = "✅ Reaction Role Successfully Removed!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.add_field(name = "ReactionRoleID: ", value = reactionRoleId, inline = False)

@@ -24,7 +24,7 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been loaded!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -48,7 +48,7 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been unloaded!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -68,7 +68,7 @@ class extensions(commands.Cog, name = "Extensions"):
 
 		embed = discord.Embed(
 			description = f"✅ `{extension}` has been reloaded!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)

@@ -32,7 +32,7 @@ class owner(commands.Cog, name = "Owner"):
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -56,7 +56,7 @@ class owner(commands.Cog, name = "Owner"):
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's status message!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -87,7 +87,7 @@ class owner(commands.Cog, name = "Owner"):
 
 		embed = discord.Embed(
 			description = "✅ Successfully changed the bot's activity!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -110,7 +110,7 @@ class owner(commands.Cog, name = "Owner"):
 
 		embed = discord.Embed(
 			description = "✅ Successfully enabled maintenance mode!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
@@ -133,7 +133,7 @@ class owner(commands.Cog, name = "Owner"):
 
 		embed = discord.Embed(
 			description = "✅ Successfully disabled maintenance mode!",
-			colour = discord.Colour.gold()
+			colour = discord.Colour.green()
 		)
 
 		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
