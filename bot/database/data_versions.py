@@ -28,9 +28,9 @@ class VERSION1(object):
 		return new_data
 
 	@staticmethod
-	def upgrade(database, version0_data):
+	def upgrade(database, version1_data):
 		print("CANNOT UPGRADE FROM BASE VERSION.")
-		return version0_data
+		return version1_data
 
 LATEST_DATA_VERSION = 1
 DATABASE_VERSIONS = {
