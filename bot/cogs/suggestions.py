@@ -1,7 +1,5 @@
 import discord
 from discord.ext import commands
-
-suggestionsChannelId = 796553486677311510
 from utils import debug
 
 class suggestions(commands.Cog, name = "Suggestions"):
@@ -10,14 +8,15 @@ class suggestions(commands.Cog, name = "Suggestions"):
 	def __init__(self, client):
 		self.client = client
 
-	def check_Channel(ctx):
-		whitelistedChannels = debug.get_testing_channels()
-		whitelistedChannels.append(suggestionsChannelId)
+	def debug_check(ctx):
+		if not ctx.guild:
+			return False
 
-		return ctx.message.channel.id in whitelistedChannels
+		debug_data = debug.get_debug_data()
+		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["testing_channels"]
 
 	@commands.command()
-	@commands.check(check_Channel)
+	@commands.check(debug_check)
 	async def suggest(self, ctx, *, suggestion: str):
 		"""Make a suggestion; only works in #suggestions."""
 
@@ -40,7 +39,7 @@ class suggestions(commands.Cog, name = "Suggestions"):
 		await message.edit(content = None, embed = embed)
 
 	@commands.command()
-	@commands.check(check_Channel)
+	@commands.check(debug_check)
 	async def editSuggestion(self, ctx, suggestionID: int, *, newSuggestionText: str):
 		"""Edit one of your suggestions."""
 
@@ -53,28 +52,26 @@ class suggestions(commands.Cog, name = "Suggestions"):
 			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
 			return
 
-		whitelistedChannels = debug.get_testing_channels()
-		whitelistedChannels.append(suggestionsChannelId)
-		if not message.channel.id in whitelistedChannels:
-			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
+		debug_data = debug.get_debug_data()
+		if message.channel.id in debug_data["testing_channels"] or message.guild.id in debug_data["testing_guilds"]:
+			embedDict = message.embeds[0].to_dict()
+			if not str(ctx.author) in embedDict["author"]["name"]:
+				await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
+				return
+			
+			embedDict["description"] = newSuggestionText
+			await message.edit(embed = discord.Embed.from_dict(embedDict))
+			await progress.edit(content = "✅ Suggestion successfully updated!", delete_after = 5)
 
-		embedDict = message.embeds[0].to_dict()
-
-		if not str(ctx.author) in embedDict["author"]["name"]:
-			await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
-			return
-
-		embedDict["description"] = newSuggestionText
-
-		await message.edit(embed = discord.Embed.from_dict(embedDict))
-		await progress.edit(content = "✅ Suggestion successfully updated!", delete_after = 5)
+		else:
+			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)			
 
 	@commands.command()
-	@commands.check(check_Channel)
+	@commands.check(debug_check)
 	async def deleteSuggestion(self, ctx, suggestionID: int):
 		"""Request for a suggestion to be deleted."""
 
-		owner = ctx.guild.get_member(296406728818425857)
+		owner = self.client.owner_id
 		
 		await ctx.message.delete()
 		await owner.send(f"{ctx.author.mention} has requested for the suggestion with id `{suggestionID}` to be deleted.")

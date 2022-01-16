@@ -11,15 +11,15 @@ class roles(commands.Cog, name = "Roles"):
 	def __init__(self, client):
 		self.client = client
 
-	def check_Server(ctx):
+	def debug_check(ctx):
 		if not ctx.guild:
 			return False
 
-		whitelistedServers = debug.get_testing_guilds()
-		return ctx.guild.id in whitelistedServers
+		debug_data = debug.get_debug_data()
+		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["testing_channels"]
 
 	@commands.command()
-	@commands.check(check_Server)
+	@commands.check(debug_check)
 	@commands.max_concurrency(1, commands.BucketType.guild)
 	async def changeRole(self, ctx):
 		"""Change your role name and colour."""
@@ -495,8 +495,12 @@ class roles(commands.Cog, name = "Roles"):
 		roleStr = "\n".join(roleList)
 
 		embed = discord.Embed(
-			title = f"Roles in {ctx.guild.name}",
 			colour = discord.Colour.gold()
+		)
+
+		embed.set_author(
+			name = f"Roles in {ctx.guild.name}",
+			icon_url = ctx.guild.icon_url
 		)
 
 		embed.add_field(
