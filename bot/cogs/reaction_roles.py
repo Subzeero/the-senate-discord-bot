@@ -80,7 +80,7 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 	@commands.command(aliases = ["reactionRoles"])
 	@commands.guild_only()
 	@commands.cooldown(1, 10, commands.BucketType.guild)
-	@commands.check_any(checks.is_mod(), checks.is_admin())
+	@checks.is_admin_or_mod()
 	async def listReactionRoles(self, ctx):
 		"""List all of the reaction roles."""
 
@@ -124,8 +124,8 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 	@commands.command(aliases = ["createreactionrole", "addreactionrole"])
 	@commands.guild_only()
-	@commands.is_owner()
 	@commands.cooldown(1, 5, commands.BucketType.guild)
+	@checks.is_admin()
 	async def newReactionRole(self, ctx, channel: discord.TextChannel, message_id: int, emoji: Union[discord.Emoji, converters.UnicodeEmojiConverter], role: discord.Role):
 		"""Create a reaction role."""
 
@@ -165,8 +165,8 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 	@commands.command(aliases = ["deletereactionrole"])
 	@commands.guild_only()
-	@commands.is_owner()
 	@commands.cooldown(1, 5, commands.BucketType.guild)
+	@checks.is_admin()
 	async def removeReactionRole(self, ctx, reactionRoleId: int):
 		"""Remove a reaction role."""
 
