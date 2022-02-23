@@ -4,6 +4,9 @@ from utils import cooldown
 
 def is_admin():
 	async def predicate(ctx):
+		if not ctx.guild:
+			return False
+
 		guild_data = db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["admin_roles"]
 		permissions = ctx.channel.permissions_for(ctx.author)
@@ -19,6 +22,9 @@ def is_admin():
 
 def is_mod():
 	async def predicate(ctx):
+		if not ctx.guild:
+			return False
+
 		guild_data = db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["mod_roles"]
 		permissions = ctx.channel.permissions_for(ctx.author)
@@ -34,6 +40,9 @@ def is_mod():
 
 def is_admin_or_mod():
 	async def predicate(ctx):
+		if not ctx.guild:
+			return False
+
 		guild_data = db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["admin_roles"] + guild_data["mod_roles"]
 
