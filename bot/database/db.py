@@ -22,8 +22,8 @@ class Database(object):
 		return Database.DB.list_collection_names()
 
 	@staticmethod
-	def insert(collection:str, data:dict = {}):
-		return Database.DB[collection].insert(data)
+	def insert_one(collection:str, data:dict = {}):
+		return Database.DB[collection].insert_one(data)
 
 	@staticmethod
 	def find(collection:str, query:dict = {}):
@@ -39,7 +39,7 @@ class Database(object):
 
 	@staticmethod
 	def delete(collection:str, query:dict = {}):
-		return Database.DB[collection].delete(query)
+		return Database.DB[collection].delete_one(query)
 
 	@staticmethod
 	def delete_one(collection:str, query:dict = {}):
