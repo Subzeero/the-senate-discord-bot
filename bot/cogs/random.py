@@ -1,6 +1,6 @@
 import asyncio, datetime, discord, math, psutil
 from discord.ext import commands
-from utils import converters, cooldown
+from utils import converters
 
 class random(commands.Cog, name = "Random"):
 	"""Random commands."""
@@ -9,7 +9,7 @@ class random(commands.Cog, name = "Random"):
 		self.client = client
 		self.start_time = datetime.datetime.now()
 
-	@commands.command(aliases = ["ping", "statistics", "uptime"])
+	@commands.command(aliases = ["ping", "statistics", "uptime", "getStats"])
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	async def stats(self, ctx):
 		"""Get some stats about the bot."""
@@ -40,6 +40,49 @@ class random(commands.Cog, name = "Random"):
 		embed.add_field(name = "Latency", value = f"{latency} ms")
 
 		await message.edit(content = None, embed = embed)
+
+	@commands.command(aliases = ["serverStatistics", "getServerStats"])
+	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.guild_only()
+	async def serverStats(self, ctx):
+		"""Get some stats about your server."""
+
+		embed = discord.Embed(colour = discord.Colour.gold(), timestamp = ctx.guild.created_at)
+		embed.set_author(name = f"Server Statistics for {ctx.guild.name}", icon_url = ctx.guild.icon_url)
+
+		embed.add_field(name = "Members", value = str(ctx.guild.member_count))
+		embed.add_field(name = "Text Channels", value = str(len(ctx.guild.text_channels)))
+		embed.add_field(name = "Voice Channels", value = str(len(ctx.guild.voice_channels)))
+		embed.add_field(name = "Roles", value = str(len(ctx.guild.roles)))
+		embed.add_field(name = "Nitro Boosts", value = str(ctx.guild.premium_subscription_count))
+		embed.add_field(name = "Boost Level", value = str(ctx.guild.premium_tier))
+		embed.add_field(name = "Emoji Limit", value = str(ctx.guild.emoji_limit))
+		embed.add_field(name = "Owner", value = f"<@!{str(ctx.guild.owner_id)}>")
+		embed.add_field(name = "Guild ID", value = str(ctx.guild.id))
+
+		embed.set_footer(text = "Created at ")
+
+		await ctx.send(embed = embed)
+
+	@commands.command(aliases = ["getServerFeatures"])
+	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.guild_only()
+	async def serverFeatures(self, ctx):
+		"""Get the Discord Features of your server."""
+
+		feature_list = ctx.guild.features
+		feature_text = ""
+		if feature_list:
+			for feature in feature_list:
+				feature_text = feature_text + f"- {feature}\n"
+			feature_text = feature_text[:-1]
+		else:
+			feature_text = "None"
+
+		embed = discord.Embed(description = feature_text, colour = discord.Colour.gold())
+		embed.set_author(name = f"Server Features of {ctx.guild.name}", icon_url=ctx.guild.icon_url)
+
+		await ctx.send(embed = embed)
 
 	@commands.command()
 	@commands.cooldown(1, 5, commands.BucketType.user)
