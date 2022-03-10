@@ -18,7 +18,7 @@ class extensions(commands.Cog, name = "Extensions"):
 		self.client.load_extension(f"cogs.{extension}")
 
 		bot_data = db.find_one("bot")
-		if not extension in bot_data["loaded_cogs"]:
+		if not extension in bot_data["loaded_cogs"] and extension != "blank_custom":
 			bot_data["loaded_cogs"].append(extension)
 			db.replace_one("bot", data = bot_data)
 
@@ -98,7 +98,7 @@ class extensions(commands.Cog, name = "Extensions"):
 			loaded_cogs.append(cog.__class__.__name__)
 
 		for fileName in os.listdir(cogs_path):
-			if fileName.endswith(".py"):
+			if fileName.endswith(".py") and fileName != "blank_custom.py":
 				if fileName[:-3] in loaded_cogs:
 					cogs[fileName[:-3]] = "✅ Loaded!"
 				else:
