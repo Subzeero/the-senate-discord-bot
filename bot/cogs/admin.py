@@ -4,7 +4,7 @@ from database.db import Database as db
 from utils import checks, find_object
 
 class admin(commands.Cog, name = "Admin"):
-	"""Server administrator commands."""
+	"""Administrator commands."""
 
 	def __init__(self, client):
 		self.client = client

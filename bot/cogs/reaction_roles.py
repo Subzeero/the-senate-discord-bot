@@ -5,7 +5,7 @@ from database.db import Database as db
 from utils import checks, converters, find_object
 
 class reaction_roles(commands.Cog, name = "Reaction Roles"):
-	"""Random commands."""
+	"""Manage Reaction Roles."""
 
 	def __init__(self, client):
 		self.client = client

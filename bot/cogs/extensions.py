@@ -3,7 +3,7 @@ from discord.ext import commands
 from database.db import Database as db
 
 class extensions(commands.Cog, name = "Extensions"):
-	"""Manages the bot's extensions."""
+	"""Manage the bot's extensions."""
 
 	def __init__(self, client):
 		self.client = client

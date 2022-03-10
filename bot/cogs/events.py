@@ -5,7 +5,7 @@ from database.db import Database as db
 suggestionsChannelId = 796553486677311510
 
 class events(commands.Cog, name = "Events"):
-	"""Listen for the bot's events."""
+	"""Global event handler. Being phased out."""
 
 	def __init__(self, client):
 		self.client = client

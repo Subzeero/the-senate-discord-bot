@@ -2,11 +2,12 @@
 # Subzeero
 # Main code file for The Senate Discord Bot
 
-# Imports
+# Load Configuration
 from utils import config
 
 config.load_config()
 
+# Imports
 import discord, os, traceback
 from database.db import Database as db
 from discord.ext import commands

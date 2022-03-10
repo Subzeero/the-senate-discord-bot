@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from utils import find_object
 
 class voice(commands.Cog, name = "Voice"):
-	"""Voice Channel Commands"""
+	"""Voice related commands."""
 
 	def __init__(self, client):
 		self.client = client

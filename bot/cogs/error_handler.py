@@ -3,7 +3,7 @@ from discord.ext import commands
 from utils import cooldown, exceptions
 
 class error_handler(commands.Cog, name = "Error Handler"):
-	"""Global error handler"""
+	"""Global error handler."""
 
 	def __init__(self, client):
 		self.client = client

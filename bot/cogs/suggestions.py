@@ -3,7 +3,7 @@ from discord.ext import commands
 from utils import debug
 
 class suggestions(commands.Cog, name = "Suggestions"):
-	"""Command for server suggestions"""
+	"""Commands for server suggestions."""
 
 	def __init__(self, client):
 		self.client = client
