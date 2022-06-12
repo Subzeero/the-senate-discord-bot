@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 from database.db import Database as db
+from pprint import pformat
 from utils import bot_status
 
 class owner(commands.Cog, name = "Owner"):
@@ -140,6 +141,12 @@ class owner(commands.Cog, name = "Owner"):
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
+	
+	@commands.command()
+	@commands.is_owner()
+	async def getData(self, ctx):
+		data = db.get_guild(ctx.guild.id)
+		await ctx.send("```py\n{}\n```".format(pformat(data, sort_dicts = False)))
 
 	@commands.command(aliases = ["close", "stop"])
 	@commands.is_owner()
