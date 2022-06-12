@@ -41,7 +41,7 @@ class random(commands.Cog, name = "Random"):
 
 		await message.edit(content = None, embed = embed)
 
-	@commands.command(aliases = ["serverStatistics", "getServerStats"])
+	@commands.command(aliases = ["serverStatistics", "getServerStats", "serverInfo"])
 	@commands.cooldown(1, 5, commands.BucketType.user)
 	@commands.guild_only()
 	async def serverStats(self, ctx):
