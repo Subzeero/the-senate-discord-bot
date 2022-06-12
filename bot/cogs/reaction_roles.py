@@ -87,38 +87,39 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 		guild_id = ctx.guild.id
 		guild_data = db.get_guild(guild_id)
 
-		if not guild_data["reaction_roles"]:
-			embed = discord.Embed(
-				description = "None!",
-				colour = discord.Colour.gold()
-			)
-		else:
-			embed = discord.Embed(
-				colour = discord.Colour.gold()
-			)
+		embed = discord.Embed(colour = discord.Colour.gold())
 
 		embed.set_author(
 			name = f"Reaction Roles in {ctx.guild.name}",
 			icon_url = ctx.guild.icon_url
 		)
 
-		for rr_id, rr_data in enumerate(guild_data["reaction_roles"]):
-			if rr_data["unicode_emoji"]:
-				emoji_object = rr_data["unicode_emoji"]
-			else:
-				emoji_object = await find_object.find_emoji(ctx.guild, rr_data["custom_emoji_id"])
+		if not guild_data["reaction_roles"]:
+			embed.add_field(name = "None!", value = f"Use `{ctx.prefix}addReactionRole` to add some.")
+		else:
+			for rr_id, rr_data in enumerate(guild_data["reaction_roles"]):
+				if rr_data["unicode_emoji"]:
+					emoji_object = rr_data["unicode_emoji"]
+				else:
+					emoji_object = await find_object.find_emoji(ctx.guild, rr_data["custom_emoji_id"])
 
-			channel_object = await find_object.find_channel(self.client, rr_data["channel_id"])
-			role_object = await find_object.find_role(ctx.guild, rr_data["role_id"])
+				channel_object = await find_object.find_channel(self.client, rr_data["channel_id"])
+				role_object = await find_object.find_role(ctx.guild, rr_data["role_id"])
 
-			channel_str = channel_object and channel_object.mention or f":warning: ({str(rr_data['channel_id'])})"
-			emoji_str = emoji_object and str(emoji_object) or f":warning: ({str(rr_data['custom_emoji_id'])})"
-			role_str = role_object and role_object.mention or f":warning: ({str(rr_data['role_id'])})"
-			
-			embed.add_field(
-				name = f"Reaction Role ID: {rr_id}",
-				value = f"Channel: {channel_str}\nMessage ID: {rr_data['message_id']}\nEmoji: {emoji_str}\nRole: {role_str}"
-			)
+				channel_str = channel_object and channel_object.mention or f":warning: ({str(rr_data['channel_id'])})"
+				emoji_str = emoji_object and str(emoji_object) or f":warning: ({str(rr_data['custom_emoji_id'])})"
+				role_str = role_object and role_object.mention or f":warning: ({str(rr_data['role_id'])})"
+
+				if channel_object:
+					jump_url = f"https://discord.com/channels/{guild_id}/{channel_object.id}/{rr_data['message_id']}"
+					embed_text = f"Channel: {channel_str}\nMessage ID: {rr_data['message_id']} [[Jump]]({jump_url})\nEmoji: {emoji_str}\nRole: {role_str}"
+				else:
+					embed_text = f"Channel: {channel_str}\nMessage ID: {rr_data['message_id']}\nEmoji: {emoji_str}\nRole: {role_str}"
+				
+				embed.add_field(
+					name = f"Reaction Role ID: {rr_id}",
+					value = embed_text
+				)
 
 		await ctx.send(embed=embed)
 
