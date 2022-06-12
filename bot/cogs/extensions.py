@@ -13,8 +13,6 @@ class extensions(commands.Cog, name = "Extensions"):
 	async def load(self, ctx, extension):
 		"""Load an extension."""
 
-		await ctx.message.delete()
-
 		self.client.load_extension(f"cogs.{extension}")
 
 		bot_data = db.find_one("bot")
@@ -22,22 +20,12 @@ class extensions(commands.Cog, name = "Extensions"):
 			bot_data["loaded_cogs"].append(extension)
 			db.replace_one("bot", data = bot_data)
 
-		embed = discord.Embed(
-			description = f"✅ `{extension}` has been loaded!",
-			colour = discord.Colour.green()
-		)
-
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
-
-		await ctx.send(embed = embed, delete_after = 10)
+		await ctx.message.add_reaction("✅")
 		
 	@commands.command(aliases = ["un"])
 	@commands.is_owner()
 	async def unload(self, ctx, extension):
 		"""Unload an extension."""
-
-		await ctx.message.delete()
 
 		self.client.unload_extension(f"cogs.{extension}")
 
@@ -46,35 +34,17 @@ class extensions(commands.Cog, name = "Extensions"):
 			bot_data["loaded_cogs"].remove(extension)
 			db.replace_one("bot", data = bot_data)
 
-		embed = discord.Embed(
-			description = f"✅ `{extension}` has been unloaded!",
-			colour = discord.Colour.green()
-		)
-
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
-
-		await ctx.send(embed = embed, delete_after = 10)
+		await ctx.message.add_reaction("✅")
 
 	@commands.command(aliases = ["re"])
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		"""Reload an extension."""
 
-		await ctx.message.delete()
-
 		self.client.unload_extension(f"cogs.{extension}")
 		self.client.load_extension(f"cogs.{extension}")
 
-		embed = discord.Embed(
-			description = f"✅ `{extension}` has been reloaded!",
-			colour = discord.Colour.green()
-		)
-
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
-
-		await ctx.send(embed = embed, delete_after = 10)
+		await ctx.message.add_reaction("✅")
 
 	@commands.command()
 	@commands.is_owner()
