@@ -38,10 +38,6 @@ class Database(object):
 		return Database.DB[collection].replace_one(query, data, upsert=upsert)
 
 	@staticmethod
-	def delete(collection:str, query:dict = {}):
-		return Database.DB[collection].delete_one(query)
-
-	@staticmethod
 	def delete_one(collection:str, query:dict = {}):
 		return Database.DB[collection].delete_one(query)
 
