@@ -42,7 +42,7 @@ class roles(commands.Cog, name = "Roles"):
 			)
 			embed.set_author(
 				name = ctx.author.name + "#" + ctx.author.discriminator,
-				icon_url = ctx.author.avatar_url
+				icon_url = ctx.author.display_avatar.url
 			)
 			embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
@@ -60,7 +60,7 @@ class roles(commands.Cog, name = "Roles"):
 
 				embed.set_author(
 					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
+					icon_url = ctx.author.display_avatar.url
 				)
 
 				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -78,7 +78,7 @@ class roles(commands.Cog, name = "Roles"):
 
 				embed.set_author(
 					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
+					icon_url = ctx.author.display_avatar.url
 				)
 
 				embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -104,7 +104,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
@@ -122,7 +122,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -140,7 +140,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -164,7 +164,7 @@ class roles(commands.Cog, name = "Roles"):
 							)
 							embed.set_author(
 								name = ctx.author.name + "#" + ctx.author.discriminator,
-								icon_url = ctx.author.avatar_url
+								icon_url = ctx.author.display_avatar.url
 							)
 
 							messages_to_delete.append(await ctx.send(embed = embed))
@@ -181,7 +181,7 @@ class roles(commands.Cog, name = "Roles"):
 							positioning_role = await find_object.find_role(ctx.guild, guild_data["custom_roles"]["placement_role_id"])
 							role_position = positioning_role.position - 1
 
-						await newRole.edit(
+						newRole = await newRole.edit(
 							position = role_position,
 							reason = "Reorder the role created by user command."
 						)
@@ -199,7 +199,7 @@ class roles(commands.Cog, name = "Roles"):
 						)
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						await ctx.send(embed = embed)
@@ -227,7 +227,7 @@ class roles(commands.Cog, name = "Roles"):
 
 				embed.set_author(
 					name = ctx.author.name + "#" + ctx.author.discriminator,
-					icon_url = ctx.author.avatar_url
+					icon_url = ctx.author.display_avatar.url
 				)
 				embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
@@ -245,7 +245,7 @@ class roles(commands.Cog, name = "Roles"):
 
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 
 					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -263,7 +263,7 @@ class roles(commands.Cog, name = "Roles"):
 
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 
 					embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -284,7 +284,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
@@ -302,7 +302,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -320,7 +320,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -337,7 +337,7 @@ class roles(commands.Cog, name = "Roles"):
 							await ctx.send("❌ Discord is being mean, please try again later.\n`ERR: ROLE NOT FOUND`")
 							break
 
-						await userRole.edit(
+						userRole = await userRole.edit(
 							name = response2.content
 						)
 
@@ -348,7 +348,7 @@ class roles(commands.Cog, name = "Roles"):
 						)
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						await ctx.send(embed = embed)
@@ -370,7 +370,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 					embed.set_footer(text = "This process will be aborted if you don't reply within 5 minutes or you type `cancel`.")
 
@@ -388,7 +388,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -406,7 +406,7 @@ class roles(commands.Cog, name = "Roles"):
 
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						embed.set_footer(text = "This message will self-destruct in 5 minutes.")
@@ -430,7 +430,7 @@ class roles(commands.Cog, name = "Roles"):
 							)
 							embed.set_author(
 								name = ctx.author.name + "#" + ctx.author.discriminator,
-								icon_url = ctx.author.avatar_url
+								icon_url = ctx.author.display_avatar.url
 							)
 
 							messages_to_delete.append(await ctx.send(embed = embed))
@@ -443,7 +443,7 @@ class roles(commands.Cog, name = "Roles"):
 							await ctx.send("❌ Discord is being mean, please try again later.\n`ERR: ROLE NOT FOUND`")
 							break
 
-						await userRole.edit(
+						userRole = await userRole.edit(
 							colour = colourValue
 						)
 
@@ -454,7 +454,7 @@ class roles(commands.Cog, name = "Roles"):
 						)
 						embed.set_author(
 							name = ctx.author.name + "#" + ctx.author.discriminator,
-							icon_url = ctx.author.avatar_url
+							icon_url = ctx.author.display_avatar.url
 						)
 
 						await ctx.send(embed = embed)
@@ -469,7 +469,7 @@ class roles(commands.Cog, name = "Roles"):
 					)
 					embed.set_author(
 						name = ctx.author.name + "#" + ctx.author.discriminator,
-						icon_url = ctx.author.avatar_url
+						icon_url = ctx.author.display_avatar.url
 					)
 
 					messages_to_delete.append(await ctx.send(embed = embed))
@@ -500,7 +500,7 @@ class roles(commands.Cog, name = "Roles"):
 
 		embed.set_author(
 			name = f"Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon_url
+			icon_url = ctx.guild.icon.url
 		)
 
 		embed.add_field(
@@ -533,5 +533,5 @@ class roles(commands.Cog, name = "Roles"):
 
 		await ctx.send(embed = embed)
 
-def setup(client):
-	client.add_cog(roles(client))
+async def setup(client):
+	await client.add_cog(roles(client))

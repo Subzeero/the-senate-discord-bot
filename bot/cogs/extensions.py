@@ -13,7 +13,7 @@ class extensions(commands.Cog, name = "Extensions"):
 	async def load(self, ctx, extension):
 		"""Load an extension."""
 
-		self.client.load_extension(f"cogs.{extension}")
+		await self.client.load_extension(f"cogs.{extension}")
 
 		bot_data = db.find_one("bot")
 		if not extension in bot_data["loaded_cogs"] and extension != "blank_custom":
@@ -27,7 +27,7 @@ class extensions(commands.Cog, name = "Extensions"):
 	async def unload(self, ctx, extension):
 		"""Unload an extension."""
 
-		self.client.unload_extension(f"cogs.{extension}")
+		await self.client.unload_extension(f"cogs.{extension}")
 
 		bot_data = db.find_one("bot")
 		if extension in bot_data["loaded_cogs"]:
@@ -41,8 +41,8 @@ class extensions(commands.Cog, name = "Extensions"):
 	async def reload(self, ctx, extension):
 		"""Reload an extension."""
 
-		self.client.unload_extension(f"cogs.{extension}")
-		self.client.load_extension(f"cogs.{extension}")
+		await self.client.unload_extension(f"cogs.{extension}")
+		await self.client.load_extension(f"cogs.{extension}")
 
 		await ctx.message.add_reaction("✅")
 
@@ -88,5 +88,5 @@ class extensions(commands.Cog, name = "Extensions"):
 					
 		await ctx.send(embed = embed)
 
-def setup(client):
-	client.add_cog(extensions(client))
+async def setup(client):
+	await client.add_cog(extensions(client))

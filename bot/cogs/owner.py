@@ -36,7 +36,7 @@ class owner(commands.Cog, name = "Owner"):
 			colour = discord.Colour.green()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
@@ -60,7 +60,7 @@ class owner(commands.Cog, name = "Owner"):
 			colour = discord.Colour.green()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
@@ -91,7 +91,7 @@ class owner(commands.Cog, name = "Owner"):
 			colour = discord.Colour.green()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
@@ -114,7 +114,7 @@ class owner(commands.Cog, name = "Owner"):
 			colour = discord.Colour.green()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
@@ -137,7 +137,7 @@ class owner(commands.Cog, name = "Owner"):
 			colour = discord.Colour.green()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
@@ -158,5 +158,5 @@ class owner(commands.Cog, name = "Owner"):
 		await self.client.close()
 
 
-def setup(client):
-	client.add_cog(owner(client))
+async def setup(client):
+	await client.add_cog(owner(client))

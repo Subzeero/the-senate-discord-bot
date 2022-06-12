@@ -8,5 +8,5 @@ class auto_roles(commands.Cog, name = "Auto Roles"):
 	def __init__(self, client):
 		self.client = client
 
-def setup(client):
-	client.add_cog(auto_roles(client))
+async def setup(client):
+	await client.add_cog(auto_roles(client))

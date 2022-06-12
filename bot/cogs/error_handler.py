@@ -70,5 +70,5 @@ class error_handler(commands.Cog, name = "Error Handler"):
 			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
 			traceback.print_exception(type(error), error, error.__traceback__)
 
-def setup(client):
-	client.add_cog(error_handler(client))
+async def setup(client):
+	await client.add_cog(error_handler(client))

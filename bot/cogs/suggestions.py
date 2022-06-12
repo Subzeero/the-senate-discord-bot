@@ -32,7 +32,7 @@ class suggestions(commands.Cog, name = "Suggestions"):
 		)
 		embed.set_author(
 			name = f"Suggestion by {str(ctx.author)}",
-			icon_url = ctx.author.avatar_url
+			icon_url = ctx.author.display_avatar.url
 		)
 		embed.set_footer(text = f"Vote by reacting to the emotes below! SuggestionID: {message.id}")
 
@@ -49,22 +49,22 @@ class suggestions(commands.Cog, name = "Suggestions"):
 		try:
 			message = await ctx.fetch_message(suggestionID)
 		except discord.NotFound:
-			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
+			progress = await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)
 			return
 
 		debug_data = debug.get_debug_data()
 		if message.channel.id in debug_data["suggestion_channels"] or message.guild.id in debug_data["testing_guilds"]:
 			embedDict = message.embeds[0].to_dict()
 			if not str(ctx.author) in embedDict["author"]["name"]:
-				await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
+				progress = await progress.edit(content = "❌ You do not own this suggestion!", delete_after = 5)
 				return
 			
 			embedDict["description"] = newSuggestionText
 			await message.edit(embed = discord.Embed.from_dict(embedDict))
-			await progress.edit(content = "✅ Suggestion successfully updated!", delete_after = 5)
+			progress = await progress.edit(content = "✅ Suggestion successfully updated!", delete_after = 5)
 
 		else:
-			await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)			
+			progress = await progress.edit(content = f"❌ Invalid suggestionID: `{suggestionID}`!", delete_after = 5)			
 
 	@commands.command()
 	@commands.check(debug_check)
@@ -81,10 +81,10 @@ class suggestions(commands.Cog, name = "Suggestions"):
 			colour = discord.Colour.gold()
 		)
 
-		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.avatar_url)
+		embed.set_author(name = ctx.author.name + "#" + ctx.author.discriminator, icon_url = ctx.author.display_avatar.url)
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
 		await ctx.send(embed = embed, delete_after = 10)
 
-def setup(client):
-	client.add_cog(suggestions(client))
+async def setup(client):
+	await client.add_cog(suggestions(client))

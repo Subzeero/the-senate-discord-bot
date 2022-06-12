@@ -47,7 +47,7 @@ class admin(commands.Cog, name = "Admin"):
 
 		embed.set_author(
 			name = f"Control Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon_url
+			icon_url = ctx.guild.icon.url
 		)
 
 		embed.add_field(
@@ -108,7 +108,7 @@ class admin(commands.Cog, name = "Admin"):
 		
 		embed.set_author(
 			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.avatar_url
+			icon_url = ctx.author.display_avatar.url
 		)
 
 		await ctx.send(embed = embed)
@@ -131,7 +131,7 @@ class admin(commands.Cog, name = "Admin"):
 		
 		embed.set_author(
 			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.avatar_url
+			icon_url = ctx.author.display_avatar.url
 		)
 
 		await ctx.send(embed = embed)
@@ -150,7 +150,7 @@ class admin(commands.Cog, name = "Admin"):
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.avatar_url
+				icon_url = ctx.author.display_avatar.url
 			)
 
 		else: 
@@ -162,7 +162,7 @@ class admin(commands.Cog, name = "Admin"):
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.avatar_url
+				icon_url = ctx.author.display_avatar.url
 			)
 
 		await ctx.send(embed = embed)
@@ -181,7 +181,7 @@ class admin(commands.Cog, name = "Admin"):
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.avatar_url
+				icon_url = ctx.author.display_avatar.url
 			)
 
 		else: 
@@ -193,7 +193,7 @@ class admin(commands.Cog, name = "Admin"):
 			)
 			embed.set_author(
 				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.avatar_url
+				icon_url = ctx.author.display_avatar.url
 			)
 
 		await ctx.send(embed = embed)
@@ -276,5 +276,5 @@ class admin(commands.Cog, name = "Admin"):
 
 		await message.edit(content = None, embed = embed)
 
-def setup(client):
-	client.add_cog(admin(client))
+async def setup(client):
+	await client.add_cog(admin(client))

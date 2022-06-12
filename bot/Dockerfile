@@ -4,8 +4,9 @@ FROM python:3.9-slim-buster
 
 ENV PYTHONUNBUFFERED True
 
-WORKDIR /bot
+RUN apt update && apt install libffi-dev libnacl-dev python3-dev
 
+WORKDIR /bot
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 

@@ -40,5 +40,3 @@ async def abide_cooldown(user, ctx, content = None, embed = None):
 			else:
 				content += f"\n\nEasy on the spam {user.mention}! Consider yourself ignored for the next while 🙊"
 		await ctx.send(content = content, embed = embed)
-
-manage_cooldowns.start()

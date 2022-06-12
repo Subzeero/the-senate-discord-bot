@@ -25,7 +25,8 @@ class action_log(commands.Cog, name = "Action Log"):
 			"member_left": {},
 			"member_banned": {},
 			"member_unbanned": {},
-			"member_updated": {"members": {"all": True, "inverse": False, "ids": []}},
+			# "member_updated": {"members": {"all": True, "inverse": False, "ids": []}},
+			# "presence_updated": {"members": {"all": True, "inverse": False, "ids": []}},
 			"role_created": {},
 			"role_deleted": {},
 			"role_updated": {"roles": {"all": True, "inverse": False, "ids": []}},
@@ -100,12 +101,12 @@ class action_log(commands.Cog, name = "Action Log"):
 				for guild_id, guild_logs in self.log_cache.items():
 					guild = await find_object.find_guild(self.client, guild_id)
 					embed = discord.Embed(colour = discord.Colour.gold())
-					embed.set_author(name = "Actions Logged!", icon_url = guild.icon_url)
+					embed.set_author(name = "Actions Logged!", icon_url = guild.icon.url)
 
 					num_logs = min(len(guild_logs), 10)
 					for i in range(num_logs):
 						embed.add_field(name = guild_logs[i][0], value = guild_logs[i][1], inline = False)
-					embed.timestamp = datetime.datetime.utcnow()
+					embed.timestamp = discord.utils.utcnow()
 
 					self.log_cache[guild_id] = guild_logs[num_logs:]
 					if not len(self.log_cache[guild_id]):
@@ -146,7 +147,7 @@ class action_log(commands.Cog, name = "Action Log"):
 
 		embed = discord.Embed(description = desc, colour = discord.Colour.gold())
 
-		embed.set_author(name = f"Action Log Rules in {ctx.guild.name}", icon_url = ctx.guild.icon_url)
+		embed.set_author(name = f"Action Log Rules in {ctx.guild.name}", icon_url = ctx.guild.icon.url)
 		embed.set_footer(text = f"If you don't see your rules, run {ctx.prefix}refreshActionLog.")
 		
 		if not guild_rules["actions"]:
@@ -541,55 +542,63 @@ class action_log(commands.Cog, name = "Action Log"):
 			log = ["Member Unbanned", f"`Member:` {member.mention} ({member.name}#{member.discriminator})\n`ID:` {member.id}"]
 			await self.enqueue_log(guild.id, log)
 
-	@commands.Cog.listener()
-	async def on_member_update(self, mem_before, mem_after):
-		rule_data = await self.rule_check("member_updated", mem_before.guild.id)
-		if rule_data:
-			member_check = await self.check_data(mem_before.id, rule_data["members"])
-			if member_check:
-				changes_str = ""
-				before_attrs = {attr: getattr(mem_before, attr, None) for attr in mem_before.__slots__}
-				for k, v in before_attrs.items():
-					if not k.startswith("_"):
-						before_val = v
-						after_val = getattr(mem_after, k, None)
-						if before_val != after_val:
-							if k == "roles":
-								if len(before_val) > len(after_val):
-									removed_roles = ", ".join([role.mention for role in before_val if not role in after_val])
-									changes_str = f"`Roles Removed:` {removed_roles}\n"
-								else:
-									added_roles = ", ".join([role.mention for role in after_val if not role in before_val])
-									changes_str = f"`Roles Added:` {added_roles}\n"
-							elif k == "activities":
-								if before_val:
-									before_val = before_val[0]
-								if after_val:
-									after_val = after_val[0]
-								activity_type_before = type(before_val)
-								activity_type_after = type(after_val)
-								print("type:", activity_type_before, activity_type_after)
-								if activity_type_before in self.activity_types:
-									activ_before = f"{self.activity_types[activity_type_before].capitalize()} {getattr(before_val, 'name', '')}"
-								else:
-									activ_before = f"{getattr(before_val, 'name', 'None')}"
-								if activity_type_after in self.activity_types:
-									activ_after = f"{self.activity_types[activity_type_after].capitalize()} {getattr(after_val, 'name', '')}"
-								else:
-									activ_after = f"{getattr(after_val, 'name', 'None')}"
-								changes_str += f"`Activity Before:` {activ_before}\n`Activity After:` {activ_after}\n"
-							elif k == "status":
-								changes_str += f"`Status Before:` {before_val}\n`Status After:` {after_val}\n"
-							elif k == "nick":
-								changes_str = f"`Nickname Before:` {before_val}\n`Nickname After:` {after_val}\n"
-							else:
-								changes_str += f"`{k.capitalize()} Before:` {before_val}\n`{k.capitalize()} After:` {after_val}\n"
-							changes_str = changes_str[:-1]
+	# THESE NEED UPDATING WITH UPDATE TO DISCORD.PY 2.0
+	
+	# @commands.Cog.listener()
+	# async def on_member_update(self, mem_before, mem_after):
+	# 	rule_data = await self.rule_check("member_updated", mem_before.guild.id)
+	# 	if rule_data:
+	# 		member_check = await self.check_data(mem_before.id, rule_data["members"])
+	# 		if member_check:
+	# 			changes_str = ""
+	# 			before_attrs = {attr: getattr(mem_before, attr, None) for attr in mem_before.__slots__}
+	# 			for k, v in before_attrs.items():
+	# 				if not k.startswith("_"):
+	# 					before_val = v
+	# 					after_val = getattr(mem_after, k, None)
+	# 					if before_val != after_val:
+	# 						if k == "roles":
+	# 							if len(before_val) > len(after_val):
+	# 								removed_roles = ", ".join([role.mention for role in before_val if not role in after_val])
+	# 								changes_str = f"`Roles Removed:` {removed_roles}\n"
+	# 							else:
+	# 								added_roles = ", ".join([role.mention for role in after_val if not role in before_val])
+	# 								changes_str = f"`Roles Added:` {added_roles}\n"
+	# 						elif k == "activities":
+	# 							if before_val:
+	# 								before_val = before_val[0]
+	# 							if after_val:
+	# 								after_val = after_val[0]
+	# 							activity_type_before = type(before_val)
+	# 							activity_type_after = type(after_val)
+	# 							print("type:", activity_type_before, activity_type_after)
+	# 							if activity_type_before in self.activity_types:
+	# 								activ_before = f"{self.activity_types[activity_type_before].capitalize()} {getattr(before_val, 'name', '')}"
+	# 							else:
+	# 								activ_before = f"{getattr(before_val, 'name', 'None')}"
+	# 							if activity_type_after in self.activity_types:
+	# 								activ_after = f"{self.activity_types[activity_type_after].capitalize()} {getattr(after_val, 'name', '')}"
+	# 							else:
+	# 								activ_after = f"{getattr(after_val, 'name', 'None')}"
+	# 							changes_str += f"`Activity Before:` {activ_before}\n`Activity After:` {activ_after}\n"
+	# 						elif k == "status":
+	# 							changes_str += f"`Status Before:` {before_val}\n`Status After:` {after_val}\n"
+	# 						elif k == "nick":
+	# 							changes_str = f"`Nickname Before:` {before_val}\n`Nickname After:` {after_val}\n"
+	# 						else:
+	# 							changes_str += f"`{k.capitalize()} Before:` {before_val}\n`{k.capitalize()} After:` {after_val}\n"
+	# 						changes_str = changes_str[:-1]
 
-				if changes_str:
-					log = ["Member Updated", f"`Member:` {mem_after.mention}\n{changes_str}"]
-					await self.enqueue_log(mem_after.guild.id, log)
+	# 			if changes_str:
+	# 				log = ["Member Updated", f"`Member:` {mem_after.mention}\n{changes_str}"]
+	# 				await self.enqueue_log(mem_after.guild.id, log)
 
+	# @commands.Cog.listener()
+	# async def on_presence_update(self, mem_before, mem_after):
+	# 	rule_data = await self.rule_check("presence_updated", mem_before)
+	# 	if rule_data:
+	# 		pass
+	
 	@commands.Cog.listener()
 	async def on_guild_role_create(self, role):
 		rule_data = await self.rule_check("role_created", role.guild.id)
@@ -701,5 +710,5 @@ class action_log(commands.Cog, name = "Action Log"):
 			log = ["Invite Deleted", f"`Channel:` {channel}\n`Link:` https://discord.com/{invite.code}"]
 			await self.enqueue_log(invite.guild.id, log)
 
-def setup(client):
-	client.add_cog(action_log(client))
+async def setup(client):
+	await client.add_cog(action_log(client))

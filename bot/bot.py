@@ -8,7 +8,7 @@ from utils import config
 config.load_config()
 
 # Imports
-import discord, os, traceback
+import asyncio, discord, os, traceback
 from database.db import Database as db
 from discord.ext import commands
 from pretty_help import PrettyHelp
@@ -65,13 +65,20 @@ async def cooldown_check(ctx):
 	else:
 		return True
 
-# Load previous cogs on startup
-for fileName in db.find_one("bot")["loaded_cogs"]:
-	try:
-		client.load_extension(f"cogs.{fileName}")
-		print(f"Loaded {fileName}.")
-	except Exception as error:
-		print(f"Failed to load {fileName}")
-		traceback.print_exception(type(error), error, error.__traceback__)
+async def run_bot():
+	async with client:
+		# Load previous cogs on startup
+		print("Loading Extensions...")
+		for fileName in db.find_one("bot")["loaded_cogs"]:
+			try:
+				await client.load_extension(f"cogs.{fileName}")
+				print(f"Loaded {fileName}.")
+			except Exception as error:
+				print(f"Failed to load {fileName}")
+				traceback.print_exception(type(error), error, error.__traceback__)
+		
+		# Start the bot
+		print("Starting Bot...")
+		await client.start(BOT_TOKEN)
 
-client.run(BOT_TOKEN) # Run the bot
+asyncio.run(run_bot())

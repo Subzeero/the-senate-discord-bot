@@ -31,7 +31,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 			)
 			embed.set_author(
 				name = "Channels with Auto Delete Rules",
-				icon_url = ctx.guild.icon_url
+				icon_url = ctx.guild.icon.url
 			)
 		else:
 			embed = discord.Embed(
@@ -39,7 +39,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 			)
 			embed.set_author(
 				name = "Channels with Auto Delete Rules",
-				icon_url = ctx.guild.icon_url
+				icon_url = ctx.guild.icon.url
 			)
 
 			for channelId in guild_data["auto_delete"]:
@@ -85,7 +85,7 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 				)
 				embed.set_author(
 					name = f"Auto Delete Rules for #{str(channel)}",
-					icon_url = ctx.guild.icon_url
+					icon_url = ctx.guild.icon.url
 				)
 				return await ctx.send(
 					embed = embed
@@ -112,5 +112,5 @@ class auto_delete(commands.Cog, name = "Auto Delete"):
 	async def removeAutoDeleteChannel(self, ctx, channel: discord.TextChannel):
 		"""Disable auto delete on a given channel."""
 
-def setup(client):
-	client.add_cog(auto_delete(client))
+async def setup(client):
+	await client.add_cog(auto_delete(client))

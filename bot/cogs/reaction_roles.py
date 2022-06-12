@@ -91,7 +91,7 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 		embed.set_author(
 			name = f"Reaction Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon_url
+			icon_url = ctx.guild.icon.url
 		)
 
 		if not guild_data["reaction_roles"]:
@@ -210,5 +210,5 @@ class reaction_roles(commands.Cog, name = "Reaction Roles"):
 
 		await ctx.send(embed = embed)
 
-def setup(client):
-	client.add_cog(reaction_roles(client))
+async def setup(client):
+	await client.add_cog(reaction_roles(client))

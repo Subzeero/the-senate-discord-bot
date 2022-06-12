@@ -1,6 +1,7 @@
 import discord, os
 from discord.ext import commands
 from database.db import Database as db
+from utils import cooldown
 
 suggestionsChannelId = 796553486677311510
 
@@ -13,6 +14,7 @@ class events(commands.Cog, name = "Events"):
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
+		cooldown.manage_cooldowns.start()
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
@@ -47,7 +49,7 @@ class events(commands.Cog, name = "Events"):
 			)
 			embed.set_author(
 				name = str(message.author),
-				icon_url = message.author.avatar_url
+				icon_url = message.author.display_avatar.url
 			)
 			embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
@@ -80,5 +82,5 @@ class events(commands.Cog, name = "Events"):
 
 		# 		await message.channel.send(embed = embed)
 
-def setup(client):
-	client.add_cog(events(client))
+async def setup(client):
+	await client.add_cog(events(client))

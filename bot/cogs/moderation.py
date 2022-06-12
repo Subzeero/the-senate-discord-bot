@@ -59,7 +59,7 @@ class moderation(commands.Cog, name = "Moderation"):
 
 		embed.set_author(
 			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.avatar_url
+			icon_url = ctx.author.display_avatar.url
 		)
 
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
@@ -114,7 +114,7 @@ class moderation(commands.Cog, name = "Moderation"):
 
 		embed.set_author(
 			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.avatar_url
+			icon_url = ctx.author.display_avatar.url
 		)
 
 		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
@@ -132,5 +132,5 @@ class moderation(commands.Cog, name = "Moderation"):
 		for reaction in reactions:
 			await message.add_reaction(reaction)
 
-def setup(client):
-	client.add_cog(moderation(client))
+async def setup(client):
+	await client.add_cog(moderation(client))

@@ -120,6 +120,7 @@ class voice(commands.Cog, name = "Voice"):
 			required_votes = max(math.floor(len(voice_state.channel.members) * (2/3)), 1)
 			current_votes = 0
 			users_voted = []
+			# Note: All the datetime.now() calls in here should be okay since they are given a utc timezone; discord.utils.utcnow() not needed.
 			expiration_datetime = datetime.now(timezone.utc) + timedelta(minutes = 5)
 
 			bot_id = self.client.user.id
@@ -132,7 +133,7 @@ class voice(commands.Cog, name = "Voice"):
 			)
 			embed.set_author(
 				name = f"Votekick for {user.display_name}",
-				icon_url = user.avatar_url
+				icon_url = user.display_avatar.url
 			)
 			embed.set_footer(
 				text = f"Created by {ctx.author.display_name} | Vote ends"
@@ -162,7 +163,7 @@ class voice(commands.Cog, name = "Voice"):
 					embed_dict["color"] = 15158332 # discord.Colour.red()
 					embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 					embed = discord.Embed.from_dict(embed_dict)
-					await vote_message.edit(
+					vote_message = await vote_message.edit(
 						embed = embed
 					)
 					break
@@ -173,7 +174,7 @@ class voice(commands.Cog, name = "Voice"):
 						current_votes += 1
 
 						if current_votes == required_votes:
-							await user.edit(
+							user = await user.edit(
 								voice_channel = None,
 								reason = "User was votekicked."
 							)
@@ -183,7 +184,7 @@ class voice(commands.Cog, name = "Voice"):
 							embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 							embed_dict["timestamp"] = datetime.isoformat(datetime.now(timezone.utc))
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 							break
@@ -191,7 +192,7 @@ class voice(commands.Cog, name = "Voice"):
 						else:
 							embed_dict["description"] = f"React with ☑️ to votekick {user.mention} out of {vc_mention}.\n`{current_votes}/{required_votes}` required votes."
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 
@@ -228,7 +229,7 @@ class voice(commands.Cog, name = "Voice"):
 			)
 			embed.set_author(
 				name = f"{duration} Minute Voice Mute for {user.display_name}",
-				icon_url = user.avatar_url
+				icon_url = user.display_avatar.url
 			)
 			embed.set_footer(
 				text = f"Created by {ctx.author.display_name} | Vote ends"
@@ -258,7 +259,7 @@ class voice(commands.Cog, name = "Voice"):
 					embed_dict["color"] = 15158332 # discord.Colour.red()
 					embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 					embed = discord.Embed.from_dict(embed_dict)
-					await vote_message.edit(
+					vote_message = await vote_message.edit(
 						embed = embed
 					)
 					break
@@ -269,7 +270,7 @@ class voice(commands.Cog, name = "Voice"):
 						current_votes += 1
 
 						if current_votes == required_votes:
-							await user.edit(
+							user = await user.edit(
 								mute = True,
 								reason = "User was votemuted."
 							)
@@ -280,7 +281,7 @@ class voice(commands.Cog, name = "Voice"):
 							embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 							embed_dict["timestamp"] = datetime.isoformat(datetime.now(timezone.utc))
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 							break
@@ -288,7 +289,7 @@ class voice(commands.Cog, name = "Voice"):
 						else:
 							embed_dict["description"] = f"React with ☑️ to vote to mute {user.mention} in {vc_mention} for {duration} minutes.\n`{current_votes}/{required_votes}` required votes."
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 
@@ -322,7 +323,7 @@ class voice(commands.Cog, name = "Voice"):
 			)
 			embed.set_author(
 				name = f"Voice Unmute for {user.display_name}",
-				icon_url = user.avatar_url
+				icon_url = user.display_avatar.url
 			)
 			embed.set_footer(
 				text = f"Created by {ctx.author.display_name} | Vote ends"
@@ -352,7 +353,7 @@ class voice(commands.Cog, name = "Voice"):
 					embed_dict["color"] = 15158332 # discord.Colour.red()
 					embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 					embed = discord.Embed.from_dict(embed_dict)
-					await vote_message.edit(
+					vote_message = await vote_message.edit(
 						embed = embed
 					)
 					break
@@ -363,7 +364,7 @@ class voice(commands.Cog, name = "Voice"):
 						current_votes += 1
 
 						if current_votes == required_votes:
-							await user.edit(
+							user = await user.edit(
 								mute = False,
 								reason = "User was unmute voted."
 							)
@@ -376,7 +377,7 @@ class voice(commands.Cog, name = "Voice"):
 							embed_dict["footer"]["text"] = f"Created by {ctx.author.display_name} | Vote ended"
 							embed_dict["timestamp"] = datetime.isoformat(datetime.now(timezone.utc))
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 							break
@@ -384,9 +385,9 @@ class voice(commands.Cog, name = "Voice"):
 						else:
 							embed_dict["description"] = f"React with ☑️ to vote to unmute {user.mention} in {vc_mention}.\n`{current_votes}/{required_votes}` required votes."
 							embed = discord.Embed.from_dict(embed_dict)
-							await vote_message.edit(
+							vote_message = await vote_message.edit(
 								embed = embed
 							)
 
-def setup(client):
-	client.add_cog(voice(client))
+async def setup(client):
+	await client.add_cog(voice(client))

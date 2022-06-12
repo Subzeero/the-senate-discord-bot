@@ -19,8 +19,8 @@ class users(commands.Cog, name = "Users"):
 			colour = member.colour
 		)
 
-		embed.set_author(name = f"{member.display_name}'s Avatar", icon_url = member.avatar_url)
-		embed.set_image(url = member.avatar_url)
+		embed.set_author(name = f"{member.display_name}'s Avatar", icon_url = member.display_avatar.url)
+		embed.set_image(url = member.display_avatar.url)
 
 		await ctx.send(embed = embed)
 
@@ -41,7 +41,7 @@ class users(commands.Cog, name = "Users"):
 		)
 
 		embed.set_author(
-			icon_url = member.avatar_url,
+			icon_url = member.display_avatar.url,
 			name = f"{str(member)}'s Permissions"
 		)
 
@@ -73,7 +73,7 @@ class users(commands.Cog, name = "Users"):
 		)
 
 		embed.set_author(
-			icon_url = member.avatar_url,
+			icon_url = member.display_avatar.url,
 			name = f"{str(member)}'s Roles in {ctx.guild.name}"
 		)
 
@@ -85,5 +85,5 @@ class users(commands.Cog, name = "Users"):
 
 		await ctx.send(embed = embed)
 
-def setup(client):
-	client.add_cog(users(client))
+async def setup(client):
+	await client.add_cog(users(client))

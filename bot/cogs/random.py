@@ -30,7 +30,7 @@ class random(commands.Cog, name = "Random"):
 
 		embed = discord.Embed(title = "Global Statistics", colour = discord.Colour.gold())
 
-		embed.set_author(name = self.client.user.name, icon_url = self.client.user.avatar_url)
+		embed.set_author(name = self.client.user.name, icon_url = self.client.user.display_avatar.url)
 		
 		embed.add_field(name = "Total Servers", value = str(len(self.client.guilds)))
 		embed.add_field(name = "Total Users", value = str(len(self.client.users)))
@@ -48,9 +48,9 @@ class random(commands.Cog, name = "Random"):
 		"""Get some stats about your server."""
 
 		embed = discord.Embed(colour = discord.Colour.gold(), timestamp = ctx.guild.created_at)
-		embed.set_author(name = f"Server Statistics for {ctx.guild.name}", icon_url = ctx.guild.icon_url)
+		embed.set_author(name = f"Server Statistics for {ctx.guild.name}", icon_url = ctx.guild.icon.url)
 
-		embed.add_field(name = "Members", value = str(ctx.guild.member_count))
+		embed.add_field(name = "Members", value = str(ctx.guild.member_count or "⚠️"))
 		embed.add_field(name = "Text Channels", value = str(len(ctx.guild.text_channels)))
 		embed.add_field(name = "Voice Channels", value = str(len(ctx.guild.voice_channels)))
 		embed.add_field(name = "Roles", value = str(len(ctx.guild.roles)))
@@ -80,7 +80,7 @@ class random(commands.Cog, name = "Random"):
 			feature_text = "None"
 
 		embed = discord.Embed(description = feature_text, colour = discord.Colour.gold())
-		embed.set_author(name = f"Server Features of {ctx.guild.name}", icon_url=ctx.guild.icon_url)
+		embed.set_author(name = f"Server Features of {ctx.guild.name}", icon_url=ctx.guild.icon.url)
 
 		await ctx.send(embed = embed)
 
@@ -112,9 +112,9 @@ class random(commands.Cog, name = "Random"):
 	@commands.max_concurrency(3, commands.BucketType.user)
 	async def timer(self, ctx, *, relativeTime: converters.TimeConverter):
 		"""Create a Discord rich-embed to countdown to a relative time. 
-		An ending notification will be sent for timers under six hours."""
+		An ending notification will be sent for timers six hours and under."""
 
-		unix = int(datetime.datetime.now(datetime.timezone.utc).timestamp())
+		unix = int(discord.utils.utcnow().timestamp())
 		target = unix + relativeTime
 		timestamp_relative = f"<t:{target}:R>"
 		timestamp_exact = f"<t:{target}:T>"
@@ -124,5 +124,5 @@ class random(commands.Cog, name = "Random"):
 			await asyncio.sleep(relativeTime)
 			await ctx.message.reply(content = "https://tenor.com/FUGa.gif")
 
-def setup(client):
-	client.add_cog(random(client))
+async def setup(client):
+	await client.add_cog(random(client))
