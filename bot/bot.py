@@ -31,7 +31,7 @@ elif BOT_ENV == "DEV":
 	BOT_PREFIX = os.environ["DISCORD_BOT_PREFIX_DEV"]
 
 # Determine prefix
-def get_prefix(bot, message):
+def get_prefix(bot: commands.Bot, message: discord.Message):
 	if message.guild == None:
 		return commands.when_mentioned_or(BOT_PREFIX)(bot, message)
 
@@ -45,7 +45,7 @@ def get_prefix(bot, message):
 status_data = bot_status.get_status()
 
 # Initialize bot
-client = commands.Bot(
+bot = commands.Bot(
 	command_prefix = get_prefix,
 	intents = discord.Intents.all(),
 	case_insensitive = True,
@@ -57,8 +57,8 @@ client = commands.Bot(
 )
 
 # Global cooldown check
-@client.check
-async def cooldown_check(ctx):
+@bot.check
+async def cooldown_check(ctx: commands.Context):
 	on_cooldown, time = await checks.is_on_global_cooldown().predicate(ctx)
 	if on_cooldown:
 		raise exceptions.UserOnGlobalCooldown()
@@ -66,12 +66,12 @@ async def cooldown_check(ctx):
 		return True
 
 async def run_bot():
-	async with client:
+	async with bot:
 		# Load previous cogs on startup
 		print("Loading Extensions...")
 		for fileName in db.find_one("bot")["loaded_cogs"]:
 			try:
-				await client.load_extension(f"cogs.{fileName}")
+				await bot.load_extension(f"cogs.{fileName}")
 				print(f"Loaded {fileName}.")
 			except Exception as error:
 				print(f"Failed to load {fileName}")
@@ -79,6 +79,6 @@ async def run_bot():
 		
 		# Start the bot
 		print("Starting Bot...")
-		await client.start(BOT_TOKEN)
+		await bot.start(BOT_TOKEN)
 
 asyncio.run(run_bot())
