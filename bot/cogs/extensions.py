@@ -1,92 +1,139 @@
-import discord, os
+import discord, os, time
+from discord import app_commands
 from discord.ext import commands
 from database.db import Database as db
+from utils import checks
 
 class extensions(commands.Cog, name = "Extensions"):
 	"""Manage the bot's extensions."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot) -> None:
+		self.bot = bot
 
-	@commands.command(aliases = ["lo"])
-	@commands.is_owner()
-	async def load(self, ctx, extension):
-		"""Load an extension."""
+		self.ext_dirs = ["cogs", "bot/cogs"]
+		self.loaded_cogs = []
+		self.unloaded_cogs = []
+		self.all_cogs = []
 
-		await self.client.load_extension(f"cogs.{extension}")
+	@app_commands.command()
+	@app_commands.guilds(discord.Object(id=831000735671123988))
+	@app_commands.check(checks.is_owner_slash)
+	@app_commands.describe(cog="The cog to load.")
+	async def load(self, interaction: discord.Integration, cog: str) -> None:
+		"""Load a cog."""
+
+		await self.bot.load_extension(f"cogs.{cog}")
 
 		bot_data = db.find_one("bot")
-		if not extension in bot_data["loaded_cogs"] and extension != "blank_custom":
-			bot_data["loaded_cogs"].append(extension)
+		if not cog in bot_data["loaded_cogs"]:
+			bot_data["loaded_cogs"].append(cog)
 			db.replace_one("bot", data = bot_data)
 
-		await ctx.message.add_reaction("✅")
+		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been loaded.", colour=discord.Color.green()), ephemeral=True)
+
+	@load.autocomplete("cog")
+	async def load_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.unloaded_cogs if current_cog in cog]
+
+	@app_commands.command()
+	@app_commands.guilds(discord.Object(id=831000735671123988))
+	@app_commands.check(checks.is_owner_slash)
+	@app_commands.describe(cog="The cog to unload.")
+	async def unload(self, interaction: discord.Integration, cog: str) -> None:
+		"""Unload a cog."""
+
+		await self.bot.unload_extension(f"cogs.{cog}")
+
+		bot_data = db.find_one("bot")
+		if cog in bot_data["loaded_cogs"]:
+			bot_data["loaded_cogs"].remove(cog)
+			db.replace_one("bot", data = bot_data)
+
+		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been unloaded.", colour=discord.Color.green()), ephemeral=True)
+
+	@unload.autocomplete("cog")
+	async def unload_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog]
+
+	@app_commands.command()
+	@app_commands.guilds(discord.Object(id=831000735671123988))
+	@app_commands.check(checks.is_owner_slash)
+	@app_commands.describe(cog="The cog to reload.")
+	async def reload(self, interaction: discord.Integration, cog: str) -> None:
+		"""Unload a cog."""
+
+		await self.bot.unload_extension(f"cogs.{cog}")
+		await self.bot.load_extension(f"cogs.{cog}")
+
+		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been reloaded.", colour=discord.Color.green()), ephemeral=True)
+	
+	@reload.autocomplete("cog")
+	async def reload_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog]
+
+	@app_commands.command()
+	@app_commands.guilds(discord.Object(id=831000735671123988))
+	@app_commands.check(checks.is_owner_slash)
+	async def listcogs(self, interaction: discord.Interaction) -> None:
+		"""List extension/cog information."""
+
+		# await interaction.response.defer(thinking=True)
 		
-	@commands.command(aliases = ["un"])
-	@commands.is_owner()
-	async def unload(self, ctx, extension):
-		"""Unload an extension."""
+		self.loaded_cogs = []
+		self.unloaded_cogs = []
+		self.all_cogs = []
 
-		await self.client.unload_extension(f"cogs.{extension}")
-
-		bot_data = db.find_one("bot")
-		if extension in bot_data["loaded_cogs"]:
-			bot_data["loaded_cogs"].remove(extension)
-			db.replace_one("bot", data = bot_data)
-
-		await ctx.message.add_reaction("✅")
-
-	@commands.command(aliases = ["re"])
-	@commands.is_owner()
-	async def reload(self, ctx, extension):
-		"""Reload an extension."""
-
-		await self.client.unload_extension(f"cogs.{extension}")
-		await self.client.load_extension(f"cogs.{extension}")
-
-		await ctx.message.add_reaction("✅")
-
-	@commands.command()
-	@commands.is_owner()
-	async def listcogs(self, ctx):
-		"""List cog information."""
-
-		loaded_cogs = []
-		cogs = {}
-		cogs_dirs = ["cogs", "bot/cogs"]
-		cogs_path = ""
-
-		for dir in cogs_dirs:
+		for dir in self.ext_dirs:
 			if os.path.exists(dir):
-				cogs_path = dir
+				ext_path = dir
 				break
 		else:
-			await ctx.send("❌ No `cogs` folder could be located!")
+			await interaction.response.send_message(embed=discord.Embed(description="❌ A `cogs` folder could not be located.", colour=discord.Color.red()), ephemeral=True)
 			return
 
-		for cog in self.client.cogs.values():
-			loaded_cogs.append(cog.__class__.__name__)
+		for cog in self.bot.cogs.values():
+			self.loaded_cogs.append(cog.__class__.__name__)
 
-		for fileName in os.listdir(cogs_path):
-			if fileName.endswith(".py") and fileName != "blank_custom.py":
-				if fileName[:-3] in loaded_cogs:
-					cogs[fileName[:-3]] = "✅ Loaded!"
-				else:
-					cogs[fileName[:-3]] = "❎ Not Loaded!"
+		for file_name in os.listdir(ext_path):
+			if file_name.endswith(".py"):
+				file_name = file_name[:-3]
+				if not file_name in self.loaded_cogs:
+					self.unloaded_cogs.append(file_name)
+		self.all_cogs = self.loaded_cogs.copy()
+		self.all_cogs.extend(self.unloaded_cogs)
+		self.all_cogs.sort()
+		self.loaded_cogs.sort()
+		self.unloaded_cogs.sort()
 
 		embed = discord.Embed(
 			title = 'Extension Information', 
 			description = "The following cogs have been registered:", 
-			colour = discord.Color.gold())
+			colour = discord.Color.gold()
+		)
 
-		for cog_name, cog_info in cogs.items():
+		for cog in self.all_cogs:
 			embed.add_field(
-				name = cog_name, 
-				value = cog_info, 
+				name = cog, 
+				value="✅ Loaded!" if cog in self.loaded_cogs else "⚠️ Not Loaded!",
 				inline = True
 			)
 					
-		await ctx.send(embed = embed)
+		# await interaction.followup.send(embed=embed)
+		await interaction.response.send_message(embed=embed)
 
-async def setup(client):
-	await client.add_cog(extensions(client))
+	@commands.command()
+	@commands.is_owner()
+	async def syncGuild(self, ctx: commands.Context) -> None:
+		"""Sync all slash commands to this guild."""
+		synced = await ctx.bot.tree.sync(guild = ctx.guild)
+		await ctx.reply(embed=discord.Embed(description=f"✅ Successfully synced `{len(synced)}` commands to this guild.", colour=discord.Color.green()))
+
+	@commands.command()
+	@commands.is_owner()
+	async def syncGlobal(self, ctx: commands.Context) -> None:
+		"""Sync all slash commands to all guilds."""
+		synced = await ctx.bot.tree.sync()
+		await ctx.reply(embed=discord.Embed(description=f"✅ Successfully synced `{len(synced)}` commands globally.", colour=discord.Color.green()))
+
+async def setup(bot: commands.Bot) -> None:
+	await bot.add_cog(extensions(bot))

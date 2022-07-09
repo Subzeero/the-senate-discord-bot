@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from database.db import Database as db
 from utils import cooldown
@@ -56,6 +57,9 @@ def is_admin_or_mod():
 				return True
 		return False
 	return commands.check(predicate)
+
+async def is_owner_slash(interaction: discord.Interaction) -> bool:
+	return await interaction.client.is_owner(interaction.user)
 
 def is_on_global_cooldown():
 	async def predicate(ctx):
