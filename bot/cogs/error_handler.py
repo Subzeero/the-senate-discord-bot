@@ -1,12 +1,14 @@
-import traceback
+import discord, traceback
+from discord import app_commands
 from discord.ext import commands
 from utils import cooldown, exceptions
 
 class error_handler(commands.Cog, name = "Error Handler"):
 	"""Global error handler."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot) -> None:
+		self.bot = bot
+		bot.tree.on_error = self.on_app_command_error
 
 	@commands.Cog.listener()
 	async def on_command_error(self, ctx, error):
@@ -19,56 +21,17 @@ class error_handler(commands.Cog, name = "Error Handler"):
 
 		error = getattr(error, "original", error)
 
-		if isinstance(error, commands.DisabledCommand):
-			message = f"❌ {ctx.command} has been disabled!"
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, commands.CommandOnCooldown):
-			message = f"❌ Slow down {ctx.author.mention}, you're running commands too fast!"
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, commands.MaxConcurrencyReached):
-			message = f"❌ This command is already running a maximum of `{error.number}` times right now. Please try again later."
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, commands.CommandNotFound):
-			prefix = ctx.prefix
-			content = ctx.message.content
-			message = f"❌ `{content.replace(prefix, '')}` is not a registered command."
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, commands.NoPrivateMessage):
-			try:
-				message = f"❌ `{ctx.command}` cannot be used in Private Messages."
-				await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-			except:
-				pass
-
-		elif isinstance(error, commands.PrivateMessageOnly):
-			try:
-				message = f"❌ `{ctx.command}` can only be used in Private Messages."
-				await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-			except:
-				pass
-
-		elif isinstance(error, commands.UserInputError):
-			message = f"❌ {error} Type `{ctx.prefix}help {ctx.command}` for more information."
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, exceptions.UserOnGlobalCooldown):
+		if isinstance(error, exceptions.UserOnGlobalCooldown):
 			pass
-
-		elif isinstance(error, commands.CheckFailure):
-			message = "❌ You don't have permission to run this command!"
-			await cooldown.abide_cooldown(ctx.author, ctx, content = message)
-
-		elif isinstance(error, commands.ExtensionError):
-			await ctx.send(f"❌ Extension Error: {error}")
-			traceback.print_exception(type(error), error, error.__traceback__)
-
 		else:
-			await ctx.send(f"❌ An error has occurred: `{type(error)}: {error}`\nhttps://tenor.com/tFAk.gif")
+			embed = discord.Embed(description=f"⚠️ **{type(error).__name__}:** `{error}`", colour=discord.Colour.yellow())
+			await cooldown.abide_cooldown(ctx.author, ctx, embed=embed)
 			traceback.print_exception(type(error), error, error.__traceback__)
 
-async def setup(client):
-	await client.add_cog(error_handler(client))
+	async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
+		error = getattr(error, "original", error)
+		await interaction.response.send_message(embed=discord.Embed(description=f"⚠️ **{type(error).__name__}:** `{error}`", colour=discord.Colour.yellow()), ephemeral=True)
+		traceback.print_exception(type(error), error, error.__traceback__)
+
+async def setup(bot: commands.Bot) -> None:
+	await bot.add_cog(error_handler(bot))
