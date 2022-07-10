@@ -1,20 +1,19 @@
-import discord, os
+import discord
 from discord.ext import commands
 from database.db import Database as db
 from utils import cooldown
 
-suggestionsChannelId = 796553486677311510
-
 class events(commands.Cog, name = "Events"):
 	"""Global event handler. Being phased out."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot):
+		self.bot = bot
 
 	@commands.Cog.listener()
 	async def on_ready(self):
 		print("Bot Running.")
-		cooldown.manage_cooldowns.start()
+		if not cooldown.manage_cooldowns.is_running():
+			cooldown.manage_cooldowns.start()
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
@@ -25,38 +24,38 @@ class events(commands.Cog, name = "Events"):
 		if message.author.bot:
 			return
 
-		if message.content == f"<@!{self.client.user.id}>":
-			prefixes = await self.client.get_prefix(message)
+		if message.content == f"<@!{self.bot.user.id}>":
+			prefixes = await self.bot.get_prefix(message)
 			prefix_str = ""
 
 			if isinstance(prefixes, list):
 				for prefix in prefixes:
-					if not str(self.client.user.id) in prefix:
+					if not str(self.bot.user.id) in prefix:
 						prefix_str = prefix
 			elif isinstance(prefixes, str):
 				prefix_str = prefixes
 
 			embed = discord.Embed(
-				description = f"My prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.client.user.display_name} help`.",
+				description = f"My prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.bot.user.display_name} help`.",
 				colour = discord.Colour.gold()
 			)
 
 			await message.reply(embed = embed)
 
-		if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
-			embed = discord.Embed(
-				description = "🛑 The only messages allowed in this channel are `;suggest <suggestion>` messages! Use #suggestion-discussion instead."
-			)
-			embed.set_author(
-				name = str(message.author),
-				icon_url = message.author.display_avatar.url
-			)
-			embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+		# if message.channel.id == suggestionsChannelId and not message.content.startswith(";suggest "):
+		# 	embed = discord.Embed(
+		# 		description = "🛑 The only messages allowed in this channel are `;suggest <suggestion>` messages! Use #suggestion-discussion instead."
+		# 	)
+		# 	embed.set_author(
+		# 		name = str(message.author),
+		# 		icon_url = message.author.display_avatar.url
+		# 	)
+		# 	embed.set_footer(text = "This message will self-destruct in 10 seconds.")
 
-			await message.delete()
-			await message.channel.send(embed = embed, delete_after = 10)
+		# 	await message.delete()
+		# 	await message.channel.send(embed = embed, delete_after = 10)
 
-		# TEMPORARILY DISABLE THIS. WORKING ON BETTER SOLUTION
+		# TEMPORARILY DISABLE THIS. WORKING ON BETTER SOLUTION THAT ISN'T HARDCODED
 
 		# print("author:", message.author.id, "message:", message.content)
 		# if message.author.id == 397879157029077002:
@@ -82,5 +81,5 @@ class events(commands.Cog, name = "Events"):
 
 		# 		await message.channel.send(embed = embed)
 
-async def setup(client):
-	await client.add_cog(events(client))
+async def setup(bot: commands.Bot):
+	await bot.add_cog(events(bot))
