@@ -24,7 +24,7 @@ class events(commands.Cog, name = "Events"):
 		if message.author.bot:
 			return
 
-		if message.content == f"<@!{self.bot.user.id}>":
+		if message.content.strip() == self.bot.user.mention:
 			prefixes = await self.bot.get_prefix(message)
 			prefix_str = ""
 
@@ -36,7 +36,7 @@ class events(commands.Cog, name = "Events"):
 				prefix_str = prefixes
 
 			embed = discord.Embed(
-				description = f"My prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.bot.user.display_name} help`.",
+				description = f"My **text command** prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.bot.user.display_name} help`.\n*⚠️ Slash Commands are preferred.*",
 				colour = discord.Colour.gold()
 			)
 
