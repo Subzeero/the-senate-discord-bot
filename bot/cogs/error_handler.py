@@ -24,13 +24,17 @@ class error_handler(commands.Cog, name = "Error Handler"):
 		if isinstance(error, exceptions.UserOnGlobalCooldown):
 			pass
 		else:
-			embed = discord.Embed(description=f"⚠️ **{type(error).__name__}:** `{error}`", colour=discord.Colour.yellow())
+			embed = discord.Embed(description=f"❌ **{type(error).__name__}:** `{error}`", colour=discord.Colour.red())
 			await cooldown.abide_cooldown(ctx.author, ctx, embed=embed)
 			traceback.print_exception(type(error), error, error.__traceback__)
 
 	async def on_app_command_error(self, interaction: discord.Interaction, error: app_commands.AppCommandError):
 		error = getattr(error, "original", error)
-		await interaction.response.send_message(embed=discord.Embed(description=f"⚠️ **{type(error).__name__}:** `{error}`", colour=discord.Colour.yellow()), ephemeral=True)
+		embed = discord.Embed(description=f"❌ **{type(error).__name__}:** `{error}`", colour=discord.Colour.red())
+		if not interaction.response.is_done():
+			await interaction.response.send_message(embed=embed, ephemeral=True)
+		else:
+			await interaction.followup.send(embed=embed, ephemeral=True)
 		traceback.print_exception(type(error), error, error.__traceback__)
 
 async def setup(bot: commands.Bot) -> None:
