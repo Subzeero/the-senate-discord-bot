@@ -1,280 +1,86 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 from database.db import Database as db
-from utils import checks, find_object
+from utils import checks, find_object, transformers
 
 class admin(commands.Cog, name = "Admin"):
 	"""Administrator commands."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot):
+		self.bot = bot
 
-	@commands.command(aliases = ["listAdminRoles", "listAdministratorRoles", "listModRoles", "listModeratorRoles", "adminRoles", "modRoles", "controlRoles"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def listControlRoles(self, ctx):
-		"""List the administrator and moderator roles used by the bot."""
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(administrator=True)
+	@app_commands.describe(new_prefix="The new prefix to use (leave blank for default).")
+	@app_commands.rename(new_prefix="prefix")
+	async def changeprefix(self, interaction: discord.Interaction, new_prefix: str = None) -> None:
+		"""Change the bot's prefix for text commands."""
 
-		message = await ctx.send("Working...")
-		
-		guild_data = db.get_guild(ctx.guild.id)
-		admin_str = ""
-		mod_str = ""
-		admin_roles_to_remove = []
-		mod_roles_to_remove = []
+		await interaction.response.defer(thinking=True, ephemeral=True)
 
-		if guild_data["admin_roles"]:
-			for role_id in guild_data["admin_roles"]:
-				role_object = await find_object.find_role(ctx.guild, role_id)
-				if role_object:
-					admin_str = f"{admin_str}\n{role_object.mention}"
-				else:
-					admin_roles_to_remove.append(role_id)
+		guild_data = db.get_guild(interaction.guild.id)
+		guild_data["custom_prefix"] = new_prefix
+		db.set_guild(interaction.guild.id, guild_data)
+
+		embed = discord.Embed(description=f"✅ {'Prefix Changed!' if new_prefix else 'Prefix Reset to Default'}", colour=discord.Colour.green())
+		await interaction.followup.send(embed=embed, ephemeral=True)
+
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(administrator=True)
+	@app_commands.describe(message_type="The type of message to send.", content="The content to send.", channel="The TextChannel to send to.")
+	@app_commands.choices(
+		message_type=[
+			app_commands.Choice(name="message", value=0),
+			app_commands.Choice(name="embed", value=1)
+		]
+	)
+	async def send(self, interaction: discord.Interaction, message_type: app_commands.Choice[int], content: str, channel: app_commands.Transform[discord.TextChannel, transformers.TextChannelTransformer] = None) -> None:
+		"""Send a message or embed from the bot."""
+
+		await interaction.response.defer(thinking=True, ephemeral=True)
+
+		channel = channel if channel else interaction.channel
+		if message_type.value:
+			await channel.send(embed=discord.Embed(description=content, colour=discord.Colour.gold()))
 		else:
-			admin_str = "None!"
+			await channel.send(content)
 
-		if guild_data["mod_roles"]:
-			for role_id in guild_data["mod_roles"]:
-				role_object = await find_object.find_role(ctx.guild, role_id)
-				if role_object:
-					mod_str = f"{mod_str}\n{role_object.mention}"
-				else:
-					mod_roles_to_remove.append(role_id)
+		embed = discord.Embed(description=f"✅ {'Message' if message_type else 'Embed'} sent to {channel.mention}", colour=discord.Colour.green())
+		await interaction.followup.send(embed=embed, ephemeral=True)
+
+	@send.autocomplete("channel")
+	async def send_autocomplete(self, interaction: discord.Interaction, current_channel: str) -> list[app_commands.Choice[str]]:
+		channels = interaction.guild.text_channels
+		return [app_commands.Choice(name=channel.name, value=channel.name) for channel in channels if current_channel in channel.name][:25]
+
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(administrator=True)
+	@app_commands.describe(message="The message to edit (CHNL_ID-MSG_ID, MSG_ID, or link).", message_type="The type of message to send.", content="The content to send.")
+	@app_commands.choices(
+		message_type=[
+			app_commands.Choice(name="message", value=0),
+			app_commands.Choice(name="embed", value=1)
+		]
+	)
+	async def edit(self, interaction: discord.Interaction, message: app_commands.Transform[discord.Message, transformers.MessageTransformer], message_type: app_commands.Choice[int], content: str) -> None:
+		"""Edit a message or embed from the bot."""
+
+		await interaction.response.defer(thinking=True, ephemeral=True)
+
+		if message_type.value:
+			await message.edit(content=None, embed=discord.Embed(description=content, colour=discord.Colour.gold()))
 		else:
-			mod_str = "None!"
+			await message.edit(content=content, embed=None)
 
-		embed = discord.Embed(colour = discord.Colour.gold())
+		embed = discord.Embed(description=f"✅ {'Message' if message_type else 'Embed'} `{message.id}` has been edited.", colour=discord.Colour.green())
+		await interaction.followup.send(embed=embed, ephemeral=True)
 
-		embed.set_author(
-			name = f"Control Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon.url
-		)
-
-		embed.add_field(
-			name = "Administrator Roles",
-			value = admin_str,
-			inline = False
-		)
-
-		embed.add_field(
-			name = "Moderator Roles",
-			value = mod_str,
-			inline = False
-		)
-
-		if admin_roles_to_remove:
-			remove_str = ""
-			for role_id in admin_roles_to_remove:
-				guild_data["admin_roles"].remove(role_id)
-				remove_str = f"{remove_str}\n`{role_id}`"
-			db.set_guild(ctx.guild.id, guild_data)
-
-			embed.add_field(
-				name = "⚠️ Important Notice",
-				value = f"The following role IDs could be not be found in your server (possibly deleted):{remove_str}\nThey have been removed as admin roles.",
-				inline = False
-			)
-
-		if mod_roles_to_remove:
-			remove_str = ""
-			for role_id in mod_roles_to_remove:
-				guild_data["mod_roles"].remove(role_id)
-				remove_str = f"{remove_str}\n`{role_id}`"
-			db.set_guild(ctx.guild.id, guild_data)
-
-			embed.add_field(
-				name = "⚠️ Important Notice",
-				value = f"The following role IDs could be not be found in your server (possibly deleted):{remove_str}\nThey have been removed as mod roles.",
-				inline = False
-			)
-
-		await message.edit(content = None, embed = embed)
-
-	@commands.command(aliases = ["addAdminRole", "newAdminRole", "newAdministratorRole"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def addAdministratorRole(self, ctx, newAdminRole: discord.Role):
-		"""Grant a role access to administrator commands."""
-
-		guild_data = db.get_guild(ctx.guild.id)
-		guild_data["admin_roles"].append(newAdminRole.id)
-
-		db.set_guild(ctx.guild.id, guild_data)
-
-		embed = discord.Embed(
-			description = f"✅ Successfully set {newAdminRole.mention} as an admin role.",
-			colour = discord.Colour.green()
-		)
-		
-		embed.set_author(
-			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.display_avatar.url
-		)
-
-		await ctx.send(embed = embed)
-
-	@commands.command(aliases = ["addModRole"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def addModeratorRole(self, ctx, newModRole: discord.Role):
-		"""Grant a role access to moderator commands."""
-
-		guild_data = db.get_guild(ctx.guild.id)
-		guild_data["mod_roles"].append(newModRole.id)
-
-		db.set_guild(ctx.guild.id, guild_data)
-
-		embed = discord.Embed(
-			description = f"✅ Successfully set {newModRole.mention} as a mod role.",
-			colour = discord.Colour.green()
-		)
-		
-		embed.set_author(
-			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.display_avatar.url
-		)
-
-		await ctx.send(embed = embed)
-
-	@commands.command(aliases = ["removeAdminRole"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def removeAdministratorRole(self, ctx, adminRoleToRemove: discord.Role):
-		"""Remove a role's access to administrator commands."""
-
-		guild_data = db.get_guild(ctx.guild.id)
-		if not adminRoleToRemove.id in guild_data["admin_roles"]:
-			embed = discord.Embed(
-				description = f"❌ {adminRoleToRemove.mention} is not an admin role.",
-				colour = discord.Colour.red()
-			)
-			embed.set_author(
-				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.display_avatar.url
-			)
-
-		else: 
-			guild_data["admin_roles"].remove(adminRoleToRemove.id)
-			db.set_guild(ctx.guild.id, guild_data)
-			embed = discord.Embed(
-				description = f"✅ {adminRoleToRemove.mention} is no longer an admin role.",
-				colour = discord.Colour.green()
-			)
-			embed.set_author(
-				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.display_avatar.url
-			)
-
-		await ctx.send(embed = embed)
-
-	@commands.command(aliases = ["removeModRole"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def removeModeratorRole(self, ctx, modRoleToRemove: discord.Role):
-		"""Remove a role's access to moderator commands."""
-
-		guild_data = db.get_guild(ctx.guild.id)
-		if not modRoleToRemove.id in guild_data["mod_roles"]:
-			embed = discord.Embed(
-				description = f"❌ {modRoleToRemove.mention} is not an mod role.",
-				colour = discord.Colour.red()
-			)
-			embed.set_author(
-				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.display_avatar.url
-			)
-
-		else: 
-			guild_data["mod_roles"].remove(modRoleToRemove.id)
-			db.set_guild(ctx.guild.id, guild_data)
-			embed = discord.Embed(
-				description = f"✅ {modRoleToRemove.mention} is no longer an mod role.",
-				colour = discord.Colour.green()
-			)
-			embed.set_author(
-				name = f"{ctx.author.name}#{ctx.author.discriminator}",
-				icon_url = ctx.author.display_avatar.url
-			)
-
-		await ctx.send(embed = embed)
-
-	@commands.command()
-	@commands.guild_only()
-	@checks.is_admin()
-	async def changePrefix(self, ctx, newPrefix:str = None):
-		"""Change the bot's prefix. Send nothing to reset to the default prefix."""
-		guild_data = db.get_guild(ctx.guild.id)
-		guild_data["custom_prefix"] = newPrefix
-		db.set_guild(ctx.guild.id, guild_data)
-
-		prefixes = await self.client.get_prefix(ctx.message)
-		prefix_str = ""
-
-		if isinstance(prefixes, list):
-			for prefix in prefixes:
-				if not str(self.client.user.id) in prefix:
-					prefix_str = prefix
-		elif isinstance(prefixes, str):
-			prefix_str = prefixes
-
-		embed = discord.Embed(
-			description = f"My prefix in this server is now: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.client.user.display_name} help`.",
-			colour = discord.Colour.green()
-		)
-
-		if newPrefix:
-			embed.set_author(name = "✅ Prefix Reset to Default!")
-		else:
-			embed.set_author(name = "✅ Prefix Changed!")
-
-		await ctx.send(embed = embed)
-
-	@commands.command(aliases = ["say"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def echo(self, ctx, *, content:str):
-		"""Echo a message back from the bot."""
-
-		await ctx.message.delete()
-		await ctx.send(content)
-
-	@commands.command(aliases = ["edit"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def editMessage(self, ctx, message:discord.Message, newContent:str):
-		"""Edit a message from the bot."""
-
-		await ctx.message.delete()
-		await message.edit(content = newContent, embed = None)
-
-	@commands.command(aliases = ["sayembed"])
-	@commands.guild_only()
-	@checks.is_admin()
-	async def echoEmbed(self, ctx, channel:discord.TextChannel, *, content:str):
-		"""Make an announcement."""
-
-		embed = discord.Embed(
-			description = content,
-			colour = discord.Colour.gold()
-		)
-
-		await ctx.message.delete()
-		await channel.send(embed = embed)
-
-	@commands.command()
-	@commands.guild_only()
-	@checks.is_admin()
-	async def editEmbedMessage(self, ctx, message:discord.Message, *, newContent:str):
-		"""Edit a message with an embed."""
-
-		await ctx.message.delete()
-
-		embed = discord.Embed(
-			description = newContent,
-			colour = discord.Colour.gold()
-		)
-
-		await message.edit(content = None, embed = embed)
-
-async def setup(client):
-	await client.add_cog(admin(client))
+async def setup(bot: commands.Bot):
+	await bot.add_cog(admin(bot))
