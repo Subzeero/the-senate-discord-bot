@@ -6,7 +6,8 @@ activityReference = {
 	"streaming": discord.ActivityType.streaming,
 	"listening": discord.ActivityType.listening,
 	"watching": discord.ActivityType.watching,
-	"competing": discord.ActivityType.competing
+	"competing": discord.ActivityType.competing,
+	"none": None
 }
 
 statusReference = {
@@ -39,7 +40,7 @@ async def update_status(client):
 		)
 	else:
 		await client.change_presence(
-				activity = discord.Activity(type = activityReference[bot_data["activity"]], name = bot_data["message"]),
+				activity = None if bot_data["activity"] is None else discord.Activity(type = activityReference[bot_data["activity"]], name = bot_data["message"]),
 				status = statusReference[bot_data["status"]]
 			)
 
