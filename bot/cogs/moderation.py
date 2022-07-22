@@ -1,7 +1,7 @@
-import discord, math
+import discord, math, datetime
+from discord import app_commands
 from discord.ext import commands
-from utils import checks, converters
-from typing import Union
+from utils import transformers
 
 class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
@@ -9,128 +9,152 @@ class moderation(commands.Cog, name = "Moderation"):
 	def __init__(self, client):
 		self.client = client
 	
-	@commands.command(aliases = ["delete"])
-	@commands.guild_only()
-	@commands.cooldown(1, 10, commands.BucketType.guild)
-	@commands.max_concurrency(1, commands.BucketType.guild)
-	@checks.is_admin_or_mod()
-	async def purge(self, ctx, num_of_messages: int, user: discord.User = None):
-		"""Purge a number of messages."""
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(manage_messages=True)
+	@app_commands.describe(
+		amount="The number of messages to purge.",
+		start="The message to begin purging from.",
+		end="The message to stop purging at.",
+		user="Only purge messages from this user."
+	)
+	async def purge(
+		self,
+		interaction: discord.Interaction,
+		amount: app_commands.Range[int, 1, 250] = None,
+		start: app_commands.Transform[discord.Message, transformers.MessageTransformer] = None,
+		end: app_commands.Transform[discord.Message, transformers.MessageTransformer] = None,
+		user: app_commands.Transform[discord.Member, transformers.MemberTransformer] = None
+	) -> None:
+		"""Purge an amount of messages OR all messages between two selected ones."""
 
-		num_purged = 0
-		def purgeCheck(message):
-			nonlocal num_purged
-			if message.id == ctx.message.id:
-				return True
-
-			if message == response:
-				return False
-
-			if num_purged >= num_of_messages:
-				return False
-
-			if user:
-				if message.author.id == user.id:
-					num_purged += 1
-					return True
-				else:
+		await interaction.response.defer(thinking=True)
+		
+		if amount:
+			running_total = 0
+			def purge_check(msg):
+				nonlocal running_total
+				if running_total >= amount:
 					return False
 
-			else:		
-				num_purged += 1
-				return True
+				if user:
+					if msg.author.id == user.id:
+						running_total += 1
+						return True
+					else:
+						return False
 
-		if num_of_messages > 250:
-			await ctx.send("❌ Please don't purge more than 250 messages at once.")
-			return
+				else:
+					running_total += 1
+					return True
+
+			while True:
+				if running_total < amount:
+					await interaction.channel.purge(limit=math.floor(amount * 0.5 + 10), check=purge_check)
+				else:
+					break
+
+			embed = discord.Embed(description=f"✅ Successfully purged `{amount}` messages", colour=discord.Colour.green())
 		
-		response = await ctx.send("Working...")
+		elif start and end:
+			if start.id < end.id:
+				temp = start
+				start = end
+				end = temp
 
-		while True:
-			if num_purged < num_of_messages:
-				await ctx.channel.purge(limit = math.floor(num_of_messages * 0.5 + 10), check = purgeCheck)
-			else:
-				break
+			running_total = 0
+			start_purged = False
+			end_purged = False
+			
+			def purge_check(msg):
+				nonlocal running_total, start_purged, end_purged
+				if msg.id < start.id and msg.id > end.id:
+					if msg.id == start.id:
+						start_purged = True
+					elif msg.id == end.id:
+						end_purged = True
+					running_total += 1
+					return True
 
-		embed = discord.Embed(
-			description = f"✅ Successfully purged `{num_of_messages}` messages.",
-			colour = discord.Colour.green()
-		)
-
-		embed.set_author(
-			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.display_avatar.url
-		)
-
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
+			while not start_purged and not end_purged:
+				await interaction.channel.purge(limit=math.floor(amount * 0.5 + 10), check=purge_check)
+				if running_total > 250:
+					embed = discord.Embed(description="⚠️ Purge Cap Reached: `250` Messages", colour=discord.Colour.yellow())
+					break
 		
-		await response.edit(content = None, embed = embed, delete_after = 10)
+		else:
+			embed = discord.Embed(description="❌ You must provide either `amount` or both `start` and `end`.", colour=discord.Colour.red())
 
-	@commands.command(name = "purgeBetween", aliases = ["deleteBetween"])
-	@commands.guild_only()
-	@commands.cooldown(1, 10, commands.BucketType.guild)
-	@commands.max_concurrency(1, commands.BucketType.guild)
-	@checks.is_admin_or_mod()
-	async def purge_between(self, ctx, message1: discord.Message, message2: discord.Message):
-		"""Purge everything in between two messages."""
+		await interaction.followup.send(embed=embed)
 
-		response = await ctx.send("Working...")
+	@purge.autocomplete("user")
+	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
+	
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(moderate_members=True)
+	@app_commands.describe(
+		user="The user to timeout.",
+		duration="The timeout duration in <s, m, h, d> (default 15m).",
+		reason="The reason for the timeout."
+	)
+	async def mute(
+		self,
+		interaction: discord.Interaction,
+		user: app_commands.Transform[discord.Member, transformers.MemberTransformer],
+		duration: app_commands.Transform[int, transformers.RelativeTimeTransformer] = None,
+		reason: str = None
+	) -> None:
+		"""Give the specified user a time out."""
 
-		if message1.id > message2.id:
-			temp = message1
-			message1 = message2
-			message2 = temp
+		await interaction.response.defer(thinking=True)
 
-		message1_removed = False
-		message2_removed = False
-		num_purged = 0 
-		
-		def purgeCheck(message):
-			nonlocal message1_removed, message2_removed, num_purged
-			if message.id == ctx.message.id:
-				return True
+		timeout_td = datetime.timedelta(seconds=duration if duration else 900)
+		await user.timeout(timeout_td, reason=f"From {interaction.user.display_name}: {reason}." if reason else f"{interaction.user.display_name} provided no reason.")
 
-			if message == response:
-				return False
+		readable_time = ""
+		td_times = str(timeout_td).split(":")
+		if td_times[0] != "0":
+			readable_time += f"{td_times[0]} hours "
+		if td_times[1] != "00":
+			readable_time += f"{int(td_times[1])} minutes, "
+		if td_times[2] != "00":
+			readable_time += f"{int(td_times[2])} seconds, "
+		readable_time = readable_time[:-2]
+		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} is on timeout for `{readable_time}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
-			if message.id >= message1.id and message.id <= message2.id:
-				if message.id == message1.id:
-					message1_removed = True
-				elif message.id == message2.id:
-					message2_removed = True
-				num_purged += 1
-				return True
+	@mute.autocomplete("user")
+	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
 
-		while not message1_removed or not message2_removed:
-			await ctx.channel.purge(limit = 15, check = purgeCheck)
-			if num_purged > 250:
-				await ctx.send(f"⚠️ Message Purging Cap Reached: `{num_purged}` messages")
-				break
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(moderate_members=True)
+	@app_commands.describe(
+		user="The user to remove from a timeout.",
+		reason="The reason for removing the timeout."
+	)
+	async def unmute(
+		self,
+		interaction: discord.Interaction,
+		user: app_commands.Transform[discord.Member, transformers.MemberTransformer],
+		reason: str = None
+	) -> None:
+		"""Remove the specified user from a time out."""
 
-		embed = discord.Embed(
-			description = f"✅ Successfully purged `{num_purged}` messages.",
-			colour = discord.Colour.green()
-		)
+		await interaction.response.defer(thinking=True)
 
-		embed.set_author(
-			name = f"{ctx.author.name}#{ctx.author.discriminator}",
-			icon_url = ctx.author.display_avatar.url
-		)
+		await user.timeout(None, reason=f"From {interaction.user.display_name}: {reason}." if reason else f"{interaction.user.display_name} provided no reason.")
 
-		embed.set_footer(text = "This message will self-destruct in 10 seconds.")
-		
-		await response.edit(content = None, embed = embed, delete_after = 10)
+		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} has been removed from a timeout for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
-	@commands.command()
-	@commands.guild_only()
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	@checks.is_admin_or_mod()
-	async def react(self, ctx, message: discord.Message, *reactions: Union[discord.Emoji, converters.UnicodeEmojiConverter]):
-		"""Add reactions to the specified message."""
-
-		await ctx.message.delete()
-		for reaction in reactions:
-			await message.add_reaction(reaction)
+	@unmute.autocomplete("user")
+	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
 
 async def setup(client):
 	await client.add_cog(moderation(client))

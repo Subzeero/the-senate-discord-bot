@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from database.db import Database as db
-from utils import checks, find_object, transformers
+from utils import transformers
 
 class admin(commands.Cog, name = "Admin"):
 	"""Administrator commands."""
@@ -81,6 +81,40 @@ class admin(commands.Cog, name = "Admin"):
 
 		embed = discord.Embed(description=f"✅ {'Message' if message_type else 'Embed'} `{message.id}` has been edited.", colour=discord.Colour.green())
 		await interaction.followup.send(embed=embed, ephemeral=True)
+
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.default_permissions(administrator=True)
+	@app_commands.describe(
+		message="The message to react to.",
+		reaction1="An emoji to react with.",
+		reaction2="An emoji to react with.",
+		reaction3="An emoji to react with.",
+		reaction4="An emoji to react with.",
+		reaction5="An emoji to react with."
+	)
+	async def react(
+		self,
+		interaction: discord.Interaction,
+		message: app_commands.Transform[discord.Message, transformers.MessageTransformer],
+		reaction1: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer],
+		reaction2: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
+		reaction3: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
+		reaction4: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
+		reaction5: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None
+	) -> None:
+		"""Add reactions to a message."""
+
+		await interaction.response.defer(thinking=True, ephemeral=True)
+
+		reactions = []
+		for reaction in [reaction1, reaction2, reaction3, reaction4, reaction5]:
+			if reaction:
+				await message.add_reaction(reaction)
+				reactions.append(str(reaction))
+
+		await interaction.followup.send(embed=discord.Embed(description=f"✅ Reacted with {', '.join(reactions)}.", colour=discord.Colour.green()), ephemeral=True)
 
 async def setup(bot: commands.Bot):
 	await bot.add_cog(admin(bot))
