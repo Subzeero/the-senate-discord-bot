@@ -1,6 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
+from utils import converters
 
 class MemberTransformer(app_commands.Transformer):
 	@classmethod
@@ -79,3 +80,9 @@ class PartialEmojiTransformer(app_commands.Transformer):
 	async def transform(cls, interaction: discord.Interaction, value: str | int) -> discord.PartialEmoji:
 		ctx = await interaction.client.get_context(interaction)
 		return await commands.PartialEmojiConverter().convert(ctx, value)
+
+class RelativeTimeTransformer(app_commands.Transformer):
+	@classmethod
+	async def transform(cls, interaction: discord.Interaction, value: str) -> int:
+		ctx = await interaction.client.get_context(interaction)
+		return await converters.RelativeTimeConverter().convert(ctx, value)
