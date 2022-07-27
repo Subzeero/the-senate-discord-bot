@@ -31,18 +31,15 @@ elif BOT_ENV == "DEV":
 	BOT_PREFIX = os.environ["DISCORD_BOT_PREFIX_DEV"]
 
 # Determine prefix
-def get_prefix(bot: commands.Bot, message: discord.Message):
+async def get_prefix(bot: commands.Bot, message: discord.Message):
 	if message.guild == None:
 		return commands.when_mentioned_or(BOT_PREFIX)(bot, message)
 
-	custom_prefix = db.get_guild(message.guild.id)["custom_prefix"]
+	custom_prefix = (await db.get_guild(message.guild.id))["custom_prefix"]
 	if custom_prefix is not None:
 		return commands.when_mentioned_or(custom_prefix)(bot, message)
 	else:
 		return commands.when_mentioned_or(BOT_PREFIX)(bot, message)
-
-# Get the bot's status
-status_data = bot_status.get_status()
 
 # Initialize bot
 bot = commands.Bot(
@@ -51,9 +48,7 @@ bot = commands.Bot(
 	case_insensitive = True,
 	help_command = PrettyHelp(
 		color = discord.Color.gold()
-	),
-	activity = status_data["activity"],
-	status = status_data["status"]
+	)
 )
 
 # Global cooldown check
@@ -68,8 +63,9 @@ async def cooldown_check(ctx: commands.Context):
 async def run_bot():
 	async with bot:
 		# Load previous cogs on startup
-		print("Loading Extensions...")
-		for fileName in db.find_one("bot")["loaded_cogs"]:
+		print("Initializing The Senate Discord Bot...\n\nLoading Bot Extensions...")
+		cog_data = (await db.get_bot())["loaded_cogs"]
+		for fileName in cog_data:
 			try:
 				await bot.load_extension(f"cogs.{fileName}")
 				print(f"Loaded {fileName}.")
@@ -78,7 +74,7 @@ async def run_bot():
 				traceback.print_exception(type(error), error, error.__traceback__)
 		
 		# Start the bot
-		print("Starting Bot...")
+		print("\nComplete.\nStarting Bot...")
 		await bot.start(BOT_TOKEN)
 
 asyncio.run(run_bot())

@@ -10,7 +10,7 @@ def is_admin():
 		if not ctx.guild:
 			return False
 
-		guild_data = db.get_guild(ctx.guild.id)
+		guild_data = await db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["admin_roles"]
 
 		permissions = ctx.channel.permissions_for(ctx.author)
@@ -28,7 +28,7 @@ async def is_admin_slash(interaction: discord.Interaction) -> bool:
 	if not interaction.guild:
 		return False
 	
-	guild_data = db.get_guild(interaction.guild.id)
+	guild_data = await db.get_guild(interaction.guild.id)
 	valid_roles = guild_data["admin_roles"]
 
 	permissions = interaction.channel.permissions_for(interaction.user)
@@ -46,7 +46,7 @@ def is_mod():
 		if not ctx.guild:
 			return False
 
-		guild_data = db.get_guild(ctx.guild.id)
+		guild_data = await db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["mod_roles"]
 
 		permissions = ctx.channel.permissions_for(ctx.author)
@@ -64,7 +64,7 @@ async def is_mod_slash(interaction: discord.Interaction) -> bool:
 	if not interaction.guild:
 		return False
 
-	guild_data = db.get_guild(interaction.guild.id)
+	guild_data = await db.get_guild(interaction.guild.id)
 	valid_roles = guild_data["mod_roles"]
 
 	permissions = interaction.channel.permissions_for(interaction.user)
@@ -82,7 +82,7 @@ def is_admin_or_mod():
 		if not ctx.guild:
 			return False
 
-		guild_data = db.get_guild(ctx.guild.id)
+		guild_data = await db.get_guild(ctx.guild.id)
 		valid_roles = guild_data["admin_roles"] + guild_data["mod_roles"]
 
 		permissions = ctx.channel.permissions_for(ctx.author)
@@ -100,7 +100,7 @@ async def is_admin_or_mod_slash(interaction: discord.Interaction) -> bool:
 	if not interaction.guild:
 		return False
 
-	guild_data = db.get_guild(interaction.guild.id)
+	guild_data = await db.get_guild(interaction.guild.id)
 	valid_roles = guild_data["admin_roles"] + guild_data["mod_roles"]
 
 	permissions = interaction.channel.permissions_for(interaction.user)

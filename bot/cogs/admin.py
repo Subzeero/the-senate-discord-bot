@@ -21,9 +21,9 @@ class admin(commands.Cog, name = "Admin"):
 
 		await interaction.response.defer(thinking=True, ephemeral=True)
 
-		guild_data = db.get_guild(interaction.guild.id)
+		guild_data = await db.get_guild(interaction.guild.id)
 		guild_data["custom_prefix"] = new_prefix
-		db.set_guild(interaction.guild.id, guild_data)
+		await db.set_guild(interaction.guild.id, guild_data)
 
 		embed = discord.Embed(description=f"✅ {'Prefix Changed!' if new_prefix else 'Prefix Reset to Default'}", colour=discord.Colour.green())
 		await interaction.followup.send(embed=embed, ephemeral=True)

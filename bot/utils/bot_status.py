@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 from database.db import Database as db
 
 activityReference = {
@@ -17,29 +18,16 @@ statusReference = {
 	"invisible": discord.Status.invisible
 }
 
-def get_status():
-	bot_data = db.find_one("bot", {})
-	if bot_data["maintenance"]:
-		return{
-			"activity": discord.Activity(type = activityReference["playing"], name = "MAINTENANCE"),
-			"status": statusReference["dnd"]
-		}
-	else:
-		return{
-				"activity": discord.Activity(type = activityReference[bot_data["activity"]], name = bot_data["message"]),
-				"status": statusReference[bot_data["status"]]
-			}
-
-async def update_status(client):
-	bot_data = db.find_one("bot", {})
+async def update_status(bot: commands.Bot) -> None:
+	bot_data = await db.get_bot()
 
 	if bot_data["maintenance"]:
-		await client.change_presence(
+		await bot.change_presence(
 			activity = discord.Activity(type = activityReference["playing"], name = "MAINTENANCE"),
 			status = statusReference["dnd"]
 		)
 	else:
-		await client.change_presence(
+		await bot.change_presence(
 				activity = None if bot_data["activity"] is None else discord.Activity(type = activityReference[bot_data["activity"]], name = bot_data["message"]),
 				status = statusReference[bot_data["status"]]
 			)

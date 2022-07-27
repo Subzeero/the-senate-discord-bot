@@ -3,7 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from database.db import Database as db
 from pprint import pformat
-from utils import bot_status, checks
+from utils import bot_status, cooldown, checks
 
 def restart_program() -> None:
 	python = sys.executable
@@ -61,7 +61,7 @@ class owner(commands.Cog, name = "Owner"):
 		await interaction.response.defer(thinking=True, ephemeral=True)
 
 		changes = ""
-		bot_data = db.find_one("bot")
+		bot_data = await db.get_bot()
 
 		if status_type is not None:
 			status_reference = bot_status.get_reference_table("status")
@@ -88,7 +88,7 @@ class owner(commands.Cog, name = "Owner"):
 				changes += "Maintenance Status `Disabled`"
 
 		if changes:
-			db.replace_one("bot", data=bot_data)
+			await db.set_bot(bot_data)
 			await bot_status.update_status(self.bot)
 		else:
 			changes = "*No Changes Recorded*"
@@ -105,10 +105,10 @@ class owner(commands.Cog, name = "Owner"):
 
 		await self.bot.load_extension(f"cogs.{cog}")
 
-		bot_data = db.find_one("bot")
+		bot_data = await db.get_bot()
 		if not cog in bot_data["loaded_cogs"]:
 			bot_data["loaded_cogs"].append(cog)
-			db.replace_one("bot", data = bot_data)
+			await db.set_bot(bot_data)
 
 		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been loaded.", colour=discord.Color.green()), ephemeral=True)
 
@@ -125,10 +125,10 @@ class owner(commands.Cog, name = "Owner"):
 
 		await self.bot.unload_extension(f"cogs.{cog}")
 
-		bot_data = db.find_one("bot")
+		bot_data = await db.get_bot()
 		if cog in bot_data["loaded_cogs"]:
 			bot_data["loaded_cogs"].remove(cog)
-			db.replace_one("bot", data = bot_data)
+			await db.set_bot(bot_data)
 
 		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been unloaded.", colour=discord.Color.green()), ephemeral=True)
 
@@ -215,9 +215,23 @@ class owner(commands.Cog, name = "Owner"):
 	
 	@commands.command()
 	@commands.is_owner()
-	async def getData(self, ctx: commands.Context) -> None:
-		data = db.get_guild(ctx.guild.id)
-		await ctx.send("```py\n{}\n```".format(pformat(data, sort_dicts = False)))
+	async def getBotData(self, ctx: commands.Context) -> None:
+		"""View the raw data saved for the bot."""
+		bot_data = await db.get_bot()
+		bot_data_str = pformat(bot_data, sort_dicts=False)
+		while len(bot_data_str) > 0:
+			await ctx.send("```py\n{}\n```".format(bot_data_str[:1975]))
+			bot_data_str = bot_data_str[1975:]
+	
+	@commands.command()
+	@commands.is_owner()
+	async def getGuildData(self, ctx: commands.Context) -> None:
+		"""View the raw data saved for this guild."""
+		guild_data = await db.get_guild(ctx.guild.id)
+		guild_data_str = pformat(guild_data, sort_dicts=False)
+		while len(guild_data_str) > 0:
+			await ctx.send("```py\n{}\n```".format(guild_data_str[:1975]))
+			guild_data_str = guild_data_str[1975:]
 
 	@commands.command()
 	@commands.is_owner()

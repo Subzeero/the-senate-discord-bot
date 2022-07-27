@@ -6,8 +6,8 @@ from utils import transformers
 class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot):
+		self.client = bot
 	
 	@app_commands.command()
 	@app_commands.guild_only()
@@ -156,5 +156,5 @@ class moderation(commands.Cog, name = "Moderation"):
 	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
 		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
 
-async def setup(client):
-	await client.add_cog(moderation(client))
+async def setup(bot: commands.Bot):
+	await bot.add_cog(moderation(bot))

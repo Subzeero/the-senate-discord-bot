@@ -1,5 +1,8 @@
 from discord.ext import commands
 
+class DatabaseInitializationError(Exception):
+	pass
+
 class MissingPermissions(commands.CheckFailure):
 	pass
 
