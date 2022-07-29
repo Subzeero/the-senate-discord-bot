@@ -30,21 +30,23 @@ class moderation(commands.Cog, name = "Moderation"):
 		"""Purge an amount of messages OR all messages between two selected ones."""
 
 		await interaction.response.defer(thinking=True)
+		original_msg = await interaction.original_message()
 		
 		if amount:
 			running_total = 0
+
 			def purge_check(msg):
 				nonlocal running_total
 				if running_total >= amount:
 					return False
-
+				if msg.id == original_msg.id:
+					return False
 				if user:
 					if msg.author.id == user.id:
 						running_total += 1
 						return True
 					else:
 						return False
-
 				else:
 					running_total += 1
 					return True
@@ -56,6 +58,7 @@ class moderation(commands.Cog, name = "Moderation"):
 					break
 
 			embed = discord.Embed(description=f"✅ Successfully purged `{amount}` messages", colour=discord.Colour.green())
+			embed.set_footer(text="This will self destruct in 5 seconds.")
 		
 		elif start and end:
 			if start.id < end.id:
@@ -69,6 +72,8 @@ class moderation(commands.Cog, name = "Moderation"):
 			
 			def purge_check(msg):
 				nonlocal running_total, start_purged, end_purged
+				if msg.id == original_msg.id:
+					return False
 				if msg.id < start.id and msg.id > end.id:
 					if msg.id == start.id:
 						start_purged = True
@@ -81,12 +86,14 @@ class moderation(commands.Cog, name = "Moderation"):
 				await interaction.channel.purge(limit=math.floor(amount * 0.5 + 10), check=purge_check)
 				if running_total > 250:
 					embed = discord.Embed(description="⚠️ Purge Cap Reached: `250` Messages", colour=discord.Colour.yellow())
+					embed.set_footer(text="This will self destruct in 5 seconds.")
 					break
 		
 		else:
 			embed = discord.Embed(description="❌ You must provide either `amount` or both `start` and `end`.", colour=discord.Colour.red())
 
-		await interaction.followup.send(embed=embed)
+		response = await interaction.followup.send(embed=embed)
+		await response.delete(delay=5)
 
 	@purge.autocomplete("user")
 	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
