@@ -19,6 +19,40 @@ class owner(commands.Cog, name = "Owner"):
 		self.unloaded_cogs = []
 		self.all_cogs = []
 
+	@commands.Cog.listener()
+	async def on_ready(self):
+		print("Bot Running.")
+		if not cooldown.manage_cooldowns.is_running():
+			cooldown.manage_cooldowns.start()
+			await bot_status.update_status(self.bot)
+
+	@commands.Cog.listener()
+	async def on_guild_join(self, guild):
+		await db.set_guild(await db.get_guild(guild.id))
+
+	@commands.Cog.listener()
+	async def on_message(self, message):
+		if message.author.bot:
+			return
+
+		if message.content.strip() == self.bot.user.mention:
+			prefixes = await self.bot.get_prefix(message)
+			prefix_str = ""
+
+			if isinstance(prefixes, list):
+				for prefix in prefixes:
+					if not str(self.bot.user.id) in prefix:
+						prefix_str = prefix
+			elif isinstance(prefixes, str):
+				prefix_str = prefixes
+
+			embed = discord.Embed(
+				description = f"My **text command** prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.bot.user.display_name} help`.\n*⚠️ Slash Commands are preferred.*",
+				colour = discord.Colour.gold()
+			)
+
+			await message.reply(embed = embed)
+
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988))
 	@app_commands.check(checks.is_owner_slash)
