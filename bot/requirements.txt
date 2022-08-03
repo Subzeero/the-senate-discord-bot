@@ -1,5 +1,5 @@
 discord-pretty-help==1.3.4
-discord.py @ git+https://github.com/Rapptz/discord.py@b88bdaf4c0c7562ccacc039886909704c8c1b49f#egg=discord.py[voice]
+discord.py @ git+https://github.com/Rapptz/discord.py@d4cc8d3006bd50392e4422c12046bdfdd4a5a0d2#egg=discord.py[voice]
 emojis==0.6.0
 motor[srv]==3.0.0
 psutil==5.9.1
