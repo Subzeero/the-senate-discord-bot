@@ -12,6 +12,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	@app_commands.command()
 	@app_commands.guild_only()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(1, 10, key=lambda i: (i.guild_id))
 	@app_commands.default_permissions(manage_messages=True)
 	@app_commands.describe(
 		amount="The number of messages to purge.",
@@ -102,6 +103,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	@app_commands.command()
 	@app_commands.guild_only()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(moderate_members=True)
 	@app_commands.describe(
 		user="The user to timeout.",
@@ -134,12 +136,13 @@ class moderation(commands.Cog, name = "Moderation"):
 		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} is on timeout for `{readable_time}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
 	@mute.autocomplete("user")
-	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
+	async def mute_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
 		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
 
 	@app_commands.command()
 	@app_commands.guild_only()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(moderate_members=True)
 	@app_commands.describe(
 		user="The user to remove from a timeout.",
@@ -160,7 +163,7 @@ class moderation(commands.Cog, name = "Moderation"):
 		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} has been removed from a timeout for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
 	@unmute.autocomplete("user")
-	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
+	async def unmute_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
 		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
 
 async def setup(bot: commands.Bot):

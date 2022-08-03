@@ -38,6 +38,7 @@ class random(commands.Cog, name = "Random"):
 
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	async def stats(self, interaction: discord.Interaction) -> None:
 		"""Get some stats about the bot."""
 
@@ -69,6 +70,7 @@ class random(commands.Cog, name = "Random"):
 	@app_commands.command()
 	@app_commands.guild_only()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	async def serverstats(self, interaction: discord.Interaction) -> None:
 		"""Get some stats about your server."""
 
@@ -89,6 +91,7 @@ class random(commands.Cog, name = "Random"):
 	@app_commands.command()
 	@app_commands.guild_only()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	async def serverfeatures(self, interaction: discord.Interaction) -> None:
 		"""Get the special Discord Features of your server."""
 
@@ -130,6 +133,7 @@ class random(commands.Cog, name = "Random"):
 
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe(relative_time="The countdown duration in <s, m, h, d>.", disable_followup="Disable the followup reply when the timer ends.")
 	async def timer(self, interaction: discord.Interaction, relative_time: app_commands.Transform[int, transformers.RelativeTimeTransformer], disable_followup: bool = False) -> None:
 		"""Create a Discord timer embed to countdown to a relative time.
