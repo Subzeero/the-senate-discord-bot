@@ -1,7 +1,7 @@
 import discord, math, datetime
 from discord import app_commands
 from discord.ext import commands
-from utils import transformers
+from utils import converters, transformers
 
 class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
@@ -98,7 +98,7 @@ class moderation(commands.Cog, name = "Moderation"):
 
 	@purge.autocomplete("user")
 	async def purge_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()][:25]
 	
 	@app_commands.command()
 	@app_commands.guild_only()
@@ -123,21 +123,11 @@ class moderation(commands.Cog, name = "Moderation"):
 
 		timeout_td = datetime.timedelta(seconds=duration if duration else 900)
 		await user.timeout(timeout_td, reason=f"From {interaction.user.display_name}: {reason}." if reason else f"{interaction.user.display_name} provided no reason.")
-
-		readable_time = ""
-		td_times = str(timeout_td).split(":")
-		if td_times[0] != "0":
-			readable_time += f"{td_times[0]} hours "
-		if td_times[1] != "00":
-			readable_time += f"{int(td_times[1])} minutes, "
-		if td_times[2] != "00":
-			readable_time += f"{int(td_times[2])} seconds, "
-		readable_time = readable_time[:-2]
-		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} is on timeout for `{readable_time}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
+		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} is on timeout for `{converters.ToReadableTime(timeout_td)}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
 	@mute.autocomplete("user")
 	async def mute_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()][:25]
 
 	@app_commands.command()
 	@app_commands.guild_only()
@@ -164,7 +154,7 @@ class moderation(commands.Cog, name = "Moderation"):
 
 	@unmute.autocomplete("user")
 	async def unmute_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()]
+		return [app_commands.Choice(name=user.display_name, value=user.display_name) for user in interaction.guild.members if current_user.lower() in user.name.lower() or current_user.lower() in user.display_name.lower()][:25]
 
 async def setup(bot: commands.Bot):
 	await bot.add_cog(moderation(bot))
