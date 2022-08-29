@@ -1,6 +1,17 @@
+import datetime, emojis, re
 from discord.ext import commands
 from utils import exceptions
-import emojis, re
+
+def ToReadableTime(td: datetime.timedelta):
+	readable_time = ""
+	td_times = str(td).split(":")
+	if td_times[0] != "0":
+		readable_time += f"{td_times[0]} hours "
+	if td_times[1] != "00":
+		readable_time += f"{int(td_times[1])} minutes, "
+	if td_times[2] != "00":
+		readable_time += f"{int(td_times[2])} seconds, "
+	return readable_time[:-2]
 
 class UnicodeEmojiConverter(commands.Converter):
 	async def convert(self, ctx, argument):
