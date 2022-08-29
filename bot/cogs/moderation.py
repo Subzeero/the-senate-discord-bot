@@ -31,7 +31,7 @@ class moderation(commands.Cog, name = "Moderation"):
 		"""Purge an amount of messages OR all messages between two selected ones."""
 
 		await interaction.response.defer(thinking=True)
-		original_msg = await interaction.original_message()
+		original_msg = await interaction.original_response()
 		
 		if amount:
 			running_total = 0
