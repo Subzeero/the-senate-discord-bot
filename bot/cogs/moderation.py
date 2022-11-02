@@ -58,7 +58,7 @@ class moderation(commands.Cog, name = "Moderation"):
 				else:
 					break
 
-			embed = discord.Embed(description=f"✅ Successfully purged `{amount}` messages", colour=discord.Colour.green())
+			embed = discord.Embed(description=f"✅ Successfully purged `{running_total}` messages", colour=discord.Colour.green())
 			embed.set_footer(text="This will self destruct in 5 seconds.")
 		
 		elif start and end:
@@ -68,14 +68,16 @@ class moderation(commands.Cog, name = "Moderation"):
 				end = temp
 
 			running_total = 0
+			running_m_id = start.id
 			start_purged = False
 			end_purged = False
 			
 			def purge_check(msg):
-				nonlocal running_total, start_purged, end_purged
+				nonlocal running_total, start_purged, end_purged, running_m_id
+				running_m_id = msg.id
 				if msg.id == original_msg.id:
 					return False
-				if msg.id < start.id and msg.id > end.id:
+				if msg.id <= start.id and msg.id >= end.id:
 					if msg.id == start.id:
 						start_purged = True
 					elif msg.id == end.id:
@@ -84,11 +86,20 @@ class moderation(commands.Cog, name = "Moderation"):
 					return True
 
 			while not start_purged and not end_purged:
-				await interaction.channel.purge(limit=math.floor(amount * 0.5 + 10), check=purge_check)
+				if running_m_id < end.id:
+					embed = discord.Embed(description="⚠️ Something weird happened and some messages may have been missed", colour=discord.Colour.yellow())
+					embed.set_footer(text="This will self destruct in 5 seconds.")
+					break
+
+				await interaction.channel.purge(limit=25, check=purge_check)
+
 				if running_total > 250:
 					embed = discord.Embed(description="⚠️ Purge Cap Reached: `250` Messages", colour=discord.Colour.yellow())
 					embed.set_footer(text="This will self destruct in 5 seconds.")
 					break
+
+			embed = discord.Embed(description=f"✅ Successfully purged `{running_total}` messages", colour=discord.Colour.green())
+			embed.set_footer(text="This will self destruct in 5 seconds.")
 		
 		else:
 			embed = discord.Embed(description="❌ You must provide either `amount` or both `start` and `end`.", colour=discord.Colour.red())
@@ -107,7 +118,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	@app_commands.default_permissions(moderate_members=True)
 	@app_commands.describe(
 		user="The user to timeout.",
-		duration="The timeout duration in <s, m, h, d> (default 15m).",
+		duration="The timeout duration in s/m/h/d (default 15m).",
 		reason="The reason for the timeout."
 	)
 	async def mute(
@@ -123,7 +134,7 @@ class moderation(commands.Cog, name = "Moderation"):
 
 		timeout_td = datetime.timedelta(seconds=duration if duration else 900)
 		await user.timeout(timeout_td, reason=f"From {interaction.user.display_name}: {reason}." if reason else f"{interaction.user.display_name} provided no reason.")
-		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} is on timeout for `{converters.ToReadableTime(timeout_td)}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
+		await interaction.followup.send(embed=discord.Embed(description=f"✅ {user.mention} has been put on timeout for `{converters.ToReadableTime(timeout_td)}` for reason `{reason if reason else 'not provided'}`.", colour=discord.Colour.green()))
 
 	@mute.autocomplete("user")
 	async def mute_autocomplete(self, interaction: discord.Interaction, current_user: str) -> list[app_commands.Choice[str]]:
