@@ -6,21 +6,174 @@ from utils import debug, find_object
 
 blockedRoleNames = ["moderator", "dj", "access", "hacker"]
 
+# class ChangeRoleDropdown(discord.ui.Select):
+# 	def __init__(self):
+# 		options = [
+# 			discord.SelectOption(label="Role Name", description="", emoji="📝"),
+# 			discord.SelectOption(label="Role Colour", description="", emoji="🎨")
+# 		]
+
+# 		super().__init__(placeholder="Role Name or Role Colour?", min_values=1, max_values=1, options=options)
+
+class ChangeRoleErrorView(discord.ui.View):
+	def __init__(self):
+		super().__init__(timeout=180)
+
+	async def on_timeout(self) -> None:
+		pass
+	
+	@discord.ui.button(label="Continue", style=discord.ButtonStyle.primary)
+	async def continue_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		self.stop()
+
+		await interaction.response.send_modal(ChangeRolePrompt())
+
+	@discord.ui.button(label="Cancel", style=discord.ButtonStyle.danger)
+	async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		self.stop()
+
+		# self.continue_button.disabled = True
+		# self.cancel_button.disabled = True
+		# await self.message.edit(view=self)
+
+class ChangeRolePrompt(discord.ui.Modal, title="Customize your Role"):
+	def __init__(self, role_choice_type: str):
+		self.role_choice_type = role_choice_type
+		if role_choice_type == "both":
+			self.new_name_value = discord.ui.TextInput(
+				label="Enter your new role name:",
+				required=True
+			)
+			self.new_colour_value = discord.ui.TextInput(
+				label="Enter your new role colour:",
+				required=True
+			)
+
+			self.add_item(self.new_name_value)
+			self.add_item(self.new_colour_value)
+
+		else:
+			self.new_role_value = discord.ui.TextInput(
+				label=f"Enter your new role {role_choice_type}:",
+				required=True
+			)
+			self.add_item(self.new_role_value)
+
+		super().__init__()
+
+	async def on_submit(self, interaction: discord.Interaction) -> None:
+		guild_data = await db.get_guild(interaction.guild.id)
+
+		if self.role_choice_type == "both":
+			colour_input = self.new_colour_value.value.strip()
+			if not colour_input.startswith("#"):
+				colour_input = "#" + colour_input
+			
+			try:
+				ctx = interaction.client.get_context(interaction)
+				colour_value = await commands.ColourConverter().convert(interaction, ctx)
+			except commands.BadColourArgument:
+				pass
+
+			new_role = await interaction.guild.create_role(name=self.new_name_value.value, colour=colour_value, reason="Created by user command.")
+			
+			role_position = 1
+			if guild_data["custom_roles"]["placement_role_id"]:
+				positioning_role = await find_object.find_role(interaction.guild, guild_data["custom_roles"]["placement_role_id"])
+				role_position = positioning_role - 1
+
+			new_role = await new_role.edit(position=role_position, reason="Reorder the new user role.")
+			await interaction.user.add_roles(new_role)
+
+			guild_data["custom_roles"]["user_roles"][str(interaction.user.id)] = new_role.id
+			await db.set_guild(interaction.guild.id, guild_data)
+
+			await interaction.response.send_message(embed=discord.Embed(description=f"✅ Role Created: {new_role.mention}", colour=discord.Colour.green()))
+
+		elif self.role_choice_type == "colour":
+			pass
+
+		elif self.role_choice_type == "name":
+			user_role = await find_object.find_role(interaction.guild, guild_data["custom_roles"]["user_roles"][str(interaction.user.id)])
+			if not user_role:
+				return await interaction.response.send_message(embed=discord.Embed(description="❌ Unable to access your role; try again later.", colour=discord.Colour.red()))
+
+			user_role = await user_role.edit(name=self.new_name_value.value)
+			await interaction.response.send_message(embed=discord.Embed(description=f"✅ Role Updated: {user_role.mention}", colour=discord.Colour.green()))
+
+	# async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+	# 	await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+
+	# 	# Make sure we know what the error actually is
+	# 	traceback.print_tb(error.__traceback__)
+
+class ChangeRoleStartView(discord.ui.View):
+	def __init__():
+		super.__init__(timeout=180)
+
+	async def on_timeout(self) -> None:
+		pass
+
+	@discord.ui.button(label="Continue", style=discord.ButtonStyle.success)
+	async def continue_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		if self.role_choice_type == "both":
+			await interaction.response.send_modal()
+
+class ChangeRoleChoice(discord.ui.Select):
+	def __init__(self):
+		options = [
+			discord.SelectOption(label="Role Name", description="", emoji="📝"),
+			discord.SelectOption(label="Role Colour", description="", emoji="🎨")
+		]
+
+		super().__init__(placeholder="Choose one:", min_values=1, max_values=1, options=options)
+
+	async def callback(self, interaction: discord.Interaction):
+		await interaction.response.send_modal(ChangeRolePrompt(self.values[0]))
+
+
+class ChangeRoleChoiceView(discord.ui.View):
+	def __init__(self):
+		super().__init__()
+		self.add_item(ChangeRoleChoice())
+
 class roles(commands.Cog, name = "Roles"):
 	"""Role-related commands."""
 
 	def __init__(self, client):
 		self.client = client
 
-	def debug_check(ctx):
-		if not ctx.guild:
-			return False
+	def debug_check():
+		async def predicate(ctx: commands.Context):
+			if not ctx.guild:
+				return False
 
-		debug_data = debug.get_debug_data()
-		return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["role_channels"]
+			debug_data = await debug.get_debug_data()
+			return ctx.guild.id in debug_data["testing_guilds"] or ctx.channel.id in debug_data["role_channels"]
+		return commands.check(predicate)
+
+	# @app_commands.command()
+	# @app_commands.guild_only()
+	# @app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	# @app_commands.checks.cooldown(1, 15, key=lambda i: (i.guild_id))
+	# async def changerole(self, interaction: discord.Interaction) -> None:
+	# 	"""Change your role name or colour."""
+
+	# 	guild_data = await db.get_guild(interaction.guild.id)
+	# 	if not str(interaction.user.id) in guild_data["custom_roles"]["user_roles"].keys():
+	# 		# NEW USER
+	# 		pass
+	# 	else:
+	# 		#EXISTING USER
+	# 		role = await find_object.find_role(interaction.guild, guild_data["custom_roles"]["user_roles"][str(interaction.user.id)])
+	# 		if not role:
+	# 			return await interaction.response.send_message(embed=discord.Embed(description="❌ Unable to access your role; try again later.", colour=discord.Colour.red()))
+			
+	# 		embed = discord.Embed(description=f"Your existing role is {role.mention}. Do you want to change its name or colour?", colour=discord.Colour.gold())
+	# 		await interaction.response.send_message(embed=embed,view=ChangeRoleChoiceView())
 
 	@commands.command()
-	@commands.check(debug_check)
+	@debug_check()
 	@commands.max_concurrency(1, commands.BucketType.guild)
 	async def changeRole(self, ctx):
 		"""Change your role name and colour."""
@@ -488,27 +641,10 @@ class roles(commands.Cog, name = "Roles"):
 
 		sorted_roles = sorted(fetched_roles, key=sortPos, reverse=True)
 		role_str = "\n".join([role.mention for role in sorted_roles])
-		roleList = []
-
-		for role in sortedRoles:
-			roleList.append(role.mention)
-		
-		roleStr = "\n".join(roleList)
-
-		embed = discord.Embed(
-			colour = discord.Colour.gold()
-		)
-
-		embed.set_author(
-			name = f"Roles in {ctx.guild.name}",
-			icon_url = ctx.guild.icon.url
-		)
 
 		embed = discord.Embed(colour=discord.Colour.gold())
 		embed.set_author(name=f"Roles in {interaction.guild.name}", icon_url=interaction.guild.icon.url)
 		embed.add_field(name="\uFEFF", value=role_str, inline=False)
-			inline = False
-		)
 
 		await interaction.response.send_message(embed=embed)
 
@@ -523,17 +659,9 @@ class roles(commands.Cog, name = "Roles"):
 
 		embed = discord.Embed(title="Permissions for:", description=role.mention, colour=role.colour)
 		embed.add_field(name="\uFEFF", value=perms, inline=False)
-			description = role.mention,
-			colour = role.colour
-		)
 
 		await interaction.response.send_message(embed=embed)
-			name = "\uFEFF",
-			value = perms,
-			inline = False
-		)
 
-		await ctx.send(embed = embed)
 
 async def setup(client):
 	await client.add_cog(roles(client))

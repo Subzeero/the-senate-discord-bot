@@ -9,7 +9,6 @@ class users(commands.Cog, name = "Users"):
 		self.client = client
 
 	@app_commands.command()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe(user="The user to fetch (blank for yourself).")
 	async def avatar(self, interaction: discord.Interaction, user: discord.User = None) -> None:
@@ -26,7 +25,6 @@ class users(commands.Cog, name = "Users"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe(member="The member to fetch (blank for yourself).")
 	async def user_permissions(self, interaction: discord.Interaction, member: discord.Member = None) -> None:
@@ -44,7 +42,6 @@ class users(commands.Cog, name = "Users"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe()
 	async def user_roles(self, interaction: discord.Interaction, member: discord.Member = None) -> None:

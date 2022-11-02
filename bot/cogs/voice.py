@@ -112,7 +112,6 @@ class voice(commands.Cog, name = "Voice"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe(capacity="The number of members allowed in the voice channel.")
 	async def cap(self, interaction: discord.Interaction, capacity: app_commands.Range[int, 0, 99]) -> None:
@@ -133,7 +132,6 @@ class voice(commands.Cog, name = "Voice"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	async def uncap(self, interaction: discord.Interaction) -> None:
 		"""Remove a capacity limit on your connected voice channel."""
@@ -154,7 +152,6 @@ class voice(commands.Cog, name = "Voice"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(1, 15, key=lambda i: (i.guild_id))
 	@app_commands.describe(user="The user to kick.")
 	async def voicekick(self, interaction: discord.Interaction, user: app_commands.Transform[discord.Member, transformers.MemberTransformer]) -> None:
@@ -196,7 +193,6 @@ class voice(commands.Cog, name = "Voice"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(1, 15, key=lambda i: (i.guild_id))
 	@app_commands.describe(user="The user to mute", duration="The mute duration in s, m, h, d.")
 	async def voicemute(self, interaction: discord.Interaction, user: app_commands.Transform[discord.Member, transformers.MemberTransformer], duration: app_commands.Transform[int, transformers.RelativeTimeTransformer]) -> None:
@@ -244,7 +240,6 @@ class voice(commands.Cog, name = "Voice"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(1, 15, key=lambda i: (i.guild_id))
 	@app_commands.describe(user="The user to unmute.")
 	async def voiceunmute(self, interaction: discord.Interaction, user: app_commands.Transform[discord.Member, transformers.MemberTransformer]) -> None:

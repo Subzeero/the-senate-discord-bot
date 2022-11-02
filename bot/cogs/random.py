@@ -37,7 +37,6 @@ class random(commands.Cog, name = "Random"):
 			await db.set_bot(bot_data)
 
 	@app_commands.command()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	async def stats(self, interaction: discord.Interaction) -> None:
 		"""Get some stats about the bot."""
@@ -57,7 +56,6 @@ class random(commands.Cog, name = "Random"):
 		uptime_minutes = math.floor(uptime % 3600 / 60)
 
 		embed = discord.Embed(title="Global Statistics", colour=discord.Colour.gold())
-		embed.set_thumbnail(url=self.bot.user.display_avatar.url)
 		embed.add_field(name = "Total Servers", value = str(len(self.bot.guilds)))
 		embed.add_field(name = "Total Users", value = str(len(self.bot.users)))
 		embed.add_field(name = "Uptime", value = f"{uptime_days} days, {uptime_hours} hours, {uptime_minutes} minutes")
@@ -72,13 +70,11 @@ class random(commands.Cog, name = "Random"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	async def serverstats(self, interaction: discord.Interaction) -> None:
 		"""Get some stats about your server."""
 
 		embed = discord.Embed(title=f"Server Statistics for {interaction.guild.name}", colour=discord.Colour.gold())
-		embed.set_thumbnail(url=interaction.guild.icon.url)
 		embed.add_field(name = "Members", value = str(interaction.guild.member_count or "⚠️"))
 		embed.add_field(name = "Text Channels", value = str(len(interaction.guild.text_channels)))
 		embed.add_field(name = "Voice Channels", value = str(len(interaction.guild.voice_channels)))
@@ -96,7 +92,6 @@ class random(commands.Cog, name = "Random"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	async def serverfeatures(self, interaction: discord.Interaction) -> None:
 		"""Get the special Discord Features of your server."""
@@ -139,7 +134,6 @@ class random(commands.Cog, name = "Random"):
 		await ctx.send("https://tenor.com/xU6p.gif")
 
 	@app_commands.command()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.describe(relative_time="The countdown duration in s/m/h/d.", disable_followup="Disable the followup reply when the timer ends.")
 	async def timer(self, interaction: discord.Interaction, relative_time: app_commands.Transform[int, transformers.RelativeTimeTransformer], disable_followup: bool = False) -> None:

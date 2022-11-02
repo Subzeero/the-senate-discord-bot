@@ -11,7 +11,6 @@ class moderation(commands.Cog, name = "Moderation"):
 	
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(1, 10, key=lambda i: (i.guild_id))
 	@app_commands.default_permissions(manage_messages=True)
 	@app_commands.describe(
@@ -113,7 +112,6 @@ class moderation(commands.Cog, name = "Moderation"):
 	
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(moderate_members=True)
 	@app_commands.describe(
@@ -142,7 +140,6 @@ class moderation(commands.Cog, name = "Moderation"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(moderate_members=True)
 	@app_commands.describe(

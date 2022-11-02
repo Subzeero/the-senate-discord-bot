@@ -12,7 +12,6 @@ class admin(commands.Cog, name = "Admin"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10, key=lambda i: (i.guild_id))
 	@app_commands.default_permissions(administrator=True)
 	@app_commands.describe(new_prefix="The new prefix to use (leave blank for default).")
@@ -31,7 +30,6 @@ class admin(commands.Cog, name = "Admin"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(administrator=True)
 	@app_commands.describe(message_type="The type of message to send.", content="The content to send.", channel="The TextChannel to send to.")
@@ -62,7 +60,6 @@ class admin(commands.Cog, name = "Admin"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(administrator=True)
 	@app_commands.describe(message="The message to edit (CHNL_ID-MSG_ID, MSG_ID, or link).", message_type="The type of message to send.", content="The content to send.")
@@ -87,7 +84,6 @@ class admin(commands.Cog, name = "Admin"):
 
 	@app_commands.command()
 	@app_commands.guild_only()
-	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
 	@app_commands.default_permissions(administrator=True)
 	@app_commands.describe(
