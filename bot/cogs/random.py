@@ -1,4 +1,4 @@
-import aiohttp, asyncio, datetime, discord, math, psutil
+import aiohttp, asyncio, discord, math, psutil
 from discord import app_commands
 from discord.ext import commands, tasks
 from database.db import Database as db
@@ -65,6 +65,9 @@ class random(commands.Cog, name = "Random"):
 		embed.add_field(name = "Memory Usage", value = "{:0.2f}GB / {:0.2f}GB".format(memory_total_GB - memory_available_GB, memory_total_GB))
 		embed.add_field(name = "Latency", value = f"{latency} ms")
 
+		if interaction.guild.icon:
+			embed.set_thumbnail(url=interaction.guild.icon.url)
+
 		await interaction.followup.send(embed=embed)
 
 	@app_commands.command()
@@ -86,6 +89,9 @@ class random(commands.Cog, name = "Random"):
 		embed.add_field(name = "Owner", value = interaction.guild.owner.mention if interaction.guild.owner else "⚠️")
 		embed.add_field(name = "Guild ID", value = str(interaction.guild.id))
 
+		if interaction.guild.icon:
+			embed.set_thumbnail(url=interaction.guild.icon.url)
+
 		await interaction.response.send_message(embed=embed)
 
 	@app_commands.command()
@@ -103,12 +109,13 @@ class random(commands.Cog, name = "Random"):
 			feature_text = "None!"
 
 		embed = discord.Embed(title=f"Server Features of {interaction.guild.name}", description=feature_text, colour=discord.Colour.gold())
-		embed.set_thumbnail(url=interaction.guild.icon.url)
+		if interaction.guild.icon:
+			embed.set_thumbnail(url=interaction.guild.icon.url)
 
 		await interaction.response.send_message(embed=embed)
 
 	@commands.command()
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.cooldown(2, 10, commands.BucketType.user)
 	async def senate(self, ctx):
 		"""Declare supremacy."""
 
@@ -116,7 +123,7 @@ class random(commands.Cog, name = "Random"):
 		await ctx.send("https://tenor.com/RfTq.gif")
 
 	@commands.command()
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.cooldown(2, 10, commands.BucketType.user)
 	async def doggo(self, ctx):
 		"""Happy doggo."""
 
@@ -124,7 +131,7 @@ class random(commands.Cog, name = "Random"):
 		await ctx.send("https://tenor.com/xFa5.gif")
 
 	@commands.command()
-	@commands.cooldown(1, 5, commands.BucketType.user)
+	@commands.cooldown(2, 10, commands.BucketType.user)
 	async def dab(self, ctx):
 		"""Dab on those haters."""
 
@@ -134,7 +141,7 @@ class random(commands.Cog, name = "Random"):
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
 	@app_commands.checks.cooldown(2, 10)
-	@app_commands.describe(relative_time="The countdown duration in <s, m, h, d>.", disable_followup="Disable the followup reply when the timer ends.")
+	@app_commands.describe(relative_time="The countdown duration in s/m/h/d.", disable_followup="Disable the followup reply when the timer ends.")
 	async def timer(self, interaction: discord.Interaction, relative_time: app_commands.Transform[int, transformers.RelativeTimeTransformer], disable_followup: bool = False) -> None:
 		"""Create a Discord timer embed to countdown to a relative time.
 		A followup notification will sent for timers under 30 days."""
