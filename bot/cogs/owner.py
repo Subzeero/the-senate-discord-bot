@@ -26,6 +26,32 @@ class owner(commands.Cog, name = "Owner"):
 			cooldown.manage_cooldowns.start()
 			await bot_status.update_status(self.bot)
 
+		self.loaded_cogs = []
+		self.unloaded_cogs = []
+		self.all_cogs = []
+
+		for dir in self.ext_dirs:
+			if os.path.exists(dir):
+				ext_path = dir
+				break
+		else:
+			print("WARNING: cogs.owner.on_ready(): A cogs folder could not be located.")
+			return
+
+		for cog in self.bot.cogs.values():
+			self.loaded_cogs.append(cog.__class__.__name__)
+
+		for file_name in os.listdir(ext_path):
+			if file_name.endswith(".py"):
+				file_name = file_name[:-3]
+				if not file_name in self.loaded_cogs:
+					self.unloaded_cogs.append(file_name)
+		self.all_cogs = self.loaded_cogs.copy()
+		self.all_cogs.extend(self.unloaded_cogs)
+		self.all_cogs.sort()
+		self.loaded_cogs.sort()
+		self.unloaded_cogs.sort()
+
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
 		await db.set_guild(await db.get_guild(guild.id))
@@ -36,21 +62,13 @@ class owner(commands.Cog, name = "Owner"):
 			return
 
 		if message.content.strip() == self.bot.user.mention:
-			prefixes = await self.bot.get_prefix(message)
-			prefix_str = ""
+			response = f"Hey {message.author.mention}!\n"
+			response += f"I am a general purpose Discord bot destined to rule over {message.guild.name}.\n\n"
+			response += "You can see my commands by typing `/` (older text commands no longer work)."
 
-			if isinstance(prefixes, list):
-				for prefix in prefixes:
-					if not str(self.bot.user.id) in prefix:
-						prefix_str = prefix
-			elif isinstance(prefixes, str):
-				prefix_str = prefixes
-
-			embed = discord.Embed(
-				description = f"My **text command** prefix in this server is: `{prefix_str}`\nUsage: `{prefix_str}help` or `@{self.bot.user.display_name} help`.\n*⚠️ Slash Commands are preferred.*",
-				colour = discord.Colour.gold()
-			)
-
+			embed = discord.Embed(description = response, colour = discord.Colour.gold())
+			embed.set_image(url="https://media.tenor.com/AF9piIF5myUAAAAC/star-wars-i-am-the-senate.gif")
+			
 			await message.reply(embed = embed)
 
 	@app_commands.command()
@@ -139,16 +157,19 @@ class owner(commands.Cog, name = "Owner"):
 
 		await self.bot.load_extension(f"cogs.{cog}")
 
-		bot_data = await db.get_bot()
-		if not cog in bot_data["loaded_cogs"]:
-			bot_data["loaded_cogs"].append(cog)
+		if not cog in self.loaded_cogs:
+			self.loaded_cogs.append(cog)
+			self.unloaded_cogs.remove(cog)
+
+			bot_data = await db.get_bot()
+			bot_data["loaded_cogs"] = self.loaded_cogs
 			await db.set_bot(bot_data)
 
 		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been loaded.", colour=discord.Color.green()), ephemeral=True)
 
 	@load.autocomplete("cog")
 	async def load_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=cog, value=cog) for cog in self.unloaded_cogs if current_cog in cog]
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.unloaded_cogs if current_cog in cog][:25]
 
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988))
@@ -159,16 +180,19 @@ class owner(commands.Cog, name = "Owner"):
 
 		await self.bot.unload_extension(f"cogs.{cog}")
 
-		bot_data = await db.get_bot()
-		if cog in bot_data["loaded_cogs"]:
-			bot_data["loaded_cogs"].remove(cog)
+		if cog in self.loaded_cogs:
+			self.loaded_cogs.remove(cog)
+			self.unloaded_cogs.append(cog)
+
+			bot_data = await db.get_bot()
+			bot_data["loaded_cogs"] = self.loaded_cogs
 			await db.set_bot(bot_data)
 
 		await interaction.response.send_message(embed=discord.Embed(description=f"✅ `{cog}` has been unloaded.", colour=discord.Color.green()), ephemeral=True)
 
 	@unload.autocomplete("cog")
 	async def unload_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog]
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog][:25]
 
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988))
@@ -184,7 +208,7 @@ class owner(commands.Cog, name = "Owner"):
 	
 	@reload.autocomplete("cog")
 	async def reload_autocomplete(self, interaction: discord.Interaction, current_cog: str) -> list[app_commands.Choice[str]]:
-		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog]
+		return [app_commands.Choice(name=cog, value=cog) for cog in self.loaded_cogs if current_cog in cog][:25]
 
 	@app_commands.command()
 	@app_commands.guilds(discord.Object(id=831000735671123988))
