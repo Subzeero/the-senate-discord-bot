@@ -1,4 +1,5 @@
 import discord
+from discord import app_commands
 from discord.ext import commands
 
 class users(commands.Cog, name = "Users"):
@@ -7,83 +8,63 @@ class users(commands.Cog, name = "Users"):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(aliases = ["profile", "av"])
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def avatar(self, ctx, member: discord.Member = None):
+	@app_commands.command()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
+	@app_commands.describe(user="The user to fetch (blank for yourself).")
+	async def avatar(self, interaction: discord.Interaction, user: discord.User = None) -> None:
 		"""Get a user's avatar image."""
 
-		if not member:
-			member = ctx.author
+		if not user:
+			user = interaction.user
 
-		embed = discord.Embed(
-			colour = member.colour
-		)
+		embed = discord.Embed(colour=discord.Colour.gold())
+		embed.set_author(name = f"{user.display_name}'s Avatar")
+		embed.set_image(url=user.display_avatar.url)
 
-		embed.set_author(name = f"{member.display_name}'s Avatar", icon_url = member.display_avatar.url)
-		embed.set_image(url = member.display_avatar.url)
+		await interaction.response.send_message(embed=embed)
 
-		await ctx.send(embed = embed)
-
-	@commands.command(name = "userPermissions", aliases = ["uperms", "userperms"])
-	@commands.guild_only()
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def user_permissions(self, ctx, member: discord.Member = None):
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
+	@app_commands.describe(member="The member to fetch (blank for yourself).")
+	async def user_permissions(self, interaction: discord.Interaction, member: discord.Member = None) -> None:
 		"""List the permissions of a given user."""
 
 		if not member:
-			member = ctx.author
+			member = interaction.member
 
-		perms = "\n".join(perm for perm, value in member.guild_permissions if value)
+		perms = "/n".join(perm for perm, value in member.guild_permissions if value)
 
-		embed = discord.Embed(
-			description = perms,
-			colour = member.colour
-		)
+		embed = discord.Embed(description=perms, colour=discord.Colour.gold())
+		embed.set_author(icon_url=member.display_avatar.url, name=f"{member.mention}'s Permissions")
+		
+		await interaction.response.send_message(embed=embed)
 
-		embed.set_author(
-			icon_url = member.display_avatar.url,
-			name = f"{str(member)}'s Permissions"
-		)
-
-		await ctx.send(embed = embed)
-
-	@commands.command(name = "userRoles", aliases = ["uroles"])
-	@commands.guild_only()
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def user_roles(self, ctx, member: discord.Member = None):
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.guilds(discord.Object(id=831000735671123988)) ## REMOVE ME
+	@app_commands.checks.cooldown(2, 10)
+	@app_commands.describe()
+	async def user_roles(self, interaction: discord.Interaction, member: discord.Member = None) -> None:
 		"""List the roles of a given user."""
 
 		if not member:
-			member = ctx.author
+			member = interaction.user
 
-		def sortPos(role):
+		def sortPos(role: discord.Role):
 			return role.position
 
-		sortedRoles = sorted(member.roles, key = sortPos, reverse = True)
+		sorted_roles = sorted(member.roles, key=sortPos, reverse=True)
+		sorted_roles = [role.mention for role in sorted_roles]
+		roles_str = "\n".join(sorted_roles)
 
-		roleList = []
+		embed = discord.Embed(colour=discord.Colour.gold())
+		embed.set_author(icon_url=member.display_avatar.url, name=f"{str(member)}'s Roles in {interaction.guild.name}")
+		embed.add_field(name = "\uFEFF", value = roles_str, inline = False)
 
-		for role in sortedRoles:
-			roleList.append(role.mention)
-		
-		roleStr = "\n".join(roleList)
-
-		embed = discord.Embed(
-			colour = discord.Colour.gold()
-		)
-
-		embed.set_author(
-			icon_url = member.display_avatar.url,
-			name = f"{str(member)}'s Roles in {ctx.guild.name}"
-		)
-
-		embed.add_field(
-			name = "\uFEFF",
-			value = roleStr,
-			inline = False
-		)
-
-		await ctx.send(embed = embed)
+		await interaction.response.send_message(embed=embed)
 
 async def setup(client):
 	await client.add_cog(users(client))
