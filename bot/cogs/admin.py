@@ -102,11 +102,11 @@ class admin(commands.Cog, name = "Admin"):
 		self,
 		interaction: discord.Interaction,
 		message: app_commands.Transform[discord.Message, transformers.MessageTransformer],
-		reaction1: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer],
-		reaction2: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
-		reaction3: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
-		reaction4: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None,
-		reaction5: app_commands.Transform[discord.PartialEmoji, transformers.PartialEmojiTransformer] = None
+		reaction1: str,
+		reaction2: str = None,
+		reaction3: str = None,
+		reaction4: str = None,
+		reaction5: str = None
 	) -> None:
 		"""Add reactions to a message."""
 
@@ -115,7 +115,10 @@ class admin(commands.Cog, name = "Admin"):
 		reactions = []
 		for reaction in [reaction1, reaction2, reaction3, reaction4, reaction5]:
 			if reaction:
-				await message.add_reaction(reaction)
+				try:
+					await message.add_reaction(reaction)
+				except:
+					return await interaction.followup.send(embed=discord.Embed(description=f"❌ Failed to react with `{reaction}`.", colour=discord.Colour.red()), ephemeral=True)
 				reactions.append(str(reaction))
 
 		await interaction.followup.send(embed=discord.Embed(description=f"✅ Reacted with {', '.join(reactions)}.", colour=discord.Colour.green()), ephemeral=True)
