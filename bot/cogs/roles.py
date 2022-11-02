@@ -1,4 +1,5 @@
 import discord, asyncio
+from discord import app_commands
 from discord.ext import commands
 from database.db import Database as db
 from utils import debug, find_object
@@ -474,19 +475,19 @@ class roles(commands.Cog, name = "Roles"):
 
 					messages_to_delete.append(await ctx.send(embed = embed))
 
-	@commands.command(aliases = ["roles"])
-	@commands.guild_only()
-	@commands.cooldown(1, 5, commands.BucketType.user)
-	async def listroles(self, ctx):
-		"""List all of the server's roles."""
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.checks.cooldown(1, 10)
+	async def roles(self, interaction: discord.Interaction) -> None:
+		"""List all the roles in the server."""
 
-		fetchedRoles = await ctx.guild.fetch_roles()
+		fetched_roles = await interaction.guild.fetch_roles()
 
-		def sortPos(role):
+		def sortPos(role: discord.Role) -> int:
 			return role.position
 
-		sortedRoles = sorted(fetchedRoles, key = sortPos, reverse = True)
-
+		sorted_roles = sorted(fetched_roles, key=sortPos, reverse=True)
+		role_str = "\n".join([role.mention for role in sorted_roles])
 		roleList = []
 
 		for role in sortedRoles:
@@ -503,29 +504,30 @@ class roles(commands.Cog, name = "Roles"):
 			icon_url = ctx.guild.icon.url
 		)
 
-		embed.add_field(
-			name = "\uFEFF",
-			value = roleStr,
+		embed = discord.Embed(colour=discord.Colour.gold())
+		embed.set_author(name=f"Roles in {interaction.guild.name}", icon_url=interaction.guild.icon.url)
+		embed.add_field(name="\uFEFF", value=role_str, inline=False)
 			inline = False
 		)
 
-		await ctx.send(embed = embed)
-		
-	@commands.command(name = "rolePermissions", aliases = ["rperms", "roleperms"])
-	@commands.guild_only()
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def role_permissions(self, ctx, role: discord.Role):
-		"""List the permissions of a given role."""
+		await interaction.response.send_message(embed=embed)
+
+	@app_commands.command()
+	@app_commands.guild_only()
+	@app_commands.checks.cooldown(2, 10)
+	@app_commands.describe(role="A role to list the permissions of.")
+	async def rolepermissions(self, interaction: discord.Interaction, role: discord.Role) -> None:
+		"""List the permissions of a role."""
 
 		perms = "\n".join(perm for perm, value in role.permissions if value)
 
-		embed = discord.Embed(
-			title = "Permissions for:",
+		embed = discord.Embed(title="Permissions for:", description=role.mention, colour=role.colour)
+		embed.add_field(name="\uFEFF", value=perms, inline=False)
 			description = role.mention,
 			colour = role.colour
 		)
 
-		embed.add_field(
+		await interaction.response.send_message(embed=embed)
 			name = "\uFEFF",
 			value = perms,
 			inline = False
