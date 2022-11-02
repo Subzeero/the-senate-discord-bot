@@ -11,7 +11,6 @@ config.load_config()
 import asyncio, discord, os, traceback
 from database.db import Database as db
 from discord.ext import commands
-from pretty_help import PrettyHelp
 from utils import bot_status, checks, exceptions
 
 # Declare Constants
@@ -46,9 +45,7 @@ bot = commands.Bot(
 	command_prefix = get_prefix,
 	intents = discord.Intents.all(),
 	case_insensitive = True,
-	help_command = PrettyHelp(
-		color = discord.Color.gold()
-	)
+	help_command = None
 )
 
 # Global cooldown check
@@ -59,6 +56,19 @@ async def cooldown_check(ctx: commands.Context):
 		raise exceptions.UserOnGlobalCooldown()
 	else:
 		return True
+
+# Help Info Embed
+@bot.command()
+async def help(ctx: commands.Context):
+	"""Basic Help Command."""
+	
+	response = f"Hey {ctx.author.mention}!\n"
+	response += f"I am a general purpose Discord bot destined to rule over {ctx.guild.name}.\n\n"
+	response += "You can see my commands by typing `/` (older text commands no longer work)."
+
+	embed = discord.Embed(description = response, colour = discord.Colour.gold())
+	embed.set_image(url="https://media.tenor.com/AF9piIF5myUAAAAC/star-wars-i-am-the-senate.gif")
+	await ctx.message.reply(embed = embed)
 
 async def run_bot():
 	async with bot:
