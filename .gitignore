@@ -12,5 +12,5 @@ __pycache__/
 *.env
 venv/
 
-# Custom Commands File
-custom.py
+# Custom Command Files
+custom*.py
