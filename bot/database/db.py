@@ -71,7 +71,7 @@ class Database(object):
 			bot_data_version = bot_data["DATA_VERSION"]
 
 			while bot_data_version < LATEST_DATA_VERSION["BOT"]:
-				bot_data = DATABASE_VERSIONS["BOT"][bot_data_version + 1].upgrade(Database, bot_data)
+				bot_data = DATABASE_VERSIONS["BOT"][bot_data_version + 1].upgrade(bot_data)
 				bot_data_version = bot_data["DATA_VERSION"]
 			await Database.set_bot(bot_data)
 
@@ -91,7 +91,7 @@ class Database(object):
 			guild_data_version = guild_data["DATA_VERSION"]
 
 			while guild_data_version < LATEST_DATA_VERSION["GUILD"]:
-				guild_data = DATABASE_VERSIONS["GUILD"][guild_data_version + 1].upgrade(Database, guild_data)
+				guild_data = DATABASE_VERSIONS["GUILD"][guild_data_version + 1].upgrade(guild_data)
 				guild_data_version = guild_data["DATA_VERSION"]
 			await Database.set_guild(guild_id, guild_data)
 
