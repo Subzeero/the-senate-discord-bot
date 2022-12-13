@@ -5,8 +5,8 @@ from discord.ext import commands
 class users(commands.Cog, name = "Users"):
 	"""User-based commands."""
 
-	def __init__(self, client):
-		self.client = client
+	def __init__(self, bot: commands.Bot):
+		self.bot = bot
 
 	@app_commands.command()
 	@app_commands.checks.cooldown(2, 10)
@@ -31,7 +31,7 @@ class users(commands.Cog, name = "Users"):
 		"""List the permissions of a given user."""
 
 		if not member:
-			member = interaction.member
+			member = interaction.user
 
 		perms = "/n".join(perm for perm, value in member.guild_permissions if value)
 
@@ -63,5 +63,5 @@ class users(commands.Cog, name = "Users"):
 
 		await interaction.response.send_message(embed=embed)
 
-async def setup(client):
-	await client.add_cog(users(client))
+async def setup(bot: commands.Bot):
+	await bot.add_cog(users(bot))
