@@ -98,8 +98,8 @@ class random(commands.Cog, name = "Random"):
 
 		feature_list = interaction.guild.features
 		if feature_list:
-			feature_text = "\n- ".join(feature_list)
-			feature_text = feature_text[1:]
+			feature_text = "".join([("- "+feature+"\n") for feature in feature_list])
+			feature_text = feature_text[:-1]
 		else:
 			feature_text = "None!"
 
