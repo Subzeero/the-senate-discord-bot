@@ -9,6 +9,70 @@ def restart_program() -> None:
 	python = sys.executable
 	os.execl(python, python, * sys.argv)
 
+class fileEditorView(discord.ui.View):
+	def __init__(self):
+		super().__init__(timeout=None)
+		self.new_file_content = None
+		self.appending = True
+		self.cancelled = False
+
+	@discord.ui.button(label="Append", style=discord.ButtonStyle.primary)
+	async def append_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		if await checks.is_owner_slash(interaction):
+			modal = fileEditorModal()
+			await interaction.response.send_modal(modal)
+			await modal.wait()
+			self.appending = True
+			self.new_file_content = modal.new_file_content
+			self.stop()
+			self.append_button.disabled = True
+			self.overwrite_button.disabled = True
+			self.cancel_button.disabled = True
+			await self.original_msg.edit(view=self)
+		else:
+			await interaction.response.send_message(embed=(discord.Embed(description="❌ This isn't yours!", colour=discord.Colour.red()).set_image(url="https://media.tenor.com/1YQDHEd7njoAAAAC/nope-no.gif")), ephemeral=True)
+
+	@discord.ui.button(label="Overwrite", style=discord.ButtonStyle.danger)
+	async def overwrite_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		if await checks.is_owner_slash(interaction):
+			modal = fileEditorModal()
+			await interaction.response.send_modal(modal)
+			await modal.wait()
+			self.appending = False
+			self.new_file_content = modal.new_file_content
+			self.stop()
+			self.append_button.disabled = True
+			self.overwrite_button.disabled = True
+			self.cancel_button.disabled = True
+			await self.original_msg.edit(view=self)
+		else:
+			await interaction.response.send_message(embed=(discord.Embed(description="❌ This isn't yours!", colour=discord.Colour.red()).set_image(url="https://media.tenor.com/1YQDHEd7njoAAAAC/nope-no.gif")), ephemeral=True)
+
+	@discord.ui.button(label="Cancel", style=discord.ButtonStyle.secondary)
+	async def cancel_button(self, interaction: discord.Interaction, button: discord.ui.Button) -> None:
+		if await checks.is_owner_slash(interaction):
+			self.cancelled = True
+			self.stop()
+			self.append_button.disabled = True
+			self.overwrite_button.disabled = True
+			self.cancel_button.disabled = True
+			await interaction.response.edit_message(view=self)
+		else:
+			await interaction.response.send_message(embed=(discord.Embed(description="❌ This isn't yours!", colour=discord.Colour.red()).set_image(url="https://media.tenor.com/1YQDHEd7njoAAAAC/nope-no.gif")), ephemeral=True)
+
+class fileEditorModal(discord.ui.Modal, title="File Editor"):
+	editor = discord.ui.TextInput(
+		label="File Content:",
+		style=discord.TextStyle.long,
+		placeholder="Enter the file's contents...",
+		required=True
+	)
+
+	async def on_submit(self, interaction: discord.Interaction) -> None:
+		self.new_file_content = self.editor.value
+		self.stop()
+		await interaction.response.edit_message(view=self)
+
 class owner(commands.Cog, name = "Owner"):
 	"""Owner commands."""
 
@@ -290,6 +354,51 @@ class owner(commands.Cog, name = "Owner"):
 		while len(guild_data_str) > 0:
 			await ctx.send("```py\n{}\n```".format(guild_data_str[:1975]))
 			guild_data_str = guild_data_str[1975:]
+
+	@commands.command()
+	@commands.is_owner()
+	async def getFiles(self, ctx: commands.Context, path: str = ".") -> None:
+		"""View the bot files."""
+		files = ""
+		for file in os.listdir(path):
+			if os.path.isdir(os.path.join(path, file)):
+				files += file + os.path.sep + "\n"
+			else:
+				files += file + "\n"
+		files = files[:-1]
+		await ctx.send("```{}```".format(files))
+
+	@commands.command()
+	@commands.is_owner()
+	async def viewFile(self, ctx: commands.Context, path: str) -> None:
+		"""View the content of a file."""
+		await ctx.send(file=discord.File(path))
+
+	@commands.command()
+	@commands.is_owner()
+	async def editFile(self, ctx: commands.Context, path: str) -> None:
+		"""Edit the content of a file."""
+		try:
+			if not os.path.isfile(path):
+				raise FileNotFoundError
+
+			view = fileEditorView()
+			msg = await ctx.send(content=f"Edit `{path}`:", view=view)
+			view.original_msg = msg
+			await view.wait()
+
+			if not view.cancelled:
+				if view.appending:
+					mode = "a"
+				else:
+					mode = "w"
+				
+				with open(path, mode) as file:
+					file.write(view.new_file_content)
+				await ctx.send(embed=discord.Embed(description=f"✅ File `{path}` updated.", colour=discord.Colour.green()))
+
+		except:
+			await ctx.send(embed=discord.Embed(description=f"❌ Invalid file `{path}`.", colour=discord.Colour.gold()))
 
 	@commands.command()
 	@commands.is_owner()
