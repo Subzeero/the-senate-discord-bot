@@ -7,7 +7,7 @@ class moderation(commands.Cog, name = "Moderation"):
 	"""Moderation commands."""
 
 	def __init__(self, bot: commands.Bot):
-		self.client = bot
+		self.bot = bot
 	
 	@app_commands.command()
 	@app_commands.guild_only()
@@ -84,7 +84,7 @@ class moderation(commands.Cog, name = "Moderation"):
 					running_total += 1
 					return True
 
-			while not start_purged and not end_purged:
+			while not start_purged or not end_purged:
 				if running_m_id < end.id:
 					embed = discord.Embed(description="⚠️ Something weird happened and some messages may have been missed", colour=discord.Colour.yellow())
 					embed.set_footer(text="This will self destruct in 5 seconds.")
