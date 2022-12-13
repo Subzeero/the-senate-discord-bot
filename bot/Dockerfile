@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-buster
 
 ENV PYTHONUNBUFFERED True
 
-RUN apt update && apt install libffi-dev libnacl-dev python3-dev
+RUN apt update && apt install libffi-dev libnacl-dev python3-dev gcc -y
 
 WORKDIR /bot
 COPY requirements.txt requirements.txt
