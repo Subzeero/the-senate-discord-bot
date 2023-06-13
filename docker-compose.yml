@@ -1,5 +1,5 @@
 version: "3.9"
-services: 
+services:
   bot:
     build: ./bot
     image: the-senate-bot:latest
@@ -7,12 +7,12 @@ services:
     # depends_on: 
     #   - db
     env_file: ./config.env
-    logging: 
+    logging:
       driver: "json-file"
-      options: 
+      options:
         max-size: "100k"
         max-file: "10"
-    networks: 
+    networks:
       - backend
     restart: unless-stopped
 
@@ -33,7 +33,7 @@ services:
 #     volumes: 
 #       - db_data:/data/db
 
-networks: 
+networks:
   backend:
     driver: bridge
     name: the-senate-backend
